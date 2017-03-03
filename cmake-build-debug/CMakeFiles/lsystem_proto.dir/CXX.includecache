@@ -1,0 +1,26 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/karinemiras/CLionProjects/lsystem-proto/main.cpp
+iostream
+-
+cstdio
+-
+cstdlib
+-
+string
+-
+sstream
+-
+iostream
+-
+vector
+-
+map
+-
+
