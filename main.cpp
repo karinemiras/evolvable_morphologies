@@ -114,9 +114,9 @@ int main()
 
     map< string, genetic_string >  grammar;
     grammar[ "B1" ] = gs_letter1;
-    grammar[ "B4" ] = gs_letter2;
+    grammar[ "B2" ] = gs_letter2;
 
-    for(int i=0;i<3;i++) {
+    for(int i=0;i<10;i++) {
         gen.gs.replaces(grammar);
         cout << "string iterastion " << i << endl;
         gen.gs.display_list();
