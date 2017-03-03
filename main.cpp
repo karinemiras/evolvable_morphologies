@@ -17,6 +17,56 @@
 using namespace std;
 
 
+/*
+ * Alphabet containing the letters and the commands com the l-system.
+ */
+class LSYSTEM{
+
+public:
+    vector<string> commands;
+    vector<string> alphabet;
+    void build_commands();
+    void build_alphabet();
+
+};
+
+void LSYSTEM::build_commands(){
+
+    commands.push_back("<");
+    commands.push_back(">");
+    commands.push_back("addl");
+    commands.push_back("addf");
+    commands.push_back("addr");
+}
+
+
+void LSYSTEM::build_alphabet(){
+
+    alphabet.push_back("C");
+    alphabet.push_back("J1");
+    alphabet.push_back("J2");
+    alphabet.push_back("J3");
+    alphabet.push_back("AJ");
+    alphabet.push_back("PJ");
+
+    vector<string> sensors;
+    sensors.push_back("L"); // light sensor
+    sensors.push_back("I"); // infra-red sensor
+    sensors.push_back("N"); // no sensor
+
+    for(int l=0; l<3 ;l++) { // for each type of sensor in the left side
+
+        for(int f=0; f<3 ;f++) {  // for each type of sensor in the front side
+
+            for(int r=0; r<3 ;r++) {  // for each type of sensor in the right side
+                string letter = "B"+sensors[l]+sensors[f]+sensors[r];
+                alphabet.push_back(letter);
+            }
+        }
+
+    }
+
+}
 
 /*
  * Structure representing the itens of the genetic-string for each genome.
@@ -57,7 +107,7 @@ public:
     map< string, genetic_string >  grammar;
 
     genetic_string build_genetic_string(genetic_string gs, std::vector<string> genetic_string_items);
-    void build_grammar();
+    void build_grammar(LSYSTEM LS);
     genome(std::vector<string> paxiom){
         axiom = paxiom;
     }
@@ -77,50 +127,79 @@ genetic_string genome::build_genetic_string(genetic_string gs, std::vector<strin
     }
 }
 
+// HERE: change this function to a simple random initializer of the grammars
+void genome::build_grammar(LSYSTEM LS){
 
 
-
-int main()
-{
-
-    std::vector<string> axiom;
-    axiom.push_back("B1");
-    axiom.push_back("B2");
-    axiom.push_back("B3");
-    axiom.push_back("B4");
 
     std::vector<string> letter1_items;
     letter1_items.push_back("B1");
     letter1_items.push_back("B5");
 
     std::vector<string> letter2_items;
-    letter2_items.push_back("B2");
     letter2_items.push_back("B6");
+    letter2_items.push_back("B7");
+
+
+
+    genetic_string gs_letter1;
+    gs_letter1 = build_genetic_string(gs_letter1,letter1_items);
+    cout << "letter replacement 1"<<endl;
+    gs_letter1.display_list();
+
+    genetic_string gs_letter2;
+    gs_letter2 = build_genetic_string(gs_letter2,letter2_items);
+    cout << "letter replacement 2"<<endl;
+    gs_letter2.display_list();
+
+    grammar[ "B1" ] = gs_letter1;
+    grammar[ "B2" ] = gs_letter2;
+
+    for(int i=0;i<3;i++) {
+        gs.replaces(grammar);
+        cout << "string iteration " << i << endl;
+        gs.display_list();
+    }
+
+}
+
+
+
+int main()
+{
+
+    /*
+     *  Alphabet and commands
+     *  > : branch out the parent on the parser build-tree
+     *  < : back to parent on the parser build-tree
+     *  addl : add component to the left side of the parent-reference
+     *  addf : add component to the front side of the parent-reference
+     *  addr : add component to the right side of the parent-reference
+     *  C : core component
+     *  J1, J3, J3: 3 different flavors of fixed joint, with angles to be evolved
+     *  AJ : active hinge joint
+     *  PJ: passive hinge joint
+     *  B--- : brick component with possibility of sensors I (infra-red) or L (light) or N (none)
+     *         on the sides --- left/front/right.
+     *         Ex.: BLIN means brick with light sensor on the left, infra-red on the front, and no sensor on the right
+     */
+
+    LSYSTEM LS;
+    LS.build_commands();
+    LS.build_alphabet();
+
+    std::vector<string> axiom;
+    axiom.push_back("C");
+    axiom.push_back("AJ");
+    axiom.push_back("BFIN");
+
 
     genome gen(axiom);
     gen.gs = gen.build_genetic_string(gen.gs, gen.axiom);
     cout << "string original"<<endl;
     gen.gs.display_list();
 
-    genetic_string gs_letter1;
-    gs_letter1 = gen.build_genetic_string(gs_letter1,letter1_items);
-    cout << "letter replacement 1"<<endl;
-    gs_letter1.display_list();
-
-    genetic_string gs_letter2;
-    gs_letter2 = gen.build_genetic_string(gs_letter2,letter2_items);
-    cout << "letter replacement 4"<<endl;
-    gs_letter2.display_list();
-
-    map< string, genetic_string >  grammar;
-    grammar[ "B1" ] = gs_letter1;
-    grammar[ "B2" ] = gs_letter2;
-
-    for(int i=0;i<10;i++) {
-        gen.gs.replaces(grammar);
-        cout << "string iterastion " << i << endl;
-        gen.gs.display_list();
-    }
+    gen.build_grammar(LS);
 
 
     return 0;
@@ -129,7 +208,7 @@ int main()
 
 
 /*
- * Performs replecements in the genetic-string, giving the defined grammar and its production rules.
+ * Performs replacements in the genetic-string, giving the defined grammar and its production rules.
  */
 void genetic_string::replaces(map< string, genetic_string >  grammar)
 {
@@ -245,7 +324,7 @@ void genetic_string::display_list()
     cout<<"The genetic-string List is :"<<endl;
     while (current != NULL)
     {
-        cout<<current->item<<" >-< ";
+        cout<<current->item<<" ";
         current = current->next;
     }
     cout<<endl<<endl;
