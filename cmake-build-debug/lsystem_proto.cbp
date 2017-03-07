@@ -82,6 +82,24 @@
 				</MakeCommands>
 			</Target>
 		</Build>
+		<Unit filename="/Users/karinemiras/CLionProjects/lsystem-proto/GeneticString.cpp">
+			<Option target="lsystem_proto"/>
+		</Unit>
+		<Unit filename="/Users/karinemiras/CLionProjects/lsystem-proto/GeneticString.h">
+			<Option target="lsystem_proto"/>
+		</Unit>
+		<Unit filename="/Users/karinemiras/CLionProjects/lsystem-proto/Genome.cpp">
+			<Option target="lsystem_proto"/>
+		</Unit>
+		<Unit filename="/Users/karinemiras/CLionProjects/lsystem-proto/Genome.h">
+			<Option target="lsystem_proto"/>
+		</Unit>
+		<Unit filename="/Users/karinemiras/CLionProjects/lsystem-proto/LSystem.cpp">
+			<Option target="lsystem_proto"/>
+		</Unit>
+		<Unit filename="/Users/karinemiras/CLionProjects/lsystem-proto/LSystem.h">
+			<Option target="lsystem_proto"/>
+		</Unit>
 		<Unit filename="/Users/karinemiras/CLionProjects/lsystem-proto/main.cpp">
 			<Option target="lsystem_proto"/>
 		</Unit>

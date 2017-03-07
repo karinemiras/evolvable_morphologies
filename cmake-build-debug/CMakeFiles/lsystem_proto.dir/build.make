@@ -81,17 +81,95 @@ CMakeFiles/lsystem_proto.dir/main.cpp.o.provides: CMakeFiles/lsystem_proto.dir/m
 CMakeFiles/lsystem_proto.dir/main.cpp.o.provides.build: CMakeFiles/lsystem_proto.dir/main.cpp.o
 
 
+CMakeFiles/lsystem_proto.dir/LSystem.cpp.o: CMakeFiles/lsystem_proto.dir/flags.make
+CMakeFiles/lsystem_proto.dir/LSystem.cpp.o: ../LSystem.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/karinemiras/CLionProjects/lsystem-proto/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/lsystem_proto.dir/LSystem.cpp.o"
+	/Library/Developer/CommandLineTools/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/lsystem_proto.dir/LSystem.cpp.o -c /Users/karinemiras/CLionProjects/lsystem-proto/LSystem.cpp
+
+CMakeFiles/lsystem_proto.dir/LSystem.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/lsystem_proto.dir/LSystem.cpp.i"
+	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/karinemiras/CLionProjects/lsystem-proto/LSystem.cpp > CMakeFiles/lsystem_proto.dir/LSystem.cpp.i
+
+CMakeFiles/lsystem_proto.dir/LSystem.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/lsystem_proto.dir/LSystem.cpp.s"
+	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/karinemiras/CLionProjects/lsystem-proto/LSystem.cpp -o CMakeFiles/lsystem_proto.dir/LSystem.cpp.s
+
+CMakeFiles/lsystem_proto.dir/LSystem.cpp.o.requires:
+
+.PHONY : CMakeFiles/lsystem_proto.dir/LSystem.cpp.o.requires
+
+CMakeFiles/lsystem_proto.dir/LSystem.cpp.o.provides: CMakeFiles/lsystem_proto.dir/LSystem.cpp.o.requires
+	$(MAKE) -f CMakeFiles/lsystem_proto.dir/build.make CMakeFiles/lsystem_proto.dir/LSystem.cpp.o.provides.build
+.PHONY : CMakeFiles/lsystem_proto.dir/LSystem.cpp.o.provides
+
+CMakeFiles/lsystem_proto.dir/LSystem.cpp.o.provides.build: CMakeFiles/lsystem_proto.dir/LSystem.cpp.o
+
+
+CMakeFiles/lsystem_proto.dir/Genome.cpp.o: CMakeFiles/lsystem_proto.dir/flags.make
+CMakeFiles/lsystem_proto.dir/Genome.cpp.o: ../Genome.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/karinemiras/CLionProjects/lsystem-proto/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/lsystem_proto.dir/Genome.cpp.o"
+	/Library/Developer/CommandLineTools/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/lsystem_proto.dir/Genome.cpp.o -c /Users/karinemiras/CLionProjects/lsystem-proto/Genome.cpp
+
+CMakeFiles/lsystem_proto.dir/Genome.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/lsystem_proto.dir/Genome.cpp.i"
+	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/karinemiras/CLionProjects/lsystem-proto/Genome.cpp > CMakeFiles/lsystem_proto.dir/Genome.cpp.i
+
+CMakeFiles/lsystem_proto.dir/Genome.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/lsystem_proto.dir/Genome.cpp.s"
+	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/karinemiras/CLionProjects/lsystem-proto/Genome.cpp -o CMakeFiles/lsystem_proto.dir/Genome.cpp.s
+
+CMakeFiles/lsystem_proto.dir/Genome.cpp.o.requires:
+
+.PHONY : CMakeFiles/lsystem_proto.dir/Genome.cpp.o.requires
+
+CMakeFiles/lsystem_proto.dir/Genome.cpp.o.provides: CMakeFiles/lsystem_proto.dir/Genome.cpp.o.requires
+	$(MAKE) -f CMakeFiles/lsystem_proto.dir/build.make CMakeFiles/lsystem_proto.dir/Genome.cpp.o.provides.build
+.PHONY : CMakeFiles/lsystem_proto.dir/Genome.cpp.o.provides
+
+CMakeFiles/lsystem_proto.dir/Genome.cpp.o.provides.build: CMakeFiles/lsystem_proto.dir/Genome.cpp.o
+
+
+CMakeFiles/lsystem_proto.dir/GeneticString.cpp.o: CMakeFiles/lsystem_proto.dir/flags.make
+CMakeFiles/lsystem_proto.dir/GeneticString.cpp.o: ../GeneticString.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/karinemiras/CLionProjects/lsystem-proto/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/lsystem_proto.dir/GeneticString.cpp.o"
+	/Library/Developer/CommandLineTools/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/lsystem_proto.dir/GeneticString.cpp.o -c /Users/karinemiras/CLionProjects/lsystem-proto/GeneticString.cpp
+
+CMakeFiles/lsystem_proto.dir/GeneticString.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/lsystem_proto.dir/GeneticString.cpp.i"
+	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/karinemiras/CLionProjects/lsystem-proto/GeneticString.cpp > CMakeFiles/lsystem_proto.dir/GeneticString.cpp.i
+
+CMakeFiles/lsystem_proto.dir/GeneticString.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/lsystem_proto.dir/GeneticString.cpp.s"
+	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/karinemiras/CLionProjects/lsystem-proto/GeneticString.cpp -o CMakeFiles/lsystem_proto.dir/GeneticString.cpp.s
+
+CMakeFiles/lsystem_proto.dir/GeneticString.cpp.o.requires:
+
+.PHONY : CMakeFiles/lsystem_proto.dir/GeneticString.cpp.o.requires
+
+CMakeFiles/lsystem_proto.dir/GeneticString.cpp.o.provides: CMakeFiles/lsystem_proto.dir/GeneticString.cpp.o.requires
+	$(MAKE) -f CMakeFiles/lsystem_proto.dir/build.make CMakeFiles/lsystem_proto.dir/GeneticString.cpp.o.provides.build
+.PHONY : CMakeFiles/lsystem_proto.dir/GeneticString.cpp.o.provides
+
+CMakeFiles/lsystem_proto.dir/GeneticString.cpp.o.provides.build: CMakeFiles/lsystem_proto.dir/GeneticString.cpp.o
+
+
 # Object files for target lsystem_proto
 lsystem_proto_OBJECTS = \
-"CMakeFiles/lsystem_proto.dir/main.cpp.o"
+"CMakeFiles/lsystem_proto.dir/main.cpp.o" \
+"CMakeFiles/lsystem_proto.dir/LSystem.cpp.o" \
+"CMakeFiles/lsystem_proto.dir/Genome.cpp.o" \
+"CMakeFiles/lsystem_proto.dir/GeneticString.cpp.o"
 
 # External object files for target lsystem_proto
 lsystem_proto_EXTERNAL_OBJECTS =
 
 lsystem_proto: CMakeFiles/lsystem_proto.dir/main.cpp.o
+lsystem_proto: CMakeFiles/lsystem_proto.dir/LSystem.cpp.o
+lsystem_proto: CMakeFiles/lsystem_proto.dir/Genome.cpp.o
+lsystem_proto: CMakeFiles/lsystem_proto.dir/GeneticString.cpp.o
 lsystem_proto: CMakeFiles/lsystem_proto.dir/build.make
 lsystem_proto: CMakeFiles/lsystem_proto.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/karinemiras/CLionProjects/lsystem-proto/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable lsystem_proto"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/karinemiras/CLionProjects/lsystem-proto/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX executable lsystem_proto"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/lsystem_proto.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -100,6 +178,9 @@ CMakeFiles/lsystem_proto.dir/build: lsystem_proto
 .PHONY : CMakeFiles/lsystem_proto.dir/build
 
 CMakeFiles/lsystem_proto.dir/requires: CMakeFiles/lsystem_proto.dir/main.cpp.o.requires
+CMakeFiles/lsystem_proto.dir/requires: CMakeFiles/lsystem_proto.dir/LSystem.cpp.o.requires
+CMakeFiles/lsystem_proto.dir/requires: CMakeFiles/lsystem_proto.dir/Genome.cpp.o.requires
+CMakeFiles/lsystem_proto.dir/requires: CMakeFiles/lsystem_proto.dir/GeneticString.cpp.o.requires
 
 .PHONY : CMakeFiles/lsystem_proto.dir/requires
 
