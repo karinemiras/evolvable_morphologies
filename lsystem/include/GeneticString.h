@@ -10,11 +10,14 @@
 #include<string>
 #include <vector>
 
-/*
+
+/**
  * Structure representing the itens of the genetic-string for each genome.
  */
 class GeneticString
 {
+public:
+
     struct node
     {
         std::string item;
@@ -22,21 +25,22 @@ class GeneticString
         struct node *prev;
     };
 
-
-private:
-    // item of the genetic-string (doubly-linked list)
-    node *start = new node;
-
-public:
     void create_list(std::vector<std::string> genetic_string_items);
     void display_list();
-    void count();
+    int count();
     void replaces(std::map< std::string, GeneticString >  grammar);
+    GeneticString::node * getStart();
+
 
     GeneticString()
     {
         start = NULL;
     }
+
+private:
+    // item of the genetic-string (doubly-linked list)
+    node *start = new node;
+
 };
 
 #endif //LSYSTEM_PROTO_GENETICSTRING_H

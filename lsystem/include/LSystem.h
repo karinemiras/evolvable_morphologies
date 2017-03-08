@@ -7,8 +7,9 @@
 
 #include <string>
 #include <vector>
+#include<map>
 
-/*
+/**
  * Alphabet containing the letters and the commands com the l-system.
  */
 class LSystem{
@@ -16,12 +17,12 @@ class LSystem{
 public:
     void build_commands();
     void build_alphabet();
-    std::vector<std::string> getAlphabet();
-    std::vector<std::string> getCommands();
+    std::map< std::string, std::string > getAlphabet();
+
 
 private:
     std::vector<std::string> commands;
-    std::vector<std::string> alphabet;
+    std::map< std::string, std::string > alphabet;
 
 };
 

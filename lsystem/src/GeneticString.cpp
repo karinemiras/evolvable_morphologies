@@ -6,23 +6,8 @@
 
 #include <iostream>
 
-#include "Genome.h"
 
-// builds a piece of genetic-string for a genome with the given items
-GeneticString Genome::build_genetic_string(GeneticString gs, std::vector<std::string> genetic_string_items){
-
-    try {
-        gs.create_list(genetic_string_items);
-        return gs;
-
-    } catch (const std::exception& e) {
-        std::cout <<"ERROR building axiom: " << e.what() << std::endl;
-
-    }
-}
-
-
-/*
+/**
  * Performs replacements in the genetic-string, giving the defined grammar and its production rules.
  */
 void GeneticString::replaces(std::map< std::string, GeneticString >  grammar)
@@ -85,7 +70,7 @@ void GeneticString::replaces(std::map< std::string, GeneticString >  grammar)
     }
 }
 
-/*
+/**
  * Creates a doubly-linked list representing a piece of genetic-string.
  */
 void GeneticString::create_list(std::vector<std::string> genetic_string_items)
@@ -93,12 +78,12 @@ void GeneticString::create_list(std::vector<std::string> genetic_string_items)
 
     if (start == NULL)
     {
-        struct node *current,*inode;
+        node *current,*inode;
 
         // adds each item of the axiom in the list
         for (int i=0; i< genetic_string_items.size();i++) {
 
-            inode = new(struct node);
+            inode = new node;
             inode->item = genetic_string_items[i];
 
             if (i==0)
@@ -124,7 +109,7 @@ void GeneticString::create_list(std::vector<std::string> genetic_string_items)
 }
 
 
-/*
+/**
  * Display elements of the List
  */
 void GeneticString::display_list()
@@ -145,10 +130,10 @@ void GeneticString::display_list()
     std::cout<<std::endl<<std::endl;
 }
 
-/*
+/**
  * Number of elements in the List
  */
-void GeneticString::count()
+int GeneticString::count()
 {
     struct node *current = start;
     int cnt = 0;
@@ -157,6 +142,10 @@ void GeneticString::count()
         current = current->next;
         cnt++;
     }
-    std::cout<<"Number of elements are: "<<cnt<<std::endl;
+    return cnt;
 }
 
+GeneticString::node * GeneticString::getStart(){
+    return this->start;
+
+}

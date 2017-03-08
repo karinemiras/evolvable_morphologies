@@ -16,12 +16,13 @@ void LSystem::build_commands(){
 
 void LSystem::build_alphabet(){
 
-    alphabet.push_back("C");
-    alphabet.push_back("J1");
-    alphabet.push_back("J2");
-    alphabet.push_back("J3");
-    alphabet.push_back("AJ");
-    alphabet.push_back("PJ");
+
+    alphabet["C"]  = "C";
+    alphabet["J1"] = "J1";
+    alphabet["J2"] = "J2";
+    alphabet["J3"] = "J3";
+    alphabet["AJ"] = "AJ";
+    alphabet["PJ"] = "PJ";
 
     std::vector<std::string> sensors;
     sensors.push_back("L"); // light sensor
@@ -34,17 +35,13 @@ void LSystem::build_alphabet(){
 
             for(int r=0; r<3 ;r++) {  // for each type of sensor in the right side
                 std::string letter = "B"+sensors[l]+sensors[f]+sensors[r];
-                alphabet.push_back(letter);
+                alphabet[letter] = letter;
             }
         }
     }
 }
 
 
-std::vector<std::string> LSystem::getAlphabet() {
+std::map< std::string, std::string > LSystem::getAlphabet(){
     return this->alphabet;
-}
-
-std::vector<std::string> LSystem::getCommands() {
-    return this->commands;
-}
+};

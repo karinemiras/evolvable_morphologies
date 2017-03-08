@@ -9,14 +9,14 @@
 #include <string>
 #include <vector>
 
+#include "DecodedGeneticString.h"
 #include "GeneticString.h"
 #include "LSystem.h"
 
-/*
+/**
  *  Genome of an individual.
  */
 class Genome{
-
 
 public:
 
@@ -24,19 +24,25 @@ public:
         axiom = _axiom;
     }
 
+    unsigned int getTo();
     GeneticString build_genetic_string(GeneticString gs, std::vector<std::string> genetic_string_items);
     void build_grammar(LSystem LS);
     GeneticString getGeneticString();
     void setGeneticString(GeneticString _gs);
     std::vector<std::string> getAxiom();
-    std::map< std::string, GeneticString > getGrammar();
     void generate_final_string();
+    void decodeGeneticString(LSystem LS);
+
 
 private:
 
     GeneticString gs;
+    DecodedGeneticString dgs;
     std::vector<std::string> axiom;
     std::map< std::string, GeneticString >  grammar;
+
+
+
 };
 
 #endif //LSYSTEM_PROTO_GENOME_H

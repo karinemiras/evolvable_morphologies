@@ -22,7 +22,7 @@ using namespace std;
 int main()
 {
 
-    /*
+    /**
      *  Alphabet and commands
      *  > : branch out the parent on the parser build-tree
      *  < : back to parent on the parser build-tree
@@ -47,14 +47,20 @@ int main()
 
 
     Genome gen(axiom);
+    // initializes the genetic-string with the axiom
     gen.setGeneticString(gen.build_genetic_string(gen.getGeneticString(), gen.getAxiom()));
 
     cout << "string original"<<endl;
     gen.getGeneticString().display_list();
 
+    // creates genetic-strings for production rules of the grammar
     gen.build_grammar(LS);
 
+    // enhances the genetic-string according to grammar iteratively
     gen.generate_final_string();
+
+    // decodes the final genetic-string into a tree of components
+    gen.decodeGeneticString(LS);
 
 
 
