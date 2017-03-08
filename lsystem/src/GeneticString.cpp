@@ -2,10 +2,11 @@
 // Created by Karine Miras on 07/03/2017.
 //
 
-#include "Genome.h"
 #include "GeneticString.h"
+
 #include <iostream>
 
+#include "Genome.h"
 
 // builds a piece of genetic-string for a genome with the given items
 GeneticString Genome::build_genetic_string(GeneticString gs, std::vector<std::string> genetic_string_items){

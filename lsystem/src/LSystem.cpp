@@ -37,11 +37,7 @@ void LSystem::build_alphabet(){
                 alphabet.push_back(letter);
             }
         }
-
     }
-
-
-
 }
 
 
