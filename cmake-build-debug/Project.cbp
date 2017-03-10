@@ -226,6 +226,7 @@
 			<Option target="lsystem_proto"/>
 		</Unit>
 		<Unit filename="/Users/karinemiras/CLionProjects/lsystem-proto/lsystem/src/DecodedGeneticString.cpp">
+			<Option target="lsystem_proto"/>
 			<Option target="lsystem_static"/>
 		</Unit>
 		<Unit filename="/Users/karinemiras/CLionProjects/lsystem-proto/lsystem/src/GeneticString.cpp">

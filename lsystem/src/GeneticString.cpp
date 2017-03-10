@@ -18,20 +18,19 @@ void GeneticString::replaces(std::map< std::string, GeneticString >  grammar)
         return;
     }
 
-    struct node *current, *previous, *next, *inode, *current_rep;
+    node *current, *previous, *next, *inode, *current_rep;
     current = start;
 
-    // for each item on the genetic string
-    while (current != NULL)
+
+    while (current != NULL) // for each item on the genetic string
     {
 
-        // if this item is part of the grammar and has production rules
-        if (!(grammar.find(current->item) == grammar.end() )){
+
+        if (!(grammar.find(current->item) == grammar.end() )){ // if this item is part of the grammar and has production rules
 
             current_rep = grammar[current->item].start;
 
-            // removes item from the genetic-string list
-            previous = current->prev;
+            previous = current->prev; // removes item from the genetic-string list
             next = current->next;
 
             if (previous != NULL) {
@@ -43,8 +42,7 @@ void GeneticString::replaces(std::map< std::string, GeneticString >  grammar)
                 next->prev = previous;
             }
 
-            // for each item on the production string, adds new items to the list replacing the removed one
-            while(current_rep != NULL) {
+            while(current_rep != NULL) { // for each item on the production string, adds new items to the list replacing the removed one
 
                 inode = new(struct node);
                 inode->item = current_rep->item;
@@ -80,8 +78,7 @@ void GeneticString::create_list(std::vector<std::string> genetic_string_items)
     {
         node *current,*inode;
 
-        // adds each item of the axiom in the list
-        for (int i=0; i< genetic_string_items.size();i++) {
+        for (int i=0; i< genetic_string_items.size();i++) {   // adds each item of the axiom in the list
 
             inode = new node;
             inode->item = genetic_string_items[i];

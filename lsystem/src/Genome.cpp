@@ -53,7 +53,7 @@ void Genome::build_grammar(LSystem LS){
  //   }
 
     std::vector<std::string> letter1_items;
-    letter1_items.push_back("C");
+    letter1_items.push_back("CNNN");
     letter1_items.push_back("addr");
     letter1_items.push_back("BLIN");
 
@@ -67,7 +67,7 @@ void Genome::build_grammar(LSystem LS){
 
     GeneticString gs_letter1;
     gs_letter1 = build_genetic_string(gs_letter1,letter1_items);
-    std::cout << "letter replacement C"<<std::endl;
+    std::cout << "letter replacement CNNN"<<std::endl;
     gs_letter1.display_list();
 
     GeneticString gs_letter2;
@@ -75,7 +75,7 @@ void Genome::build_grammar(LSystem LS){
     std::cout << "letter replacement BLIN"<<std::endl;
     gs_letter2.display_list();
 
-    this->grammar[ "C" ] = gs_letter1;
+    this->grammar[ "CNNN" ] = gs_letter1;
     this->grammar[ "BLIN" ] = gs_letter2;
 
 

@@ -47,6 +47,7 @@ file(GLOB_RECURSE SOURCES
      src/GeneticString.cpp
      src/Genome.cpp
      src/LSystem.cpp
+     src/DecodedGeneticString.cpp
      )
 
 # Generate

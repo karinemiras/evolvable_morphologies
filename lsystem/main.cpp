@@ -43,8 +43,13 @@ int main()
     LS.build_alphabet();
 
     std::vector<string> axiom;
-    axiom.push_back("C");
+    //axiom.push_back("CNNN");
 
+    axiom.push_back("CNNN");
+    axiom.push_back("addl");
+    axiom.push_back("BNNI");
+    axiom.push_back("addr");
+    axiom.push_back("BNNN");
 
     Genome gen(axiom);
     // initializes the genetic-string with the axiom
@@ -54,10 +59,10 @@ int main()
     gen.getGeneticString().display_list();
 
     // creates genetic-strings for production rules of the grammar
-    gen.build_grammar(LS);
+    //gen.build_grammar(LS);
 
     // enhances the genetic-string according to grammar iteratively
-    gen.generate_final_string();
+    //gen.generate_final_string();
 
     // decodes the final genetic-string into a tree of components
     gen.decodeGeneticString(LS);

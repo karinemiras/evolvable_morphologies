@@ -17,7 +17,7 @@ void LSystem::build_commands(){
 void LSystem::build_alphabet(){
 
 
-    alphabet["C"]  = "C";
+    alphabet["CNNN"]  = "CNNN";
     alphabet["J1"] = "J1";
     alphabet["J2"] = "J2";
     alphabet["J3"] = "J3";
