@@ -11,7 +11,7 @@
 
 void DecodedGeneticString::decode(GeneticString gs, LSystem LS) {
 
-    int parts = 0;
+    //int parts = 0;
     std::string command = "";
     DecodedGeneticString::node  *current_component = NULL;
     GeneticString::node *current_gs_item = new GeneticString::node;
@@ -30,32 +30,34 @@ void DecodedGeneticString::decode(GeneticString gs, LSystem LS) {
             DecodedGeneticString::node *new_component;
             new_component = new DecodedGeneticString::node;
             new_component->item = letter;
+            new_component->left = NULL;
+            new_component->front = NULL;
+            new_component->right = NULL;
 
-            if (root == NULL) { // if there are no components in the tree yet, creates root
+            if (root == NULL) { // if there are no components in the graph yet, creates root
                 std::cout<<"root"<<std::endl;
 
                 new_component->back = NULL;
-                new_component->left = NULL;
-                new_component->front = NULL;
-                new_component->right = NULL;
 
                 current_component = new_component;
                 root = new_component;
 
-            }else{ // if the tree has been started already
+            }else{ // if the graph has been started already
 
                 if (!command.empty()){ // if a command has been set for mounting the component
 
                     std::string component = current_component->item.substr(0, 1);
-                    std::string left = current_component->item.substr(1, 1);
-                    std::string front = current_component->item.substr(2, 1);
-                    std::string right = current_component->item.substr(3, 1);
 
                     if (component == "C" or component == "B") { // if component is core or brick, having multilateral connexion
+
+                        std::string left = current_component->item.substr(1, 1);
+                        std::string front = current_component->item.substr(2, 1);
+                        std::string right = current_component->item.substr(3, 1);
+
                         std::cout << " multi parent-" << component <<left<< front<< right << std::endl;
 
-                        if(command=="l"){
-                            if(left!="N"){
+                        if(command == "l"){  // mount on the left
+                            if(left!= "N" or current_component->left != NULL){ // if theres a sensor or position is occupied
                                 std::cout<< "--left violation!" << std::endl;
                                 std::exit(EXIT_FAILURE);
                             }else{
@@ -63,8 +65,8 @@ void DecodedGeneticString::decode(GeneticString gs, LSystem LS) {
                                 current_component->left = new_component;
                             }
                         }
-                        if(command=="f"){
-                            if(front!="N"){
+                        if(command == "f"){  // mount on the front
+                            if(front!= "N" or current_component->front != NULL){ // if theres a sensor or position is occupied
                                 std::cout<< "--front violation!" << std::endl;
                                 std::exit(EXIT_FAILURE);
                             }else{
@@ -72,8 +74,8 @@ void DecodedGeneticString::decode(GeneticString gs, LSystem LS) {
                                 current_component->front = new_component;
                             }
                         }
-                        if(command=="r"){
-                            if(right!="N"){
+                        if(command == "r"){  // mount on the right
+                            if(right!= "N" or current_component->right != NULL){ // if theres a sensor or position is occupied
                                 std::cout<< "--right violation!" << std::endl;
                                 std::exit(EXIT_FAILURE);
                             }else{
@@ -82,14 +84,22 @@ void DecodedGeneticString::decode(GeneticString gs, LSystem LS) {
                             }
                         }
 
-                        new_component->back = current_component;
-                        current_component = new_component;
 
                     }else{ // if component is a joint
-                        std::cout << "comp joint-" << component <<left<< front<< right << std::endl;
+                        std::cout << "comp joint-" << component << std::endl;
+
+                        if(current_component->front != NULL){  // if position is occupied
+                                std::cout<< "--front violation!" << std::endl;
+                                std::exit(EXIT_FAILURE);
+                        }else{
+                                std::cout<<" front "<<std::endl;
+                                current_component->front = new_component;
+                        }
 
                     }
 
+                    new_component->back = current_component;
+                    current_component = new_component;
                     command = "";
 
                 }else{
@@ -103,10 +113,11 @@ void DecodedGeneticString::decode(GeneticString gs, LSystem LS) {
             command = current_gs_item->item.substr(current_gs_item->item.size()-1,1);
             std::cout<<" "<<current_gs_item->item<<" "<<command << "-- not alpha" << std::endl;
 
-            if(command == "<"){ // move back to parent in the tree, if theres one
-                if (root != NULL and current_component != root) {
+            if(command == "<"){ // move back to parent in the graph, if theres one
+                if (current_component != root and current_component->back != NULL) {
                     current_component = current_component->back;
-                    std::cout << " move back to parent " << std::endl;
+                    command = "";
+                    std::cout << " move back to parent " << current_component->item<<std::endl;
                 }else{
                     std::cout<< "-- back-to-parent violation!" << std::endl;
                     std::exit(EXIT_FAILURE);

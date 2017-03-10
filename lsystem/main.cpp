@@ -45,11 +45,24 @@ int main()
     std::vector<string> axiom;
     //axiom.push_back("CNNN");
 
+    axiom.push_back("addf");
     axiom.push_back("CNNN");
     axiom.push_back("addl");
-    axiom.push_back("BNNI");
+    axiom.push_back("addr");
+    axiom.push_back("J1");
+    axiom.push_back("addr");
+    axiom.push_back("BNIN");
+    axiom.push_back("addl");
+    axiom.push_back("BNNN");
+    axiom.push_back("<");
     axiom.push_back("addr");
     axiom.push_back("BNNN");
+    axiom.push_back("<");
+    axiom.push_back("<");
+    axiom.push_back("<");
+    axiom.push_back("addf");
+    axiom.push_back("BNNN");
+
 
     Genome gen(axiom);
     // initializes the genetic-string with the axiom
