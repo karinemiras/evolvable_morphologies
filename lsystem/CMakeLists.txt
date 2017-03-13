@@ -34,6 +34,9 @@ find_package(Boost COMPONENTS REQUIRED
              )
 include_directories(${Boost_INCLUDE_DIRS})
 
+#find_package(Qt5 COMPONENTS Core)# Widgets)
+#find_package(Qt5Widgets)
+
 # Source subdirectories
 # _____________________________________________________________________________
 

@@ -27,58 +27,142 @@ std::vector<std::string> Genome::getAxiom(){
 
 
 /**
-* Generates random production rules for the alphabet ### remove static grammar after test, and then use the dynamic one ###
+* Generates initial production rules for the alphabet
 */
 void Genome::build_grammar(LSystem LS){
 
-//    std::random_device rd;
-//    std::default_random_engine re(rd());
-//    int asize = LS.getAlphabet().size(); // fix map
-//    std::uniform_int_distribution<int> uniform_dist(1, asize);
-//    std::vector<std::string> alp = LS.getAlphabet();  // fix map
-//
-//    for(int l=0; l<asize; l++){
-//
-//        int pos = uniform_dist(re)-1;
+    std::map< std::string, std::string > alp = LS.getAlphabet();
+
+//    for (std::map< std::string, std::string >::const_iterator it = alp.begin(); it != alp.end(); ++it) {
 //
 //        std::vector<std::string> letter_items;
-//        letter_items.push_back(alp[l]);
-//        letter_items.push_back(alp[pos]);
-//        GeneticString gs;
-//        gs = build_genetic_string(gs,letter_items);
-//        std::cout << "letter replacement "<<alp[l]<<std::endl;
-//        gs.display_list();
-//        this->grammar[ alp[l] ] = lgs;
+//        letter_items.push_back(it->first);
+//        GeneticString lgs;
+//        lgs = build_genetic_string(lgs,letter_items);
+//        lgs.display_list();
+//        this->grammar[ it->first ] = lgs;
+//    }
 
- //   }
+    // manual production 3
+    std::vector<std::string> letter_c;
+    letter_c.push_back("CNNN");
+    letter_c.push_back("addr");
+    letter_c.push_back("BNNN");
+    GeneticString cgs;
+    cgs = build_genetic_string(cgs,letter_c);
+    cgs.display_list();
+    this->grammar[ "CNNN" ] = cgs;
 
-    std::vector<std::string> letter1_items;
-    letter1_items.push_back("CNNN");
-    letter1_items.push_back("addr");
-    letter1_items.push_back("BLIN");
+    std::vector<std::string> letter_b;
+    letter_b.push_back("BNNN");
+    letter_b.push_back("<");
+    letter_b.push_back("<");
+    letter_b.push_back("addl");
+    letter_b.push_back("J1");
+    GeneticString bgs;
+    bgs = build_genetic_string(bgs,letter_b);
+    bgs.display_list();
+    this->grammar[ "BNNN" ] = bgs;
+
+    std::vector<std::string> letter_j;
+    letter_j.push_back("addf");
+    letter_j.push_back("J1");
+    letter_j.push_back("addf");
+    letter_j.push_back("BNNN");
+    letter_j.push_back("<");
+    letter_j.push_back("<");
+    letter_j.push_back("addl");
+    letter_j.push_back("BNNN");
+    GeneticString jgs;
+    jgs = build_genetic_string(jgs,letter_j);
+    jgs.display_list();
+    this->grammar[ "J1" ] = jgs;
+
+    // manual production 1
+//    std::vector<std::string> letter_c;
+//    letter_c.push_back("CNNN");
+//    letter_c.push_back("addr");
+//    letter_c.push_back("BNNN");
+//    GeneticString cgs;
+//    cgs = build_genetic_string(cgs,letter_c);
+//    cgs.display_list();
+//    this->grammar[ "CNNN" ] = cgs;
+//
+//    std::vector<std::string> letter_b;
+//    letter_b.push_back("addl");
+//    letter_b.push_back("J1");
+//    letter_b.push_back("<");
+//    letter_b.push_back("addr");
+//    letter_b.push_back("J1");
+//    GeneticString bgs;
+//    bgs = build_genetic_string(bgs,letter_b);
+//    bgs.display_list();
+//    this->grammar[ "BNNN" ] = bgs;
+//
+//    std::vector<std::string> letter_j;
+//    letter_j.push_back("J1");
+//    letter_j.push_back("addf");
+//    letter_j.push_back("BNNN");
+//    letter_j.push_back("<");
+//    letter_j.push_back("<");
+//    GeneticString jgs;
+//    jgs = build_genetic_string(jgs,letter_j);
+//    jgs.display_list();
+//    this->grammar[ "J1" ] = jgs;
+
+    // manual production 2
+//    std::vector<std::string> letter_c;
+//    letter_c.push_back("CNNN");
+//    letter_c.push_back("addr");
+//    letter_c.push_back("BNNN");
+//    GeneticString cgs;
+//    cgs = build_genetic_string(cgs,letter_c);
+//    cgs.display_list();
+//    this->grammar[ "CNNN" ] = cgs;
+//
+//    std::vector<std::string> letter_b;
+//    letter_b.push_back("addl");
+//    letter_b.push_back("J1");
+//    letter_b.push_back("<");
+//    letter_b.push_back("addr");
+//    letter_b.push_back("J1");
+//    GeneticString bgs;
+//    bgs = build_genetic_string(bgs,letter_b);
+//    bgs.display_list();
+//    this->grammar[ "BNNN" ] = bgs;
+//
+//    std::vector<std::string> letter_j;
+//    letter_j.push_back("J1");
+//    letter_j.push_back("addf");
+//    letter_j.push_back("BNNN");
+//    letter_j.push_back("addf");
+//    letter_j.push_back("AJ");
+//    letter_j.push_back("addf");
+//    letter_j.push_back("BNNN");
+//    letter_j.push_back("<");
+//    letter_j.push_back("<");
+//    letter_j.push_back("<");
+//    letter_j.push_back("<");
+//    GeneticString jgs;
+//    jgs = build_genetic_string(jgs,letter_j);
+//    jgs.display_list();
+//    this->grammar[ "J1" ] = jgs;
 
 
 
-    std::vector<std::string> letter2_items;
-    letter2_items.push_back("BLIN");
-    letter2_items.push_back("addr");
-    letter2_items.push_back("BLIN");
-
-
-    GeneticString gs_letter1;
-    gs_letter1 = build_genetic_string(gs_letter1,letter1_items);
-    std::cout << "letter replacement CNNN"<<std::endl;
-    gs_letter1.display_list();
-
-    GeneticString gs_letter2;
-    gs_letter2 = build_genetic_string(gs_letter2,letter2_items);
-    std::cout << "letter replacement BLIN"<<std::endl;
-    gs_letter2.display_list();
-
-    this->grammar[ "CNNN" ] = gs_letter1;
-    this->grammar[ "BLIN" ] = gs_letter2;
-
-
+//    std::vector<std::string> letter_p;
+//    letter_p.push_back("PJ");
+//    GeneticString pgs;
+//    pgs = build_genetic_string(pgs,letter_p);
+//    pgs.display_list();
+//    this->grammar[ "PJ" ] = pgs;
+//
+//    std::vector<std::string> letter_a;
+//    letter_a.push_back("AJ");
+//    GeneticString ags;
+//    ags = build_genetic_string(ags,letter_a);
+//    ags.display_list();
+//    this->grammar[ "AJ" ] = ags;
 }
 
 /**
@@ -86,7 +170,7 @@ void Genome::build_grammar(LSystem LS){
  */
 void Genome::generate_final_string(){
 
-    int iterations = 2;
+    int iterations = 3;
 
     for(int i=0;i<iterations;i++) {
         this->gs.replaces(this->grammar);

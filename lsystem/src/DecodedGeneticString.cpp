@@ -11,7 +11,7 @@
 
 void DecodedGeneticString::decode(GeneticString gs, LSystem LS) {
 
-    //int parts = 0;
+    int id = 0;
     std::string command = "";
     DecodedGeneticString::node  *current_component = NULL;
     GeneticString::node *current_gs_item = new GeneticString::node;
@@ -29,7 +29,9 @@ void DecodedGeneticString::decode(GeneticString gs, LSystem LS) {
 
             DecodedGeneticString::node *new_component;
             new_component = new DecodedGeneticString::node;
+            id ++;
             new_component->item = letter;
+            new_component->id = id;
             new_component->left = NULL;
             new_component->front = NULL;
             new_component->right = NULL;
@@ -41,6 +43,7 @@ void DecodedGeneticString::decode(GeneticString gs, LSystem LS) {
 
                 current_component = new_component;
                 root = new_component;
+                command = "";
 
             }else{ // if the graph has been started already
 
@@ -54,33 +57,49 @@ void DecodedGeneticString::decode(GeneticString gs, LSystem LS) {
                         std::string front = current_component->item.substr(2, 1);
                         std::string right = current_component->item.substr(3, 1);
 
-                        std::cout << " multi parent-" << component <<left<< front<< right << std::endl;
+                        std::cout << "multi parent-" << component <<left<< front<< right << std::endl;
 
-                        if(command == "l"){  // mount on the left
-                            if(left!= "N" or current_component->left != NULL){ // if theres a sensor or position is occupied
-                                std::cout<< "--left violation!" << std::endl;
-                                std::exit(EXIT_FAILURE);
+                        if(root == current_component and current_component->left != NULL and current_component->front != NULL and current_component->right != NULL ){ // if all sides are occupied in the root, grows to the back
+
+                            if(current_component->back == NULL){
+                                std::cout << " back " << std::endl;
+                                current_component->back = new_component;
                             }else{
-                                std::cout<<" left "<<std::endl;
-                                current_component->left = new_component;
+                                std::cout << "--root-back violation!" << std::endl;
+                                goto violation;
                             }
-                        }
-                        if(command == "f"){  // mount on the front
-                            if(front!= "N" or current_component->front != NULL){ // if theres a sensor or position is occupied
-                                std::cout<< "--front violation!" << std::endl;
-                                std::exit(EXIT_FAILURE);
-                            }else{
-                                std::cout<<" front "<<std::endl;
-                                current_component->front = new_component;
+
+                        }else {
+
+                            if (command == "l") {  // mount on the left
+                                if (left != "N" or
+                                    current_component->left != NULL) { // if theres a sensor or position is occupied
+                                    std::cout << "--left violation!" << std::endl;
+                                    goto violation;
+                                } else {
+                                    std::cout << " left " << std::endl;
+                                    current_component->left = new_component;
+                                }
                             }
-                        }
-                        if(command == "r"){  // mount on the right
-                            if(right!= "N" or current_component->right != NULL){ // if theres a sensor or position is occupied
-                                std::cout<< "--right violation!" << std::endl;
-                                std::exit(EXIT_FAILURE);
-                            }else{
-                                std::cout<<" right "<<std::endl;
-                                current_component->right = new_component;
+                            if (command == "f") {  // mount on the front
+                                if (front != "N" or
+                                    current_component->front != NULL) { // if theres a sensor or position is occupied
+                                    std::cout << "--front violation!" << std::endl;
+                                    goto violation;
+                                } else {
+                                    std::cout << " front " << std::endl;
+                                    current_component->front = new_component;
+                                }
+                            }
+                            if (command == "r") {  // mount on the right
+                                if (right != "N" or
+                                    current_component->right != NULL) { // if theres a sensor or position is occupied
+                                    std::cout << "--right violation!" << std::endl;
+                                    goto violation;
+                                } else {
+                                    std::cout << " right " << std::endl;
+                                    current_component->right = new_component;
+                                }
                             }
                         }
 
@@ -90,7 +109,7 @@ void DecodedGeneticString::decode(GeneticString gs, LSystem LS) {
 
                         if(current_component->front != NULL){  // if position is occupied
                                 std::cout<< "--front violation!" << std::endl;
-                                std::exit(EXIT_FAILURE);
+                                goto violation;
                         }else{
                                 std::cout<<" front "<<std::endl;
                                 current_component->front = new_component;
@@ -100,27 +119,27 @@ void DecodedGeneticString::decode(GeneticString gs, LSystem LS) {
 
                     new_component->back = current_component;
                     current_component = new_component;
+
+                    violation:
                     command = "";
 
                 }else{
                     std::cout<< "-- no-command violation!" << std::endl;
-                    std::exit(EXIT_FAILURE);
                 }
             }
 
         } else { // the item is a command
 
             command = current_gs_item->item.substr(current_gs_item->item.size()-1,1);
-            std::cout<<" "<<current_gs_item->item<<" "<<command << "-- not alpha" << std::endl;
+            std::cout<<current_gs_item->item<<" "<<command << "-- not alpha" << std::endl;
 
-            if(command == "<"){ // move back to parent in the graph, if theres one
-                if (current_component != root and current_component->back != NULL) {
+            if(command == "<"){ // if it is a move-command, move back to parent in the graph, if it is not on root
+                if (current_component != root) { // root has no parent, so the back is another branch
                     current_component = current_component->back;
                     command = "";
                     std::cout << " move back to parent " << current_component->item<<std::endl;
                 }else{
                     std::cout<< "-- back-to-parent violation!" << std::endl;
-                    std::exit(EXIT_FAILURE);
                 }
             }
         }
