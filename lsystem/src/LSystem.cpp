@@ -7,7 +7,6 @@
 void LSystem::build_commands(){
 
     commands.push_back("<");
-    commands.push_back(">");
     commands.push_back("addl");
     commands.push_back("addf");
     commands.push_back("addr");

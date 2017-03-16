@@ -8,8 +8,17 @@
 #include <string>
 
 
+#include <QtWidgets/QGraphicsScene>
+#include <QtWidgets/QGraphicsView>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QGraphicsRectItem>
+
+
+
 #include "GeneticString.h"
 #include "LSystem.h"
+
+
 
 class DecodedGeneticString{
 
@@ -19,6 +28,7 @@ public:
 
     struct node{
         std::string item;
+        QGraphicsRectItem * comp;
         int id;
         struct node *left;
         struct node *front;

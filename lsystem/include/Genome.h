@@ -9,6 +9,12 @@
 #include <string>
 #include <vector>
 
+#include <QtWidgets/QGraphicsScene>
+#include <QtWidgets/QGraphicsView>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QGraphicsRectItem>
+
+
 #include "DecodedGeneticString.h"
 #include "GeneticString.h"
 #include "LSystem.h"
@@ -32,7 +38,8 @@ public:
     std::vector<std::string> getAxiom();
     void generate_final_string();
     void decodeGeneticString(LSystem LS);
-
+    void constructor(int argc, char* argv[]);
+    void draw_component(std::string reference, std::string direction, QGraphicsScene * scene, std::vector<QGraphicsRectItem *>  items,DecodedGeneticString::node * c1, DecodedGeneticString::node * c2);
 
 private:
 

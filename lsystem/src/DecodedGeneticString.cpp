@@ -146,3 +146,9 @@ void DecodedGeneticString::decode(GeneticString gs, LSystem LS) {
         current_gs_item = current_gs_item->next;
     }
 }
+
+DecodedGeneticString::node * DecodedGeneticString::getRoot(){
+
+    return this->root;
+
+}

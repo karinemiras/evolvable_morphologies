@@ -34,8 +34,9 @@ find_package(Boost COMPONENTS REQUIRED
              )
 include_directories(${Boost_INCLUDE_DIRS})
 
-#find_package(Qt5 COMPONENTS Core)# Widgets)
-#find_package(Qt5Widgets)
+find_package(Qt5 COMPONENTS
+        Core
+        Widgets)
 
 # Source subdirectories
 # _____________________________________________________________________________
@@ -57,3 +58,5 @@ file(GLOB_RECURSE SOURCES
 # _____________________________________________________________________________
 
 add_executable(lsystem_proto ${SOURCES})
+target_link_libraries(lsystem_proto
+        Qt5::Widgets)

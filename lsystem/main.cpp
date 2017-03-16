@@ -13,18 +13,19 @@
 #include <sstream>
 #include <vector>
 
+
+
 #include "Genome.h"
 #include "LSystem.h"
 
 using namespace std;
 
 
-int main()
+int main(int argc, char* argv[])
 {
 
     /**
      *  Alphabet and commands
-     *  > : branch out the parent on the parser build-tree
      *  < : back to parent on the parser build-tree
      *  addl : add component to the left side of the parent-reference
      *  addf : add component to the front side of the parent-reference
@@ -45,17 +46,6 @@ int main()
     std::vector<string> axiom;
     axiom.push_back("CNNN");
 
-
-//    axiom.push_back("CNNN");
-//    axiom.push_back("addf");
-//    axiom.push_back("BNNN");
-//    axiom.push_back("<");
-//    axiom.push_back("addf");
-//    axiom.push_back("BNNN");
-//    axiom.push_back("addl");
-//    axiom.push_back("BNNN");
-
-
     Genome gen(axiom);
     // initializes the genetic-string with the axiom
     gen.setGeneticString(gen.build_genetic_string(gen.getGeneticString(), gen.getAxiom()));
@@ -73,9 +63,11 @@ int main()
     // decodes the final genetic-string into a tree of components
     gen.decodeGeneticString(LS);
 
-
+    // generates robot-graphics
+    gen.constructor(argc, argv);
 
     return 0;
+
 }
 
 
