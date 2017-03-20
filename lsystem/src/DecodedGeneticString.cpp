@@ -120,7 +120,7 @@ void DecodedGeneticString::decode(GeneticString gs, LSystem LS) {
                     new_component->back = current_component;
                     current_component = new_component;
 
-                    violation:
+                    violation: // when the genetic-string leads to trying to hatch a component into a position where theres already another component or a sensor, the command is ignored
                     command = "";
 
                 }else{

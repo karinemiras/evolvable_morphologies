@@ -45,26 +45,40 @@ int main(int argc, char* argv[])
 
     std::vector<string> axiom;
     axiom.push_back("CNNN");
+    axiom.push_back("addr");
+    axiom.push_back("BNNN");
+    axiom.push_back("addl");
+    axiom.push_back("BNNN");
+    axiom.push_back("<");
+    axiom.push_back("<");
+    axiom.push_back("addf");
+    axiom.push_back("BNNN");
+    axiom.push_back("addr");
+    axiom.push_back("BNNN");
 
-    Genome gen(axiom);
+    Genome gen("1",axiom);
     // initializes the genetic-string with the axiom
     gen.setGeneticString(gen.build_genetic_string(gen.getGeneticString(), gen.getAxiom()));
 
-    cout << "string original:"<<endl;
+    cout << " >>> building axiom ..."<<endl;
     gen.getGeneticString().display_list();
 
     // creates genetic-strings for production rules of the grammar
-    cout << "grammar:"<<endl;
-    gen.build_grammar(LS);
+    //cout << " >>> building grammar ..."<<endl;
+    //gen.build_grammar(LS);
 
     // enhances the genetic-string according to grammar iteratively
-    gen.generate_final_string();
+    //cout << " >>> iterating replacements ..."<<endl;
+    //gen.generate_final_string();
 
     // decodes the final genetic-string into a tree of components
+    std::cout<<" >>> decoding ... "<<std::endl;
     gen.decodeGeneticString(LS);
 
     // generates robot-graphics
+    std::cout<<" >>> constructing ... "<<std::endl;
     gen.constructor(argc, argv);
+    std::cout<<" >>> validity: "<<gen.getValidity();
 
     return 0;
 
