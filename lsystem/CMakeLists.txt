@@ -51,12 +51,13 @@ file(GLOB_RECURSE SOURCES
      src/GeneticString.cpp
      src/Genome.cpp
      src/LSystem.cpp
+     src/Evolution.cpp
      src/DecodedGeneticString.cpp
      )
 
 # Generate
 # _____________________________________________________________________________
 
-add_executable(lsystem_proto ${SOURCES})
+add_executable(lsystem_proto ${SOURCES} )
 target_link_libraries(lsystem_proto
         Qt5::Widgets)

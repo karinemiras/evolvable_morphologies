@@ -18,12 +18,14 @@ public:
     void build_commands();
     void build_alphabet();
     std::map< std::string, std::string > getAlphabet();
+    std::vector<std::string> getAlphabetIndex();
+    std::vector<std::string> getCommands();
 
 
 private:
     std::vector<std::string> commands;
     std::map< std::string, std::string > alphabet;
-
+    std::vector<std::string> alphabet_index;
 };
 
 

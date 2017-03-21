@@ -4,6 +4,21 @@
 
 #include "LSystem.h"
 
+/**
+ *  Alphabet and commands
+ *  < : back to parent on the parser build-tree
+ *  addl : add component to the left side of the parent-reference
+ *  addf : add component to the front side of the parent-reference
+ *  addr : add component to the right side of the parent-reference
+ *  CNNN : core component
+ *  J1, J3, J3: 3 different flavors of fixed joint, with angles to be evolved
+ *  AJ : active hinge joint
+ *  PJ: passive hinge joint
+ *  B--- : brick component with possibility of sensors I (infra-red) or L (light) or N (none)
+ *         on the sides --- left/front/right.
+ *         Ex.: BLIN means brick with light sensor on the left, infra-red on the front, and no sensor on the right
+ */
+
 void LSystem::build_commands(){
 
     commands.push_back("<");
@@ -11,6 +26,7 @@ void LSystem::build_commands(){
     commands.push_back("addf");
     commands.push_back("addr");
 }
+
 
 
 void LSystem::build_alphabet(){
@@ -40,9 +56,21 @@ void LSystem::build_alphabet(){
 //            }
 //        }
 //    }
+
+    for (std::map< std::string, std::string >::const_iterator it = alphabet.begin(); it != alphabet.end(); ++it) {
+        alphabet_index.push_back(it->first);
+    }
 }
 
 
 std::map< std::string, std::string > LSystem::getAlphabet(){
     return this->alphabet;
+};
+
+std::vector<std::string> LSystem::getCommands(){
+    return this->commands;
+};
+
+std::vector< std::string > LSystem::getAlphabetIndex(){
+    return this->alphabet_index;
 };

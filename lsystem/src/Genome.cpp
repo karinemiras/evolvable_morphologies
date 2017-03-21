@@ -24,32 +24,56 @@ std::vector<std::string> Genome::getAxiom(){
     return this->axiom;
 }
 
-void Genome::setValidity(std::string _validity){
-    this->validity = _validity;
-}
-
-std::string Genome::getValidity(){
-    return this->validity;
-}
-
 
 
 /**
-* Generates initial production rules for the alphabet
+* Generates initial production rules for the alphabet.
 */
 void Genome::build_grammar(LSystem LS){
 
     std::map< std::string, std::string > alp = LS.getAlphabet();
+    std::vector<std::string>  alp_i = LS.getAlphabetIndex();
+    std::vector<std::string>  com = LS.getCommands();
 
-    for (std::map< std::string, std::string >::const_iterator it = alp.begin(); it != alp.end(); ++it) {
+    std::random_device rd;
+    std::default_random_engine generator(rd());
+
+    std::uniform_int_distribution<int> dist_1(1, 3); // distribuition for the number of components
+    std::uniform_int_distribution<int> dist_2(0, alp_i.size()-1); // distribuition for letters of the alphabet
+    std::uniform_int_distribution<int> dist_3(1, com.size()-1); // distribuition for the hatching commands
+
+    for (std::map< std::string, std::string >::const_iterator it = alp.begin(); it != alp.end(); ++it) { // for each letter of the alphabet
+
+        std::string letter = it->first;
+        std::cout<<"letter "<<letter<<std::endl;
 
         std::vector<std::string> letter_items;
-        letter_items.push_back(it->first);
         GeneticString lgs;
-        lgs = build_genetic_string(lgs,letter_items);
+
+        if (letter == "CNNN") { // if it is a core component, forces its inclusion in the rule
+            letter_items.push_back(letter);
+        }
+
+        while(letter_items.size() < (dist_1(generator)*2) ){  // while raffled number of components is not achieved (times 2 because it must take the commands into account)
+
+            std::string item = alp_i[dist_2(generator)]; // raffles a letter to be included
+
+            if (item != "CNNN") { // prevents core component of being (re)included in the rule
+                letter_items.push_back(com[dist_3(generator)]); // raffles a hatching command to be included
+                letter_items.push_back(item);
+
+                std::uniform_real_distribution<double> p_btp(0.0, 1.0); // distribuition for back-to-parent command
+                if (p_btp(generator) < 0.2){
+                    letter_items.push_back(com[0]);
+                }
+            }
+        }
+        lgs = build_genetic_string(lgs, letter_items);
         lgs.display_list();
-        this->grammar[ it->first ] = lgs;
+        this->grammar[letter] = lgs;
     }
+
+}
 
 //    int t;
 //    t = 2;
@@ -170,10 +194,10 @@ void Genome::build_grammar(LSystem LS){
 //    }
 
 
-}
+
 
 /**
- * Performs production rules for a number of iterations.
+ * Performs replacements with production rules for a number of iterations.
  */
 void Genome::generate_final_string(){
 
@@ -237,7 +261,7 @@ void Genome::constructor(int argc, char* argv[]) {
 
     DecodedGeneticString::node * c = NULL;
     c = this->dgs.getRoot();
-    Genome::draw_component("bottom","root",scene,items,c,c);
+    Genome::draw_component("bottom","root",scene,items,c,c); // from component on the root, draws all components in the graph
 
     // exports drawn robot into image file
     scene->clearSelection();                                                  // Selections would also render to the file
@@ -249,7 +273,7 @@ void Genome::constructor(int argc, char* argv[]) {
     QString qstr = QString::fromStdString("/Users/karinemiras/CLionProjects/lsystem-proto/"+this->id+".png");
     image.save(qstr);
 
-    app.exec();
+    //app.exec();
 }
 
 
@@ -260,13 +284,15 @@ void Genome::draw_component( std::string reference, std::string direction, QGrap
 
     int size = 40;
 
-    if(c2 != NULL){
+    if(c2 != NULL){ // condition to stop recursive calls
 
         items.push_back(new QGraphicsRectItem()); // draws a new component
         items[items.size()-1]->setRect(0,0,size,size);
 
-        QGraphicsTextItem * sign = new QGraphicsTextItem; // draws a sign from the component to its parent
+        QGraphicsTextItem * sign = new QGraphicsTextItem; // draws a sign (direction) from the component to its parent
         scene->addItem(sign);
+
+        // defines colors for the components according to type
 
         if(c2->item == "CNNN"){
             items[items.size()-1]->setBrush(Qt::yellow);
@@ -274,19 +300,23 @@ void Genome::draw_component( std::string reference, std::string direction, QGrap
         if(c2->item == "BNNN"){
             items[items.size()-1]->setBrush(Qt::blue);
         }
-        if(c2->item == "J1"){
+        if(c2->item == "PJ"){
             items[items.size()-1]->setBrush(Qt::green);
+        }
+        if(c2->item == "J1"){
+            items[items.size()-1]->setBrush(Qt::white);
         }
         if(c2->item == "AJ"){
             items[items.size()-1]->setBrush(Qt::red);
         }
 
-        c2->comp = items[items.size()-1]; // save reference for the component inside the graph-node
-        sign->setZValue(1);
-        scene->addItem(items[items.size()-1]);
+        c2->comp = items[items.size()-1]; // saves reference for the component inside the graph-node
+
+        sign->setZValue(1); // sign must be drawn over the component
+        scene->addItem(items[items.size()-1]);  // adds new compoent to the scene
 
 
-        if(c2 != c1) {  // sets the component in the proper position in the drawing
+        if(c2 != c1) {  // sets the component (and sign) in the proper position in the drawing
 
             std::string tsign;
 

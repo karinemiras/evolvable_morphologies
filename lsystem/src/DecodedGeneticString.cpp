@@ -2,11 +2,13 @@
 // Created by Karine Miras on 08/03/2017.
 //
 
-#include "DecodedGeneticString.h"
 
 #include <iostream>
 
 
+#include "DecodedGeneticString.h"
+#include "GeneticString.h"
+#include "LSystem.h"
 
 
 void DecodedGeneticString::decode(GeneticString gs, LSystem LS) {
@@ -14,18 +16,18 @@ void DecodedGeneticString::decode(GeneticString gs, LSystem LS) {
     int id = 0;
     std::string command = "";
     DecodedGeneticString::node  *current_component = NULL;
-    GeneticString::node *current_gs_item = new GeneticString::node;
+    GeneticString::node *current_gs_item;// = new GeneticString::node;
     current_gs_item = gs.getStart();
 
 
     for (int i = 0; i < gs.count(); i++) { // for each item of the genetic string
 
-        std::string letter =  LS.getAlphabet()[current_gs_item->item];
-        std::cout<<std::endl<<"comp: "<<letter<< " command: "<<command<<std::endl;
+        std::cout<<std::endl<<"item: "<<LS.getAlphabet()[current_gs_item->item]<< " previous command: "<<command<<std::endl;
 
-        if (LS.getAlphabet().count(letter) > 0) {  // if the item is a component in the alphabet
+        if (LS.getAlphabet().count(current_gs_item->item) > 0) {  // if the item is a component in the alphabet
 
-            std::cout << LS.getAlphabet()[letter] << "- is alpha" << std::endl;
+            std::string letter = LS.getAlphabet()[current_gs_item->item];
+            std::cout << letter << " - comp is alpha" << std::endl;
 
             DecodedGeneticString::node *new_component;
             new_component = new DecodedGeneticString::node;

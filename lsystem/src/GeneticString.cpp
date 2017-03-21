@@ -20,7 +20,7 @@ void GeneticString::replaces(std::map< std::string, GeneticString >  grammar)
 
     node *current, *previous, *next, *inode, *current_rep;
     current = start;
-
+    std::cout<<"place 1";
 
     while (current != NULL) // for each item on the genetic string
     {
@@ -44,7 +44,7 @@ void GeneticString::replaces(std::map< std::string, GeneticString >  grammar)
 
             while(current_rep != NULL) { // for each item on the production string, adds new items to the list replacing the removed one
 
-                inode = new(struct node);
+                inode = new node;
                 inode->item = current_rep->item;
                 inode->prev = previous;
                 inode->next = next;

@@ -47,7 +47,7 @@ public:
 
 private:
 
-    node *root = new node;
+    node *root;// = new node;
 
 };
 

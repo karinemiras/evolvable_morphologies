@@ -39,7 +39,7 @@ public:
 
 private:
 
-    node *start = new node; // item of the genetic-string (doubly-linked list)
+    node *start;// = new node; // item of the genetic-string (doubly-linked list)
 
 };
 
