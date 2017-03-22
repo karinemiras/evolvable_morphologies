@@ -15,8 +15,8 @@ void DecodedGeneticString::decode(GeneticString gs, LSystem LS) {
 
     int id = 0;
     std::string command = "";
-    DecodedGeneticString::node  *current_component = NULL;
-    GeneticString::node *current_gs_item;// = new GeneticString::node;
+    DecodedGeneticString::Vertex  *current_component = NULL;
+    GeneticString::Node *current_gs_item;
     current_gs_item = gs.getStart();
 
 
@@ -29,8 +29,8 @@ void DecodedGeneticString::decode(GeneticString gs, LSystem LS) {
             std::string letter = LS.getAlphabet()[current_gs_item->item];
             std::cout << letter << " - comp is alpha" << std::endl;
 
-            DecodedGeneticString::node *new_component;
-            new_component = new DecodedGeneticString::node;
+            DecodedGeneticString::Vertex *new_component;
+            new_component = new DecodedGeneticString::Vertex;
             id ++;
             new_component->item = letter;
             new_component->id = id;
@@ -149,7 +149,7 @@ void DecodedGeneticString::decode(GeneticString gs, LSystem LS) {
     }
 }
 
-DecodedGeneticString::node * DecodedGeneticString::getRoot(){
+DecodedGeneticString::Vertex * DecodedGeneticString::getRoot(){
 
     return this->root;
 

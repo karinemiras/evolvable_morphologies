@@ -22,6 +22,7 @@
 /**
  *  Genome of an individual.
  */
+
 class Genome{
 
 public:
@@ -40,7 +41,7 @@ public:
     void generate_final_string();
     void decodeGeneticString(LSystem LS);
     void constructor(int argc, char* argv[]);
-    void draw_component(std::string reference, std::string direction, QGraphicsScene * scene, std::vector<QGraphicsRectItem *>  items,DecodedGeneticString::node * c1, DecodedGeneticString::node * c2);
+    void draw_component(std::string reference, std::string direction, QGraphicsScene * scene, std::vector<QGraphicsRectItem *>  items,DecodedGeneticString::Vertex * c1, DecodedGeneticString::Vertex * c2);
 
 private:
 
@@ -49,9 +50,6 @@ private:
     std::vector<std::string> axiom;
     std::map< std::string, GeneticString >  grammar;
     std::string id;
-
-
-
 
 };
 

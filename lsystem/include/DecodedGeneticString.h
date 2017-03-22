@@ -26,17 +26,18 @@ class DecodedGeneticString{
 public:
 
 
-    struct node{
+    struct Vertex{
         std::string item;
         QGraphicsRectItem * comp;
         int id;
-        struct node *left;
-        struct node *front;
-        struct node *right;
-        struct node *back; // parent component in the tree
+        Vertex *left;
+        Vertex *front;
+        Vertex *right;
+        Vertex *back; // parent component in the tree
+        Vertex() { left=front=right=back=NULL; comp=NULL; }
     };
 
-    DecodedGeneticString::node * getRoot();
+    DecodedGeneticString::Vertex * getRoot();
 
     void decode(GeneticString gs, LSystem LS);
 
@@ -47,7 +48,7 @@ public:
 
 private:
 
-    node *root;// = new node;
+    Vertex *root;  // item of the graph of components
 
 };
 

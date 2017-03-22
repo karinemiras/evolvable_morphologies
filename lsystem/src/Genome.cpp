@@ -29,7 +29,7 @@ std::vector<std::string> Genome::getAxiom(){
 /**
 * Generates initial production rules for the alphabet.
 */
-void Genome::build_grammar(LSystem LS){
+void Genome::build_grammar(LSystem LS) {
 
     std::map< std::string, std::string > alp = LS.getAlphabet();
     std::vector<std::string>  alp_i = LS.getAlphabetIndex();
@@ -38,9 +38,10 @@ void Genome::build_grammar(LSystem LS){
     std::random_device rd;
     std::default_random_engine generator(rd());
 
-    std::uniform_int_distribution<int> dist_1(1, 3); // distribuition for the number of components
-    std::uniform_int_distribution<int> dist_2(0, alp_i.size()-1); // distribuition for letters of the alphabet
-    std::uniform_int_distribution<int> dist_3(1, com.size()-1); // distribuition for the hatching commands
+    std::uniform_int_distribution<int> dist_1(1, 3); // distribution for the number of components
+    std::uniform_int_distribution<int> dist_2(0, alp_i.size()-1); // distribution for letters of the alphabet
+    std::uniform_int_distribution<int> dist_3(1, com.size()-1); // distribution for the hatching commands
+
 
     for (std::map< std::string, std::string >::const_iterator it = alp.begin(); it != alp.end(); ++it) { // for each letter of the alphabet
 
@@ -48,7 +49,6 @@ void Genome::build_grammar(LSystem LS){
         std::cout<<"letter "<<letter<<std::endl;
 
         std::vector<std::string> letter_items;
-        GeneticString lgs;
 
         if (letter == "CNNN") { // if it is a core component, forces its inclusion in the rule
             letter_items.push_back(letter);
@@ -62,15 +62,21 @@ void Genome::build_grammar(LSystem LS){
                 letter_items.push_back(com[dist_3(generator)]); // raffles a hatching command to be included
                 letter_items.push_back(item);
 
-                std::uniform_real_distribution<double> p_btp(0.0, 1.0); // distribuition for back-to-parent command
+                std::uniform_real_distribution<double> p_btp(0.0, 1.0); // distribution for back-to-parent command
                 if (p_btp(generator) < 0.2){
                     letter_items.push_back(com[0]);
                 }
             }
         }
+
+
+        GeneticString lgs;
         lgs = build_genetic_string(lgs, letter_items);
+
         lgs.display_list();
-        this->grammar[letter] = lgs;
+        this->grammar.emplace(letter, lgs);
+
+
     }
 
 }
@@ -78,7 +84,7 @@ void Genome::build_grammar(LSystem LS){
 //    int t;
 //    t = 2;
 //
-//    if (t==3) {
+//    if (t == 3) {
 //
 //        // manual production 3
 //        std::vector<std::string> letter_c;
@@ -119,7 +125,7 @@ void Genome::build_grammar(LSystem LS){
 //        jgs.display_list();
 //        this->grammar["J1"] = jgs;
 //    }
-//    if (t==1) {
+//    if (t == 1) {
 //        // manual production 1
 //        std::vector<std::string> letter_c;
 //        letter_c.push_back("CNNN");
@@ -152,7 +158,7 @@ void Genome::build_grammar(LSystem LS){
 //        jgs.display_list();
 //        this->grammar["J1"] = jgs;
 //    }
-//    if(t==2) {
+//    if (t == 2) {
 //        // manual production 2
 //        std::vector<std::string> letter_c;
 //        letter_c.push_back("CNNN");
@@ -192,8 +198,8 @@ void Genome::build_grammar(LSystem LS){
 //        this->grammar["J1"] = jgs;
 //
 //    }
-
-
+//
+//}
 
 
 /**
@@ -215,11 +221,11 @@ void Genome::generate_final_string(){
 /**
 * Builds a piece of genetic-string for a genome with the given items.
  */
-GeneticString Genome::build_genetic_string(GeneticString gs, std::vector<std::string> genetic_string_items){
+GeneticString Genome::build_genetic_string(GeneticString _gs, std::vector<std::string> genetic_string_items){
 
     try {
-        gs.create_list(genetic_string_items);
-        return gs;
+        _gs.create_list(genetic_string_items);
+        return _gs;
 
     } catch (const std::exception& e) {
         std::cout <<"ERROR building axiom: " << e.what() << std::endl;
@@ -259,8 +265,9 @@ void Genome::constructor(int argc, char* argv[]) {
 
     std::vector<QGraphicsRectItem *> items;
 
-    DecodedGeneticString::node * c = NULL;
+    DecodedGeneticString::Vertex * c = NULL;
     c = this->dgs.getRoot();
+    std::cout<<" will draw "<<std::endl;
     Genome::draw_component("bottom","root",scene,items,c,c); // from component on the root, draws all components in the graph
 
     // exports drawn robot into image file
@@ -280,7 +287,7 @@ void Genome::constructor(int argc, char* argv[]) {
 /**
  * Roams the graph, drawing each component of the chart.
  */
-void Genome::draw_component( std::string reference, std::string direction, QGraphicsScene * scene, std::vector<QGraphicsRectItem *> items,  DecodedGeneticString::node * c1, DecodedGeneticString::node * c2){
+void Genome::draw_component( std::string reference, std::string direction, QGraphicsScene * scene, std::vector<QGraphicsRectItem *> items,  DecodedGeneticString::Vertex * c1, DecodedGeneticString::Vertex * c2){
 
     int size = 40;
 
@@ -313,7 +320,7 @@ void Genome::draw_component( std::string reference, std::string direction, QGrap
         c2->comp = items[items.size()-1]; // saves reference for the component inside the graph-node
 
         sign->setZValue(1); // sign must be drawn over the component
-        scene->addItem(items[items.size()-1]);  // adds new compoent to the scene
+        scene->addItem(items[items.size()-1]);  // adds new component to the scene
 
 
         if(c2 != c1) {  // sets the component (and sign) in the proper position in the drawing
@@ -400,14 +407,15 @@ void Genome::draw_component( std::string reference, std::string direction, QGrap
         }
 
 
-        QList<QGraphicsItem *> coll;
+
+        QList < QGraphicsItem * > coll;
         coll =  items[items.size()-1]->collidingItems();
 
         if(coll.size() > 1) { // if the new component is overlapping another component, it is removed from the graph
 
             scene->removeItem(items[items.size()-1]);
             scene->removeItem(sign);
-            c2->comp = NULL;
+           // c2->comp = NULL;
         }
 
         // recursively calls this function to roam the rest of the graph

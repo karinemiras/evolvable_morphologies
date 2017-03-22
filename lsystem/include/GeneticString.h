@@ -18,18 +18,19 @@ class GeneticString
 {
 public:
 
-    struct node
+    struct Node
     {
         std::string item;
-        struct node *next;
-        struct node *prev;
+        Node *next;
+        Node *prev;
+        Node() { next=prev=NULL; }
     };
 
     void create_list(std::vector<std::string> genetic_string_items);
     void display_list();
     int count();
     void replaces(std::map< std::string, GeneticString >  grammar);
-    GeneticString::node * getStart();
+    GeneticString::Node * getStart();
 
 
     GeneticString()
@@ -39,7 +40,7 @@ public:
 
 private:
 
-    node *start;// = new node; // item of the genetic-string (doubly-linked list)
+    Node *start; // item of the genetic-string (doubly-linked list)
 
 };
 

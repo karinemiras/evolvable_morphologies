@@ -40,7 +40,7 @@ void Evolution::readParams(){
  */
 void Evolution::initPopulation(int argc, char* argv[], LSystem LS){
 
-    for(int i=0; i <= 0; i++) {
+    for(int i=0; i <= params["pop_size"]; i++) {
 
         std::cout<<" ------ genome "<<i<<std::endl;
         std::vector<std::string> axiom;
