@@ -55,11 +55,12 @@ file(GLOB_RECURSE SOURCES
      src/DecodedGeneticString.cpp
      src/Measures.cpp
 
+     include/Axiom.h
      )
 
 # Generate
 # _____________________________________________________________________________
 
-add_executable(lsystem_proto ${SOURCES}  )
+add_executable(lsystem_proto ${SOURCES})
 target_link_libraries(lsystem_proto
         Qt5::Widgets)
