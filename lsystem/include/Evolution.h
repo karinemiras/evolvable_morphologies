@@ -19,10 +19,12 @@ public:
 
     void initPopulation(int argc, char* argv[], LSystem LS);
     void readParams();
+    void developGenome(int argc, char* argv[], Genome * gen, LSystem LS);
+
 
 private:
 
-    std::vector<Genome> population;
+    std::vector<Genome *>  population;
     std::map<std::string, int> params;
 
 

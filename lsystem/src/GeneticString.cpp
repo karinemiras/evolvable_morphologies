@@ -113,13 +113,12 @@ void GeneticString::display_list()
     Node *current;
     if (start == NULL)
     {
-        std::cout<<"WARNING: List empty,nothing to display"<<std::endl;
+        std::cout<<"WARNING: List empty, nothing to display."<<std::endl;
         return;
     }
     current = start;
     std::cout<<"The genetic-string List is :"<<std::endl;
-    while (current != NULL)
-    {
+    while (current != NULL) {
         std::cout<<current->item<<" ";
         current = current->next;
     }

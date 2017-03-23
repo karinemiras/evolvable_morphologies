@@ -40,36 +40,21 @@ void Evolution::readParams(){
  */
 void Evolution::initPopulation(int argc, char* argv[], LSystem LS){
 
-    for(int i=0; i <= params["pop_size"]; i++) {
+    for(int i=0; i <= this->params["pop_size"]; i++) {
 
         std::cout<<" ------ genome "<<i<<std::endl;
-        std::vector<std::string> axiom;
-        axiom.push_back("CNNN");
+        Genome * gen = new Genome(std::to_string(this->population.size()+1));
+        gen->createEmbryo();
+        gen->developGenome(argc, argv, this->params, LS);
 
-        Genome gen(std::to_string(i+1), axiom);
-        // initializes the genetic-string with the axiom
-        gen.setGeneticString(gen.build_genetic_string(gen.getGeneticString(), gen.getAxiom()));
-
-        std::cout << " >> building axiom ..." << std::endl;
-        gen.getGeneticString().display_list();
-
-        // creates genetic-strings for production initial rules with the grammar
-        std::cout << " >> building grammar ..." << std::endl;
-        gen.build_grammar(LS);
-
-        // enhances the genetic-string according to grammar iteratively
-        std::cout << " >> iterating replacements ..." << std::endl;
-        gen.generate_final_string();
-
-        // decodes the final genetic-string into a tree of components
-        std::cout << " >> decoding ... " << std::endl;
-        gen.decodeGeneticString(LS);
-
-        // generates robot-graphics
-        std::cout << " >> constructing ... " << std::endl;
-        gen.constructor(argc, argv);
+        gen->initalizeMeasures();
+        gen->measurePhenotype();
+        std::cout<<" total "<<gen->getMeasures()["total_components"]<<std::endl;
 
         this->population.push_back(gen);
     }
 
 }
+
+
+
