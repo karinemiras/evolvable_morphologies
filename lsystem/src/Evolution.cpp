@@ -25,7 +25,7 @@ void Evolution::readParams(){
         while ( getline (myfile,line) ) {
             std::vector<std::string> tokens;
             boost::split( tokens, line, boost::is_any_of(" ") );
-            this->params[tokens[0]] = std::stoi(tokens[1]);
+            this->params[tokens[0]] = std::stod(tokens[1]);
         }
         myfile.close();
     }
@@ -40,16 +40,15 @@ void Evolution::readParams(){
  */
 void Evolution::initPopulation(int argc, char* argv[], LSystem LS){
 
-    for(int i=0; i <= this->params["pop_size"]; i++) {
+    for(int i=1; i <= this->params["pop_size"]; i++) {
 
         std::cout<<" ------ genome "<<i<<std::endl;
-        Genome * gen = new Genome(std::to_string(this->population.size()+1));
+        Genome * gen = new Genome(std::to_string(i));
         gen->createEmbryo();
         gen->developGenome(argc, argv, this->params, LS);
 
         gen->initalizeMeasures();
         gen->measurePhenotype();
-        std::cout<<" total "<<gen->getMeasures()["total_components"]<<std::endl;
 
         this->population.push_back(gen);
     }

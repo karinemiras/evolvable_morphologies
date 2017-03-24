@@ -28,13 +28,14 @@ public:
 
     struct Vertex{
         std::string item;
-        QGraphicsRectItem * comp;
         int id;
+        int x;
+        int y;
         Vertex *left;
         Vertex *front;
         Vertex *right;
         Vertex *back; // parent component in the tree
-        Vertex() { left=front=right=back=NULL; comp=NULL; }
+        Vertex() { left=front=right=back=NULL; x=y=0;}
     };
 
     DecodedGeneticString::Vertex * getRoot();

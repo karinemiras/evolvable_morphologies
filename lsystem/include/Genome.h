@@ -33,7 +33,7 @@ public:
 
     unsigned int getTo();
     GeneticString build_genetic_string(GeneticString gs, std::vector<std::string> genetic_string_items);
-    void build_grammar(LSystem LS, int num_initial_comp, int add_backtoparent_prob);
+    void build_grammar(LSystem LS, int num_initial_comp, double add_backtoparent_prob);
     GeneticString getGeneticString();
     void setGeneticString(GeneticString _gs);
     std::vector<std::string> getAxiom();
@@ -44,11 +44,11 @@ public:
     std::string getId();
     void exportGenome();
     void createEmbryo();
-    void developGenome(int argc, char* argv[], std::map<std::string, int> params, LSystem LS);
+    void developGenome(int argc, char* argv[], std::map<std::string, double> params, LSystem LS);
     void measurePhenotype();
     void measureComponent(DecodedGeneticString::Vertex * c1, DecodedGeneticString::Vertex * c2);
     void initalizeMeasures();
-    std::map< std::string, int> getMeasures();
+    std::map< std::string, double> getMeasures();
 
 private:
 
@@ -58,7 +58,7 @@ private:
     std::map< std::string, GeneticString >  grammar;
     std::string id;
     QGraphicsScene * scene;
-    std::map< std::string, int >  measures;
+    std::map< std::string, double >  measures;
 
 };
 

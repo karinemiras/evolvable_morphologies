@@ -25,7 +25,7 @@ public:
 private:
 
     std::vector<Genome *>  population;
-    std::map<std::string, int> params;
+    std::map<std::string, double> params;
 
 
 };
