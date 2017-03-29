@@ -68,7 +68,6 @@ void Genome::build_grammar(LSystem LS, int num_initial_comp, double add_backtopa
 
                 std::uniform_real_distribution<double> p_btp(0.0, 1.0); // distribution for back-to-parent command
                 double p = p_btp(generator);
-                std::cout<<" Aaaaaaaaaaaaaakkkkkkkkkiiiiiiiiii " <<p <<"   "<<add_backtoparent_prob;
                 if (p < add_backtoparent_prob){
                     letter_items.push_back(com[0]);
                 }
@@ -226,7 +225,7 @@ void Genome::generate_final_string(int  replacement_iterations, int export_genom
 void Genome::exportGenome() {
 
     std::ofstream genome_file;
-    std::string path = "/Users/karinemiras/CLionProjects/lsystem-proto/genome_"+this->id+".txt";
+    std::string path = "/Users/karinemiras/CLionProjects/lsystem-proto/tests/genome_"+this->id+".txt";
     genome_file.open(path);
 
     GeneticString::Node *current;
@@ -300,7 +299,7 @@ void Genome::constructor(int argc, char* argv[], int show_phenotypes, int export
         image.fill(Qt::transparent);                                              // Start all pixels transparent
         QPainter painter(&image);
         this->scene->render(&painter);
-        QString qstr = QString::fromStdString("/Users/karinemiras/CLionProjects/lsystem-proto/" + this->id + ".png");
+        QString qstr = QString::fromStdString("/Users/karinemiras/CLionProjects/lsystem-proto/tests/" + this->id + ".png");
         image.save(qstr);
     }
 
@@ -317,6 +316,7 @@ void Genome::constructor(int argc, char* argv[], int show_phenotypes, int export
 void Genome::draw_component( std::string reference, std::string direction, QGraphicsScene * scene, std::vector<QGraphicsRectItem *> items,  DecodedGeneticString::Vertex * c1, DecodedGeneticString::Vertex * c2){
 
     int size = 40;
+    int space = 1;
 
     if(c2 != NULL){ // condition to stop recursive calls
 
@@ -352,25 +352,25 @@ void Genome::draw_component( std::string reference, std::string direction, QGrap
 
             std::string tsign;
 
-            if(direction == "left") { // direction is accprding to the command
+            if(direction == "left") { // direction is according to the command
 
                 if(reference == "bottom") {   // reference is according to the turtle path, starting in the bottom
-                    items[items.size() - 1]->setPos(c2->back->x - size-1, c2->back->y);
+                    items[items.size() - 1]->setPos(c2->back->x - size-space, c2->back->y);
                     reference = "rside";
                     tsign = ">";
                 }
                 else if(reference == "top") {
-                    items[items.size() - 1]->setPos(c2->back->x + size+1, c2->back->y);
+                    items[items.size() - 1]->setPos(c2->back->x + size+space, c2->back->y);
                     reference = "lside";
                     tsign = "<";
                 }
                 else if(reference == "lside") {
-                    items[items.size() - 1]->setPos(c2->back->x , c2->back->y-size+-1);
+                    items[items.size() - 1]->setPos(c2->back->x , c2->back->y-size-space);
                     reference = "bottom";
                     tsign = "v";
                 }
                 else if(reference == "rside") {
-                    items[items.size() - 1]->setPos(c2->back->x , c2->back->y+size+1);
+                    items[items.size() - 1]->setPos(c2->back->x , c2->back->y+size+space);
                     reference = "top";
                     tsign = "^";
                 }
@@ -378,22 +378,22 @@ void Genome::draw_component( std::string reference, std::string direction, QGrap
             if(direction == "right") {
 
                 if(reference == "bottom") {
-                    items[items.size() - 1]->setPos(c2->back->x + size+1, c2->back->y);
+                    items[items.size() - 1]->setPos(c2->back->x + size+space, c2->back->y);
                     reference = "lside";
                     tsign = "<";
                 }
                 else if(reference == "top") {
-                    items[items.size() - 1]->setPos(c2->back->x - size-1, c2->back->y);
+                    items[items.size() - 1]->setPos(c2->back->x - size-space, c2->back->y);
                     reference = "rside";
                     tsign = ">";
                 }
                 else if(reference == "lside") {
-                    items[items.size() - 1]->setPos(c2->back->x , c2->back->y+size+1);
+                    items[items.size() - 1]->setPos(c2->back->x , c2->back->y+size+space);
                     reference = "top";
                     tsign = "^";
                 }
                 else if(reference == "rside") {
-                    items[items.size() - 1]->setPos(c2->back->x , c2->back->y-size-1);
+                    items[items.size() - 1]->setPos(c2->back->x , c2->back->y-size-space);
                     reference = "bottom";
                     tsign = "v";
                 }
@@ -401,38 +401,38 @@ void Genome::draw_component( std::string reference, std::string direction, QGrap
             if(direction == "front") {
 
                 if(reference == "bottom") {
-                    items[items.size() - 1]->setPos(c2->back->x, c2->back->y-size-1);
+                    items[items.size() - 1]->setPos(c2->back->x, c2->back->y-size-space);
                     tsign = "v";
                 }
                 else if(reference == "top") {
-                    items[items.size() - 1]->setPos(c2->back->x, c2->back->y+size+1);
+                    items[items.size() - 1]->setPos(c2->back->x, c2->back->y+size+space);
                     tsign = "^";
                 }
                 else if(reference == "lside") {
-                    items[items.size() - 1]->setPos(c2->back->x+size+1 , c2->back->y);
+                    items[items.size() - 1]->setPos(c2->back->x+size+space , c2->back->y);
                     tsign = "<";
                 }
                 else if(reference == "rside") {
-                    items[items.size() - 1]->setPos(c2->back->x -size-1, c2->back->y);
+                    items[items.size() - 1]->setPos(c2->back->x -size-space, c2->back->y);
                     tsign = ">";
                 }
             }
             if(direction == "root-back" ) {
 
-                items[items.size() - 1]->setPos(c2->back->x , c2->back->y+size+1);
+                items[items.size() - 1]->setPos(c2->back->x , c2->back->y+size+space);
                 reference = "top";
                 tsign = "^";
             }
 
-            sign->setPos(items[items.size() - 1]->x()+15 , items[items.size() - 1]->y()+15);
+            sign->setPos(items[items.size() - 1]->x()+15 , items[items.size() - 1]->y()+15); // set position for the sign, relative to its component
             sign->setPlainText(QString::fromStdString(tsign));
 
         }else{
-                items[items.size() - 1]->setPos(250, 250);
+                items[items.size() - 1]->setPos(0, 0);
         }
 
-        c2->x = items[items.size()-1]->x(); // saves x coordinate for the component in the graph
-        c2->y = items[items.size()-1]->y(); // saves y coordinate for the component in the graph
+        c2->x = items[items.size()-1]->x(); // saves x coordinate in the graph for the component
+        c2->y = items[items.size()-1]->y(); // saves y coordinate in the graph for the component
 
         QList < QGraphicsItem * > coll;
         coll =  items[items.size()-1]->collidingItems();
@@ -446,8 +446,16 @@ void Genome::draw_component( std::string reference, std::string direction, QGrap
             if(direction == "front"){ c2->back->front = NULL; }
             if(direction == "right"){ c2->back->right = NULL; }
             if(direction == "root-back"){ c2->back->back = NULL; }
+            c2 = NULL;
 
             return; // does not keep building from there
+
+        }else{  // saves shortcut for coordinates of the item
+            this->coor_x.push_back(c2->x);
+            this->coor_y.push_back(c2->y);
+
+            std::pair<int, int> key = std::make_pair(c2->x,c2->y);
+            this->list_components[key] = c2->item;
         }
 
         // recursively calls this function to roam the rest of the graph
@@ -512,15 +520,96 @@ void Genome::developGenome(int argc, char* argv[], std::map<std::string, double>
 **/
 void Genome::measurePhenotype(){
 
+    int size = 40+1;
+
     DecodedGeneticString::Vertex * c = NULL;
     c = this->dgs.getRoot();
 
-    this->measureComponent(c,c);
+    this->initalizeMeasures();
+    this->measureComponent(c,c); // roams graph accounting for metrics for the measures
 
+    // calculates the length ratio
+    std::vector<int>::iterator aux_pos;
+    aux_pos = std::max_element(this->coor_x.begin(), this->coor_x.end());
+    int max_x = this->coor_x[std::distance(this->coor_x.begin(), aux_pos)];
+    aux_pos = std::max_element(this->coor_y.begin(), this->coor_y.end());
+    int max_y = this->coor_y[std::distance(this->coor_y.begin(), aux_pos)];
+    aux_pos = std::min_element(this->coor_x.begin(), this->coor_x.end());
+    int min_x = this->coor_x[std::distance(this->coor_x.begin(), aux_pos)];
+    aux_pos = std::min_element(this->coor_y.begin(), this->coor_y.end());
+    int min_y = this->coor_y[std::distance(this->coor_y.begin(), aux_pos)];
+    int horizontal_length = max_x + size - min_x ;
+    int vertical_length = max_y+size - min_y;
+    if( horizontal_length < vertical_length ) {
+        this->measures["length_ratio"] = roundf(  (horizontal_length / (double)vertical_length) * 100) / 100;
+    }else{
+        this->measures["length_ratio"] = roundf(  (vertical_length / (double)horizontal_length) * 100) / 100;
+    }
+
+    // calculates the covered area
+    int number_components = 1 + this->measures["total_bricks"] + this->measures["total_fixed_joints"] + this->measures["total_passive_joints"] + this->measures["total_active_joints"];
+    int expected_components =  (horizontal_length / size) * (vertical_length / size);
+    this->measures["coverage"] = roundf( (number_components/(double)expected_components)*100)/100;
+
+    // calculates the average distance of components from each other
+    for(int i = 0; i < this->coor_x.size(); i++){
+        for(int j=0; j < this->coor_x.size(); j++) {
+            if(i != j){ // does not compare to itself
+                this->measures["sparsity"] += abs(abs(this->coor_x[i]) - abs(this->coor_x[j])) + abs(abs(this->coor_y[i]) - abs(this->coor_y[j]));
+              }
+        }
+    }
+    this->measures["sparsity"] =  roundf( ( (this->measures["sparsity"]/2) / ( ((this->coor_x.size() * this->coor_x.size()) - this->coor_x.size()) /2 ) )*100)/100;
+//    for(int i = 0; i < this->coor_x.size(); i++){
+//        std::cout<<" here "<<this->coor_x[i]<<" "<<this->coor_y[i]<<std::endl;
+//    }
+
+    // calculates the horizontal symmetry
+    int ncomp = 0;
+    for (std::map< std::pair<int, int>, std::string >::const_iterator it = this->list_components.begin(); it != this->list_components.end(); ++it) {
+        std::cout << it->first.first << " : "<< it->first.second << " : " << it->second << std::endl;
+        if( it->first.first < 0 or it->first.first >= size ) {
+            ncomp +=1;
+            std::pair<int, int> l_key = std::make_pair(it->first.first * (-1),
+                                                       it->first.second); // the horizontal-opposite coordinate
+            auto l_it = this->list_components.find(l_key);
+            if (l_it != this->list_components.end()) {
+                std::cout << " found  " << std::endl;
+
+                if (it->second == this->list_components[l_key]) { // if the component at the other side is the same type
+                    this->measures["horizontal_symmetry"]+= 1 ;
+                    std::cout<<it->first.first  * (-1) <<" "<<it->first.second <<" "<<it->second<< "  "<<this->list_components[l_key]<<std::endl;
+                }
+            }
+        }
+    }
+    this->measures["horizontal_symmetry"] /= roundf(ncomp*100)/100;
+    std::cout << " ----------  " << std::endl;
+    // calculates the vertical symmetry
+    ncomp = 0;
+    for (std::map< std::pair<int, int>, std::string >::const_iterator it = this->list_components.begin(); it != this->list_components.end(); ++it) {
+        std::cout << it->first.first << " : "<< it->first.second << " : " << it->second << std::endl;
+        if(it->first.second < 0 or it->first.second >= size ) {
+            ncomp +=1;
+            std::pair<int, int> l_key = std::make_pair(it->first.first,
+                                                       it->first.second * (-1)); // the vertical-opposite coordinate
+            auto l_it = this->list_components.find(l_key);
+            if (l_it != this->list_components.end()) {
+                std::cout << " found " << std::endl;
+
+                if (it->second == this->list_components[l_key]) { // if the component at the other side is the same type
+                    this->measures["vertical_symmetry"]+= 1 ;
+                    std::cout<<it->first.first <<" "<<it->first.second * (-1) <<" "<<it->second<< "  "<<this->list_components[l_key]<<std::endl;
+                }
+            }
+        }
+    }
+    this->measures["vertical_symmetry"] /= roundf(ncomp*100)/100;
+
+    // exports measures to file
     std::ofstream measures_file;
-    std::string path = "/Users/karinemiras/CLionProjects/lsystem-proto/measures_"+this->id+".txt";
+    std::string path = "/Users/karinemiras/CLionProjects/lsystem-proto/tests/measures_"+this->id+".txt";
     measures_file.open(path);
-
     for (std::map< std::string, double >::const_iterator it = this->measures.begin(); it != this->measures.end(); ++it) {
         measures_file << it->first << " : " << it->second << std::endl;
     }
@@ -530,7 +619,6 @@ void Genome::measurePhenotype(){
 void Genome::measureComponent(DecodedGeneticString::Vertex * c1, DecodedGeneticString::Vertex * c2){
 
     if(c2 != NULL){ // condition to stop recursive calls
-
 
         if (c2->item == "BNNN") { this->measures["total_bricks"]++; } // counts for each brick
         if (c2->item == "J1") { this->measures["total_fixed_joints"]++; } // counts for each fixed joint
@@ -542,7 +630,7 @@ void Genome::measureComponent(DecodedGeneticString::Vertex * c1, DecodedGeneticS
             connected_sides++; // counts for parent connectivity
         } else {
             if (c2->back != NULL) { connected_sides++; }
-        } // if it is root, and theres back-side connectivity
+        } // if it is root, and there is back-side connectivity
         if (c2->left != NULL) { connected_sides++; } //  if theres left-side connectivity
         if (c2->right != NULL) { connected_sides++; } // if theres right-side connectivity
         if (c2->front != NULL) { connected_sides++; } //  if theres front-side connectivity
@@ -550,7 +638,9 @@ void Genome::measureComponent(DecodedGeneticString::Vertex * c1, DecodedGeneticS
         if (connected_sides == 2) {
             this->measures["connectivity2"]++; // counts for only two sides are connected
 
-            if(c2->item == "J1" or c2->item == "PJ" or c2->item == "AJ") { this->measures["effective_joints"]++; } // counts for joints connected by both sides
+            if( (c2->item == "J1" or c2->item == "PJ" or c2->item == "AJ")  and (c2->back->item == "CNNN" or c2->back->item == "BNNN") and (c2->front->item == "BNNN") ){
+                this->measures["effective_joints"]++;
+            } // counts for joints connected by both sides to brick or core component
         }
         if (connected_sides == 3) { this->measures["connectivity3"]++; } // counts for only three sides are connected
         if (connected_sides == 4) { this->measures["connectivity4"]++; } // counts for all four sides are connected
@@ -569,15 +659,20 @@ void Genome::measureComponent(DecodedGeneticString::Vertex * c1, DecodedGeneticS
 
 void Genome::initalizeMeasures(){
 
-    this->measures["total_bricks"] = 0; // measure: total amount of brick-components forming the robot
-    this->measures["total_fixed_joints"] = 0; // measure: total amount of fixed-joint-components forming the robot
+    this->measures["total_bricks"] = 0; //  total amount of brick-components forming the robot
+    this->measures["total_fixed_joints"] = 0; //  total amount of fixed-joint-components forming the robot
     this->measures["total_passive_joints"] = 0; // measure: total amount of passive-joint-components forming the robot
-    this->measures["total_active_joints"] = 0; // measure: total amount of active-joint-components forming the robot
-    this->measures["connectivity1"] = 0;  // measure: total of components with one side connected to another component
-    this->measures["connectivity2"] = 0;  // measure: total of components with two sides connected to another component
-    this->measures["connectivity3"] = 0;  // measure: total of components with three sides connected to another component
-    this->measures["connectivity4"] = 0;  // measure: total of components with four sides connected to another component
-    this->measures["effective_joints"] = 0;  // measure: total of joints connected by both sides
+    this->measures["total_active_joints"] = 0; //   total amount of active-joint-components forming the robot
+    this->measures["connectivity1"] = 0; //   total of components with one side connected to another component
+    this->measures["connectivity2"] = 0; //  total of components with two sides connected to another component
+    this->measures["connectivity3"] = 0; // total of components with three sides connected to another component
+    this->measures["connectivity4"] = 0; //   total of components with four sides connected to another component
+    this->measures["effective_joints"] = 0; //  total of joints connected by both sides to a brick or core component
+    this->measures["length_ratio"] = 0; // length of the shortest side dived by the longest
+    this->measures["coverage"] = 0; // proportion of the expected area (given the horizontal e vertical lengths) that is covered with components
+    this->measures["sparsity"] = 0; // average distance of each component from each other in the axises x/y
+    this->measures["horizontal_symmetry"] = 0; // proportion of components in the left side which match with the same type of component in the same relative position on the right side
+    this->measures["vertical_symmetry"] = 0; // proportion of components in the top side which match with the same type of component in the same relative position on the bottom side
 }
 
 std::map< std::string, double > Genome::getMeasures() {

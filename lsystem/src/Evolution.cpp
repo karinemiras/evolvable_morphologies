@@ -47,7 +47,7 @@ void Evolution::initPopulation(int argc, char* argv[], LSystem LS){
         gen->createEmbryo();
         gen->developGenome(argc, argv, this->params, LS);
 
-        gen->initalizeMeasures();
+
         gen->measurePhenotype();
 
         this->population.push_back(gen);

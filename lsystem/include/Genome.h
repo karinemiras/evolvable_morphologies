@@ -50,6 +50,7 @@ public:
     void initalizeMeasures();
     std::map< std::string, double> getMeasures();
 
+
 private:
 
     GeneticString gs;
@@ -59,6 +60,9 @@ private:
     std::string id;
     QGraphicsScene * scene;
     std::map< std::string, double >  measures;
+    std::vector<int> coor_x;
+    std::vector<int> coor_y;
+    std::map< std::pair<int, int>, std::string >  list_components;
 
 };
 

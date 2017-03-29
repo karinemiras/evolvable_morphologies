@@ -25,12 +25,14 @@ using namespace std;
 int main(int argc, char* argv[])
 {
 
+    std::cout<<" step 1";
     LSystem LS;
     LS.build_commands();
     LS.build_alphabet();
-
+    std::cout<<" step 2";
     Evolution e;
     e.readParams();
+    std::cout<<" step 3";
     e.initPopulation(argc, argv, LS);
 
 

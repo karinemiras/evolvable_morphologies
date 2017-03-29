@@ -1,4 +1,4 @@
-pop_size 1000
+pop_size 100
 add_backtoparent_prob 0.20
 num_initial_comp 3
 show_phenotypes 0
