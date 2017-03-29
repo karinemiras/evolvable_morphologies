@@ -555,66 +555,74 @@ void Genome::measurePhenotype(){
     for(int i = 0; i < this->coor_x.size(); i++){
         for(int j=0; j < this->coor_x.size(); j++) {
             if(i != j){ // does not compare to itself
-                this->measures["sparsity"] += abs(abs(this->coor_x[i]) - abs(this->coor_x[j])) + abs(abs(this->coor_y[i]) - abs(this->coor_y[j]));
+                this->measures["spreadness"] += abs(abs(this->coor_x[i]) - abs(this->coor_x[j])) + abs(abs(this->coor_y[i]) - abs(this->coor_y[j]));
               }
         }
     }
-    this->measures["sparsity"] =  roundf( ( (this->measures["sparsity"]/2) / ( ((this->coor_x.size() * this->coor_x.size()) - this->coor_x.size()) /2 ) )*100)/100;
-//    for(int i = 0; i < this->coor_x.size(); i++){
-//        std::cout<<" here "<<this->coor_x[i]<<" "<<this->coor_y[i]<<std::endl;
-//    }
+    this->measures["spreadness"] =  roundf( ( (this->measures["spreadness"]/2) / ( ((this->coor_x.size() * this->coor_x.size()) - this->coor_x.size()) /2 ) )*100)/100;
+
 
     // calculates the horizontal symmetry
     int ncomp = 0;
     for (std::map< std::pair<int, int>, std::string >::const_iterator it = this->list_components.begin(); it != this->list_components.end(); ++it) {
-        std::cout << it->first.first << " : "<< it->first.second << " : " << it->second << std::endl;
         if( it->first.first < 0 or it->first.first >= size ) {
             ncomp +=1;
             std::pair<int, int> l_key = std::make_pair(it->first.first * (-1),
                                                        it->first.second); // the horizontal-opposite coordinate
             auto l_it = this->list_components.find(l_key);
             if (l_it != this->list_components.end()) {
-                std::cout << " found  " << std::endl;
 
                 if (it->second == this->list_components[l_key]) { // if the component at the other side is the same type
                     this->measures["horizontal_symmetry"]+= 1 ;
-                    std::cout<<it->first.first  * (-1) <<" "<<it->first.second <<" "<<it->second<< "  "<<this->list_components[l_key]<<std::endl;
                 }
             }
         }
     }
-    this->measures["horizontal_symmetry"] /= roundf(ncomp*100)/100;
-    std::cout << " ----------  " << std::endl;
+    if(ncomp > 0){ this->measures["horizontal_symmetry"] = roundf( (this->measures["horizontal_symmetry"] / ncomp)*100)/100; }else{ this->measures["horizontal_symmetry"]=1; }
+
+
     // calculates the vertical symmetry
     ncomp = 0;
     for (std::map< std::pair<int, int>, std::string >::const_iterator it = this->list_components.begin(); it != this->list_components.end(); ++it) {
-        std::cout << it->first.first << " : "<< it->first.second << " : " << it->second << std::endl;
         if(it->first.second < 0 or it->first.second >= size ) {
             ncomp +=1;
             std::pair<int, int> l_key = std::make_pair(it->first.first,
                                                        it->first.second * (-1)); // the vertical-opposite coordinate
             auto l_it = this->list_components.find(l_key);
             if (l_it != this->list_components.end()) {
-                std::cout << " found " << std::endl;
 
                 if (it->second == this->list_components[l_key]) { // if the component at the other side is the same type
                     this->measures["vertical_symmetry"]+= 1 ;
-                    std::cout<<it->first.first <<" "<<it->first.second * (-1) <<" "<<it->second<< "  "<<this->list_components[l_key]<<std::endl;
                 }
             }
         }
     }
-    this->measures["vertical_symmetry"] /= roundf(ncomp*100)/100;
+    if(ncomp > 0){ this->measures["vertical_symmetry"] = roundf( (this->measures["vertical_symmetry"] / ncomp)*100 )/100; }else{ this->measures["vertical_symmetry"]=1; }
 
-    // exports measures to file
+
+    // exports measures to file (individual and populational)
+
+    std::ofstream measures_file_general;
+    std::string path = "/Users/karinemiras/CLionProjects/lsystem-proto/tests/measures.txt";
+    measures_file_general.open(path, std::ofstream::app);
+
     std::ofstream measures_file;
-    std::string path = "/Users/karinemiras/CLionProjects/lsystem-proto/tests/measures_"+this->id+".txt";
+    path = "/Users/karinemiras/CLionProjects/lsystem-proto/tests/measures_"+this->id+".txt";
     measures_file.open(path);
+    measures_file_general << this->id;
+
     for (std::map< std::string, double >::const_iterator it = this->measures.begin(); it != this->measures.end(); ++it) {
         measures_file << it->first << " : " << it->second << std::endl;
+        measures_file_general <<"\t"<< it->second;
     }
+    measures_file_general << std::endl;
+
     measures_file.close();
+    measures_file_general.close();
 }
+
+
+
 
 void Genome::measureComponent(DecodedGeneticString::Vertex * c1, DecodedGeneticString::Vertex * c2){
 
@@ -657,6 +665,7 @@ void Genome::measureComponent(DecodedGeneticString::Vertex * c1, DecodedGeneticS
 
 }
 
+
 void Genome::initalizeMeasures(){
 
     this->measures["total_bricks"] = 0; //  total amount of brick-components forming the robot
@@ -670,7 +679,7 @@ void Genome::initalizeMeasures(){
     this->measures["effective_joints"] = 0; //  total of joints connected by both sides to a brick or core component
     this->measures["length_ratio"] = 0; // length of the shortest side dived by the longest
     this->measures["coverage"] = 0; // proportion of the expected area (given the horizontal e vertical lengths) that is covered with components
-    this->measures["sparsity"] = 0; // average distance of each component from each other in the axises x/y
+    this->measures["spreadness"] = 0; // average distance of each component from each other in the axises x/y
     this->measures["horizontal_symmetry"] = 0; // proportion of components in the left side which match with the same type of component in the same relative position on the right side
     this->measures["vertical_symmetry"] = 0; // proportion of components in the top side which match with the same type of component in the same relative position on the bottom side
 }

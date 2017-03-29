@@ -34,7 +34,11 @@ int main(int argc, char* argv[])
     e.readParams();
     std::cout<<" step 3";
     e.initPopulation(argc, argv, LS);
+    e.measurePopulation();
 
+
+  //  Evolution e;
+   // e.testGeneticString(argc, argv,"fixed_morph/gecko.txt", LS);
 
 
     return 0;

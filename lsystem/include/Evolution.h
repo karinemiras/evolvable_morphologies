@@ -20,7 +20,9 @@ public:
     void initPopulation(int argc, char* argv[], LSystem LS);
     void readParams();
     void developGenome(int argc, char* argv[], Genome * gen, LSystem LS);
-
+    void loadPopulation(int argc, char* argv[],int size_pop, std::string test_folder, LSystem LS);
+    void testGeneticString(int argc, char* argv[],std::string test_genome, LSystem LS);
+    void measurePopulation();
 
 private:
 
