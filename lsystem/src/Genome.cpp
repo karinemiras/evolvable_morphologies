@@ -528,14 +528,23 @@ void Genome::measurePhenotype(std::map<std::string, double> params){
     this->initalizeMeasures(); // creates map with keys for measures as zero-valued
     this->measureComponent(c,c); // roams graph accounting for metrics for the measures
 
-    // general total of components
+    // general total of components, sums core plus all types
     this->measures["total_components"] = 1 + this->measures["total_bricks"] + this->measures["total_fixed_joints"] + this->measures["total_passive_joints"] + this->measures["total_active_joints"];
+
+    // relative numbers of joints
+    int joints = this->measures["total_fixed_joints"] + this->measures["total_passive_joints"] + this->measures["total_active_joints"];
+    this->measures["joints_per_limb"] = roundf((this->measures["effective_joints"] / this->measures["connectivity1"])*100)/100;  // number of effective joints per total of limbs
+    if(joints > 0) { this->measures["effective_joints"] = roundf( (this->measures["effective_joints"]/joints)*100)/100; } // percentages for effective-joints per total of joints
 
     // transforms totals in percentages
     this->measures["total_bricks"] = roundf(( this->measures["total_bricks"]/this->measures["total_components"])*100)/100;
     this->measures["total_fixed_joints"] = roundf((this->measures["total_fixed_joints"]/this->measures["total_components"])*100)/100;
     this->measures["total_passive_joints"] = roundf((this->measures["total_passive_joints"]/this->measures["total_components"])*100)/100;
     this->measures["total_active_joints"] = roundf((this->measures["total_active_joints"]/this->measures["total_components"])*100)/100;
+    this->measures["connectivity1"] = roundf ((this->measures["connectivity1"] / this->measures["total_components"])*100)/100;
+    this->measures["connectivity2"] = roundf ((this->measures["connectivity2"] / this->measures["total_components"])*100)/100;
+    this->measures["connectivity3"] = roundf ((this->measures["connectivity3"] / this->measures["total_components"])*100)/100;
+    this->measures["connectivity4"] = roundf ((this->measures["connectivity4"] / this->measures["total_components"])*100)/100;
 
     // calculates the length ratio
 
@@ -562,15 +571,21 @@ void Genome::measurePhenotype(std::map<std::string, double> params){
     int expected_components =  (horizontal_length / size) * (vertical_length / size); // number of components which would fit, given the expected area according to lenghts
     this->measures["coverage"] = roundf( (this->measures["total_components"]/(double)expected_components)*100)/100;
 
+
     // calculates the average distance among components
+    int comps = 0;
     for(int i = 0; i < this->coor_x.size(); i++){  // for each component
+        int comp = 0;
         for(int j=0; j < this->coor_x.size(); j++) {   // compare with all other component
             if(i != j){ // does not compare to itself
-                this->measures["spreadness"] += abs(abs(this->coor_x[i]) - abs(this->coor_x[j])) + abs(abs(this->coor_y[i]) - abs(this->coor_y[j]));
+                comp += abs(abs(this->coor_x[i]) - abs(this->coor_x[j])) + abs(abs(this->coor_y[i]) - abs(this->coor_y[j])); // sum of distances for that component to all the others
               }
         }
+        comp /= this->coor_x.size() - 1; // average of the distances for the component
+        comps += comp; // sum of averages of all components
     }
-    this->measures["spreadness"] =  roundf( ( (this->measures["spreadness"]/2) / ( ((this->coor_x.size() * this->coor_x.size()) - this->coor_x.size()) /2 ) )*100)/100;
+    comps /= this->coor_x.size();  // average of the averages
+    this->measures["spreadness"] = roundf((comps/this->measures["total_components"])*100)/100;
 
 
     // calculates the horizontal symmetry
@@ -661,6 +676,8 @@ void Genome::measureComponent(DecodedGeneticString::Vertex * c1, DecodedGeneticS
                 this->measures["effective_joints"]++;
             } // counts for joints connected by both sides to brick or core component
         }
+
+
         if (connected_sides == 3) { this->measures["connectivity3"]++; } // counts for only three sides are connected
         if (connected_sides == 4) { this->measures["connectivity4"]++; } // counts for all four sides are connected
 
@@ -694,6 +711,7 @@ void Genome::initalizeMeasures(){
     this->measures["spreadness"] = 0; // average distance of each component from each other in the axises x/y
     this->measures["horizontal_symmetry"] = 0; // proportion of components in the left side which match with the same type of component in the same relative position on the right side
     this->measures["vertical_symmetry"] = 0; // proportion of components in the top side which match with the same type of component in the same relative position on the bottom side
+    this->measures["joints_per_limb"] = 0; //  total amount of effective joints per limb
 }
 
 std::map< std::string, double > Genome::getMeasures() {
