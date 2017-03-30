@@ -1,7 +1,9 @@
-pop_size 1000
+pop_size 10
 add_backtoparent_prob 0.20
 num_initial_comp 3
 show_phenotypes 0
 export_phenotypes 1
 export_genomes 1
 replacement_iterations 3
+size_component 40
+spacing 1

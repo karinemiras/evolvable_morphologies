@@ -39,13 +39,13 @@ public:
     std::vector<std::string> getAxiom();
     void generate_final_string(int  replacement_iterations, int export_genomes);
     void decodeGeneticString(LSystem LS);
-    void constructor(int argc, char* argv[], int show_phenotypes, int export_phenotypes);
-    void draw_component(std::string reference, std::string direction, QGraphicsScene * scene, std::vector<QGraphicsRectItem *>  items,DecodedGeneticString::Vertex * c1, DecodedGeneticString::Vertex * c2);
+    void constructor(int argc, char* argv[], std::map<std::string, double> params);
+    void draw_component(std::string reference, std::string direction, QGraphicsScene * scene, std::vector<QGraphicsRectItem *>  items,DecodedGeneticString::Vertex * c1, DecodedGeneticString::Vertex * c2, std::map<std::string, double> params);
     std::string getId();
     void exportGenome();
     void createEmbryo();
     void developGenome(int argc, char* argv[], std::map<std::string, double> params, LSystem LS);
-    void measurePhenotype();
+    void measurePhenotype(std::map<std::string, double> params);
     void measureComponent(DecodedGeneticString::Vertex * c1, DecodedGeneticString::Vertex * c2);
     void initalizeMeasures();
     std::map< std::string, double> getMeasures();

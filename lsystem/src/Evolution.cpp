@@ -64,7 +64,7 @@ void Evolution::initPopulation(int argc, char* argv[], LSystem LS){
     measures_file_general.open(path);
 
     for(int i=0; i <= this->params["pop_size"]-1; i++) {
-        this->population[i]->measurePhenotype();
+        this->population[i]->measurePhenotype(this->params);
     }
     measures_file_general.close();
 
@@ -131,9 +131,9 @@ void Evolution::testGeneticString(int argc, char* argv[],std::string test_genome
 
         // generates robot-graphics
         std::cout << " >> constructing ... " << std::endl;
-        gen->constructor(argc, argv, 0, 1);
+        gen->constructor(argc, argv, this->params);
 
-        gen->measurePhenotype();
+        gen->measurePhenotype(this->params);
 
         myfile.close();
     }else{

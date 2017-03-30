@@ -272,7 +272,7 @@ void Genome::decodeGeneticString(LSystem LS){
 /**
  * Draws a chart from the graph.
  */
-void Genome::constructor(int argc, char* argv[], int show_phenotypes, int export_phenotypes) {
+void Genome::constructor(int argc, char* argv[], std::map<std::string, double> params) {
 
 
     QApplication app(argc, argv);
@@ -287,10 +287,10 @@ void Genome::constructor(int argc, char* argv[], int show_phenotypes, int export
     DecodedGeneticString::Vertex * c = NULL;
     c = this->dgs.getRoot();
 
-    this->draw_component("bottom","root",this->scene,items,c,c); // from component on the root, draws all components in the graph
+    this->draw_component("bottom","root",this->scene,items,c,c, params); // from component on the root, draws all components in the graph
 
     // exports drawn robot into image file
-    if (export_phenotypes == 1) {
+    if (params["export_phenotypes"] == 1) {
         this->scene->clearSelection();                                                  // Selections would also render to the file
         this->scene->setSceneRect(
                 this->scene->itemsBoundingRect());                                      // Re-shrink the scene to it's bounding contents
@@ -304,7 +304,7 @@ void Genome::constructor(int argc, char* argv[], int show_phenotypes, int export
     }
 
     // show drawn robot on the screen
-    if (show_phenotypes == 1){
+    if (params["show_phenotypes"] == 1){
         app.exec();
     }
 }
@@ -313,10 +313,10 @@ void Genome::constructor(int argc, char* argv[], int show_phenotypes, int export
 /**
  * Roams the graph, drawing each component of the chart.
  */
-void Genome::draw_component( std::string reference, std::string direction, QGraphicsScene * scene, std::vector<QGraphicsRectItem *> items,  DecodedGeneticString::Vertex * c1, DecodedGeneticString::Vertex * c2){
+void Genome::draw_component( std::string reference, std::string direction, QGraphicsScene * scene, std::vector<QGraphicsRectItem *> items,  DecodedGeneticString::Vertex * c1, DecodedGeneticString::Vertex * c2, std::map<std::string, double> params){
 
-    int size = 40;
-    int space = 1;
+    int size = params["size_component"];
+    int space = params["spacing"];
 
     if(c2 != NULL){ // condition to stop recursive calls
 
@@ -459,11 +459,11 @@ void Genome::draw_component( std::string reference, std::string direction, QGrap
         }
 
         // recursively calls this function to roam the rest of the graph
-        this->draw_component(reference,"left",scene,items,c1,c2->left);
-        this->draw_component(reference,"front",scene,items,c1,c2->front);
-        this->draw_component(reference,"right",scene,items,c1,c2->right);
+        this->draw_component(reference,"left",scene,items,c1,c2->left, params);
+        this->draw_component(reference,"front",scene,items,c1,c2->front, params);
+        this->draw_component(reference,"right",scene,items,c1,c2->right, params);
         if(c2 == c1){
-            this->draw_component(reference,"root-back",scene,items,c1,c2->back);
+            this->draw_component(reference,"root-back",scene,items,c1,c2->back, params);
         }
     }
 
@@ -510,7 +510,7 @@ void Genome::developGenome(int argc, char* argv[], std::map<std::string, double>
 
     // generates robot-graphics
     std::cout << " >> constructing ... " << std::endl;
-    this->constructor(argc, argv, params["show_phenotypes"], params["export_phenotypes"]);
+    this->constructor(argc, argv, params);
 }
 
 
@@ -518,17 +518,27 @@ void Genome::developGenome(int argc, char* argv[], std::map<std::string, double>
 /**
 *  Measures several metrics about the phenotype of an individual.
 **/
-void Genome::measurePhenotype(){
+void Genome::measurePhenotype(std::map<std::string, double> params){
 
-    int size = 40+1;
+    int size = params["size_component"] + params["spacing"]; // size of the component plus the spacing between components
 
     DecodedGeneticString::Vertex * c = NULL;
-    c = this->dgs.getRoot();
+    c = this->dgs.getRoot(); // root for the graph which logically represents the morphology
 
-    this->initalizeMeasures();
+    this->initalizeMeasures(); // creates map with keys for measures as zero-valued
     this->measureComponent(c,c); // roams graph accounting for metrics for the measures
 
+    // general total of components
+    this->measures["total_components"] = 1 + this->measures["total_bricks"] + this->measures["total_fixed_joints"] + this->measures["total_passive_joints"] + this->measures["total_active_joints"];
+
+    // transforms totals in percentages
+    this->measures["total_bricks"] = roundf(( this->measures["total_bricks"]/this->measures["total_components"])*100)/100;
+    this->measures["total_fixed_joints"] = roundf((this->measures["total_fixed_joints"]/this->measures["total_components"])*100)/100;
+    this->measures["total_passive_joints"] = roundf((this->measures["total_passive_joints"]/this->measures["total_components"])*100)/100;
+    this->measures["total_active_joints"] = roundf((this->measures["total_active_joints"]/this->measures["total_components"])*100)/100;
+
     // calculates the length ratio
+
     std::vector<int>::iterator aux_pos;
     aux_pos = std::max_element(this->coor_x.begin(), this->coor_x.end());
     int max_x = this->coor_x[std::distance(this->coor_x.begin(), aux_pos)];
@@ -538,22 +548,23 @@ void Genome::measurePhenotype(){
     int min_x = this->coor_x[std::distance(this->coor_x.begin(), aux_pos)];
     aux_pos = std::min_element(this->coor_y.begin(), this->coor_y.end());
     int min_y = this->coor_y[std::distance(this->coor_y.begin(), aux_pos)];
-    int horizontal_length = max_x + size - min_x ;
-    int vertical_length = max_y+size - min_y;
-    if( horizontal_length < vertical_length ) {
+
+    int horizontal_length = max_x + size - min_x ; // length considering the components in the very left/right extremes
+    int vertical_length = max_y+size - min_y;   // length considering the components in the very top/bottom extremes
+
+    if( horizontal_length < vertical_length ) { // the shortest side by the longest
         this->measures["length_ratio"] = roundf(  (horizontal_length / (double)vertical_length) * 100) / 100;
     }else{
         this->measures["length_ratio"] = roundf(  (vertical_length / (double)horizontal_length) * 100) / 100;
     }
 
     // calculates the covered area
-    int number_components = 1 + this->measures["total_bricks"] + this->measures["total_fixed_joints"] + this->measures["total_passive_joints"] + this->measures["total_active_joints"];
-    int expected_components =  (horizontal_length / size) * (vertical_length / size);
-    this->measures["coverage"] = roundf( (number_components/(double)expected_components)*100)/100;
+    int expected_components =  (horizontal_length / size) * (vertical_length / size); // number of components which would fit, given the expected area according to lenghts
+    this->measures["coverage"] = roundf( (this->measures["total_components"]/(double)expected_components)*100)/100;
 
-    // calculates the average distance of components from each other
-    for(int i = 0; i < this->coor_x.size(); i++){
-        for(int j=0; j < this->coor_x.size(); j++) {
+    // calculates the average distance among components
+    for(int i = 0; i < this->coor_x.size(); i++){  // for each component
+        for(int j=0; j < this->coor_x.size(); j++) {   // compare with all other component
             if(i != j){ // does not compare to itself
                 this->measures["spreadness"] += abs(abs(this->coor_x[i]) - abs(this->coor_x[j])) + abs(abs(this->coor_y[i]) - abs(this->coor_y[j]));
               }
@@ -668,6 +679,7 @@ void Genome::measureComponent(DecodedGeneticString::Vertex * c1, DecodedGeneticS
 
 void Genome::initalizeMeasures(){
 
+    this->measures["total_components"] = 0; //  total amount of components of all types
     this->measures["total_bricks"] = 0; //  total amount of brick-components forming the robot
     this->measures["total_fixed_joints"] = 0; //  total amount of fixed-joint-components forming the robot
     this->measures["total_passive_joints"] = 0; // measure: total amount of passive-joint-components forming the robot
