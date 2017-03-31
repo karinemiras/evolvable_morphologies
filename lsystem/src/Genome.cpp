@@ -86,125 +86,6 @@ void Genome::build_grammar(LSystem LS, int num_initial_comp, double add_backtopa
 
 }
 
-//    int t;
-//    t = 2;
-//
-//    if (t == 3) {
-//
-//        // manual production 3
-//        std::vector<std::string> letter_c;
-//        letter_c.push_back("CNNN");
-//        letter_c.push_back("addr");
-//        letter_c.push_back("BNNN");
-//        GeneticString cgs;
-//        cgs = build_genetic_string(cgs, letter_c);
-//        cgs.display_list();
-//        this->grammar["CNNN"] = cgs;
-//
-//        std::vector<std::string> letter_b;
-//        letter_b.push_back("BNNN");
-//        letter_b.push_back("<");
-//        letter_b.push_back("<");
-//        letter_b.push_back("addl");
-//        letter_b.push_back("J1");
-//        GeneticString bgs;
-//        bgs = build_genetic_string(bgs, letter_b);
-//        bgs.display_list();
-//        this->grammar["BNNN"] = bgs;
-//
-//        std::vector<std::string> letter_j;
-//        letter_j.push_back("addf");
-//        letter_j.push_back("J1");
-//        letter_j.push_back("addf");
-//        letter_j.push_back("BNNN");
-//        letter_j.push_back("<");
-//        letter_j.push_back("<");
-//        letter_j.push_back("addl");
-//        letter_j.push_back("BNNN");
-//        letter_j.push_back("addr");
-//        letter_j.push_back("BNNN");
-//
-//
-//        GeneticString jgs;
-//        jgs = build_genetic_string(jgs, letter_j);
-//        jgs.display_list();
-//        this->grammar["J1"] = jgs;
-//    }
-//    if (t == 1) {
-//        // manual production 1
-//        std::vector<std::string> letter_c;
-//        letter_c.push_back("CNNN");
-//        letter_c.push_back("addr");
-//        letter_c.push_back("BNNN");
-//        GeneticString cgs;
-//        cgs = build_genetic_string(cgs, letter_c);
-//        cgs.display_list();
-//        this->grammar["CNNN"] = cgs;
-//
-//        std::vector<std::string> letter_b;
-//        letter_b.push_back("addl");
-//        letter_b.push_back("J1");
-//        letter_b.push_back("<");
-//        letter_b.push_back("addr");
-//        letter_b.push_back("J1");
-//        GeneticString bgs;
-//        bgs = build_genetic_string(bgs, letter_b);
-//        bgs.display_list();
-//        this->grammar["BNNN"] = bgs;
-//
-//        std::vector<std::string> letter_j;
-//        letter_j.push_back("J1");
-//        letter_j.push_back("addf");
-//        letter_j.push_back("BNNN");
-//        letter_j.push_back("<");
-//        letter_j.push_back("<");
-//        GeneticString jgs;
-//        jgs = build_genetic_string(jgs, letter_j);
-//        jgs.display_list();
-//        this->grammar["J1"] = jgs;
-//    }
-//    if (t == 2) {
-//        // manual production 2
-//        std::vector<std::string> letter_c;
-//        letter_c.push_back("CNNN");
-//        letter_c.push_back("addr");
-//        letter_c.push_back("BNNN");
-//        GeneticString cgs;
-//        cgs = build_genetic_string(cgs, letter_c);
-//        cgs.display_list();
-//        this->grammar["CNNN"] = cgs;
-//
-//        std::vector<std::string> letter_b;
-//        letter_b.push_back("addl");
-//        letter_b.push_back("J1");
-//        letter_b.push_back("<");
-//        letter_b.push_back("addr");
-//        letter_b.push_back("J1");
-//        GeneticString bgs;
-//        bgs = build_genetic_string(bgs, letter_b);
-//        bgs.display_list();
-//        this->grammar["BNNN"] = bgs;
-//
-//        std::vector<std::string> letter_j;
-//        letter_j.push_back("J1");
-//        letter_j.push_back("addf");
-//        letter_j.push_back("BNNN");
-//        letter_j.push_back("addf");
-//        letter_j.push_back("AJ");
-//        letter_j.push_back("addf");
-//        letter_j.push_back("BNNN");
-//        letter_j.push_back("<");
-//        letter_j.push_back("<");
-//        letter_j.push_back("<");
-//        letter_j.push_back("<");
-//        GeneticString jgs;
-//        jgs = build_genetic_string(jgs, letter_j);
-//        jgs.display_list();
-//        this->grammar["J1"] = jgs;
-//
-//    }
-//
-//}
 
 
 /**
@@ -326,22 +207,31 @@ void Genome::draw_component( std::string reference, std::string direction, QGrap
         QGraphicsTextItem * sign = new QGraphicsTextItem; // draws a sign (direction) from the component to its parent
         scene->addItem(sign);
 
-        // defines colors for the components according to type
+        // defines colors for the components according to type  (light color has angle in axis x / dark color around z)
 
         if(c2->item == "CNNN"){
-            items[items.size()-1]->setBrush(Qt::yellow);
+            items[items.size()-1]->setBrush(Qt::yellow); // yellow
         }
         if(c2->item == "BNNN"){
-            items[items.size()-1]->setBrush(Qt::blue);
+            items[items.size()-1]->setBrush(Qt::blue); // blue
         }
-        if(c2->item == "PJ"){
-            items[items.size()-1]->setBrush(Qt::green);
+        if(c2->item == "PJ1"){
+            items[items.size()-1]->setBrush(QColor(128,246,152));  // dark green
+        }
+        if(c2->item == "PJ2"){
+            items[items.size()-1]->setBrush(QColor(34,122,27));  // light green
         }
         if(c2->item == "J1"){
-            items[items.size()-1]->setBrush(Qt::white);
+            items[items.size()-1]->setBrush(QColor(182,186,184)); // light grey
         }
-        if(c2->item == "AJ"){
-            items[items.size()-1]->setBrush(Qt::red);
+        if(c2->item == "J2"){
+            items[items.size()-1]->setBrush(QColor(102,105,103));  // dark grey
+        }
+        if(c2->item == "AJ1"){
+            items[items.size()-1]->setBrush(QColor(233,97,118)); // light red
+        }
+        if(c2->item == "AJ2"){
+            items[items.size()-1]->setBrush(Qt::red);  // dark red
         }
 
         sign->setZValue(1); // sign must be drawn over the component
@@ -528,19 +418,29 @@ void Genome::measurePhenotype(std::map<std::string, double> params){
     this->initalizeMeasures(); // creates map with keys for measures as zero-valued
     this->measureComponent(c,c); // roams graph accounting for metrics for the measures
 
-    // general total of components, sums core plus all types
-    this->measures["total_components"] = 1 + this->measures["total_bricks"] + this->measures["total_fixed_joints"] + this->measures["total_passive_joints"] + this->measures["total_active_joints"];
 
     // relative numbers of joints
-    int joints = this->measures["total_fixed_joints"] + this->measures["total_passive_joints"] + this->measures["total_active_joints"];
+    int joints = this->measures["total_fixed_joints_horizontal"] + this->measures["total_passive_joints_horizontal"] + this->measures["total_active_joints_horizontal"] + this->measures["total_fixed_joints_vertical"] + this->measures["total_passive_joints_vertical"] + this->measures["total_active_joints_vertical"];
     this->measures["joints_per_limb"] = roundf((this->measures["effective_joints"] / this->measures["connectivity1"])*100)/100;  // number of effective joints per total of limbs
     if(joints > 0) { this->measures["effective_joints"] = roundf( (this->measures["effective_joints"]/joints)*100)/100; } // percentages for effective-joints per total of joints
 
-    // transforms totals in percentages
+
+    // general total amount of components: core + bricks + joints
+    this->measures["total_components"] = 1 + this->measures["total_bricks"] + joints;
+
+
+    // transforms totals in percentages for joints and connectivity
+
     this->measures["total_bricks"] = roundf(( this->measures["total_bricks"]/this->measures["total_components"])*100)/100;
-    this->measures["total_fixed_joints"] = roundf((this->measures["total_fixed_joints"]/this->measures["total_components"])*100)/100;
-    this->measures["total_passive_joints"] = roundf((this->measures["total_passive_joints"]/this->measures["total_components"])*100)/100;
-    this->measures["total_active_joints"] = roundf((this->measures["total_active_joints"]/this->measures["total_components"])*100)/100;
+
+    this->measures["total_fixed_joints_horizontal"] = roundf((this->measures["total_fixed_joints_horizontal"]/this->measures["total_components"])*100)/100;
+    this->measures["total_passive_joints_horizontal"] = roundf((this->measures["total_passive_joints_horizontal"]/this->measures["total_components"])*100)/100;
+    this->measures["total_active_joints_horizontal"] = roundf((this->measures["total_active_joints_horizontal"]/this->measures["total_components"])*100)/100;
+
+    this->measures["total_fixed_joints_vertical"] = roundf((this->measures["total_fixed_joints_vertical"]/this->measures["total_components"])*100)/100;
+    this->measures["total_passive_joints_vertical"] = roundf((this->measures["total_passive_joints_vertical"]/this->measures["total_components"])*100)/100;
+    this->measures["total_active_joints_vertical"] = roundf((this->measures["total_active_joints_vertical"]/this->measures["total_components"])*100)/100;
+
     this->measures["connectivity1"] = roundf ((this->measures["connectivity1"] / this->measures["total_components"])*100)/100;
     this->measures["connectivity2"] = roundf ((this->measures["connectivity2"] / this->measures["total_components"])*100)/100;
     this->measures["connectivity3"] = roundf ((this->measures["connectivity3"] / this->measures["total_components"])*100)/100;
@@ -655,9 +555,12 @@ void Genome::measureComponent(DecodedGeneticString::Vertex * c1, DecodedGeneticS
     if(c2 != NULL){ // condition to stop recursive calls
 
         if (c2->item == "BNNN") { this->measures["total_bricks"]++; } // counts for each brick
-        if (c2->item == "J1") { this->measures["total_fixed_joints"]++; } // counts for each fixed joint
-        if (c2->item == "PJ") { this->measures["total_passive_joints"]++; } // counts for each passive joint
-        if (c2->item == "AJ") { this->measures["total_active_joints"]++; } // counts for each active joint
+        if (c2->item == "J1") { this->measures["total_fixed_joints_horizontal"]++; } // counts for each horizontal fixed joint
+        if (c2->item == "PJ1") { this->measures["total_passive_joints_horizontal"]++; } // counts for each horizontal passive joint
+        if (c2->item == "AJ1") { this->measures["total_active_joints_horizontal"]++; } // counts for each horizontal active joint
+        if (c2->item == "J2") { this->measures["total_fixed_joints_vertical"]++; } // counts for each vertical fixed joint
+        if (c2->item == "PJ2") { this->measures["total_passive_joints_vertical"]++; } // counts for each vertical passive joint
+        if (c2->item == "AJ2") { this->measures["total_active_joints_vertical"]++; } // counts for each vertical active joint
 
         int connected_sides = 0;
         if (c1 != c2) {
@@ -672,7 +575,7 @@ void Genome::measureComponent(DecodedGeneticString::Vertex * c1, DecodedGeneticS
         if (connected_sides == 2) {
             this->measures["connectivity2"]++; // counts for only two sides are connected
 
-            if( (c2->item == "J1" or c2->item == "PJ" or c2->item == "AJ")  and (c2->back->item == "CNNN" or c2->back->item == "BNNN") and (c2->front->item == "BNNN") ){
+            if( (c2->item.substr(0,1) == "J" or c2->item.substr(0,2) == "PJ" or c2->item.substr(0,2) == "AJ")  and (c2->back->item == "CNNN" or c2->back->item == "BNNN") and (c2->front->item == "BNNN") ){
                 this->measures["effective_joints"]++;
             } // counts for joints connected by both sides to brick or core component
         }
@@ -698,9 +601,12 @@ void Genome::initalizeMeasures(){
 
     this->measures["total_components"] = 0; //  total amount of components of all types
     this->measures["total_bricks"] = 0; //  total amount of brick-components forming the robot
-    this->measures["total_fixed_joints"] = 0; //  total amount of fixed-joint-components forming the robot
-    this->measures["total_passive_joints"] = 0; // measure: total amount of passive-joint-components forming the robot
-    this->measures["total_active_joints"] = 0; //   total amount of active-joint-components forming the robot
+    this->measures["total_fixed_joints_horizontal"] = 0; //  total amount of horizontal fixed-joint-components forming the robot
+    this->measures["total_passive_joints_horizontal"] = 0; // measure: total amount of horizontal passive-joint-components forming the robot
+    this->measures["total_active_joints_horizontal"] = 0; //   total amount of horizontal active-joint-components forming the robot
+    this->measures["total_fixed_joints_vertical"] = 0; //  total amount of vertical fixed-joint-components forming the robot
+    this->measures["total_passive_joints_vertical"] = 0; // measure: total amount of vertical passive-joint-components forming the robot
+    this->measures["total_active_joints_vertical"] = 0; //   total amount of vertical active-joint-components forming the robot
     this->measures["connectivity1"] = 0; //   total of components with one side connected to another component
     this->measures["connectivity2"] = 0; //  total of components with two sides connected to another component
     this->measures["connectivity3"] = 0; // total of components with three sides connected to another component

@@ -32,14 +32,15 @@ void LSystem::build_commands(){
 void LSystem::build_alphabet(){
 
 
-    alphabet["CNNN"]  = "CNNN";
-    alphabet["J1"] = "J1";
-//    alphabet["J2"] = "J2";
-//    alphabet["J3"] = "J3";
-    alphabet["AJ"] = "AJ";
-    alphabet["PJ"] = "PJ";
+    alphabet["CNNN"]  = "CNNN";  // core component
+    alphabet["J1"] = "J1";  // fixed joint - horizontal                                                             f§
+    alphabet["J2"] = "J2";  // fixed joint - vertical
+    alphabet["AJ1"] = "AJ1"; // active joint - horizontal
+    alphabet["AJ2"] = "AJ2"; // active joint - vertical
+    alphabet["PJ1"] = "PJ1";  // passive joint - horizontal
+    alphabet["PJ2"] = "PJ2";  // passive joint - vertical
 
-    alphabet["BNNN"] = "BNNN";
+    alphabet["BNNN"] = "BNNN";  // brick (no sensors)
 
 //    std::vector<std::string> sensors;
 //    sensors.push_back("L"); // light sensor
