@@ -46,7 +46,7 @@ public:
     void createEmbryo();
     void developGenome(int argc, char* argv[], std::map<std::string, double> params, LSystem LS);
     void measurePhenotype(std::map<std::string, double> params);
-    void measureComponent(DecodedGeneticString::Vertex * c1, DecodedGeneticString::Vertex * c2);
+    void measureComponent(std::string reference, std::string direction, DecodedGeneticString::Vertex * c1, DecodedGeneticString::Vertex * c2, std::map<std::string, double> params);
     void initalizeMeasures();
     std::map< std::string, double> getMeasures();
 

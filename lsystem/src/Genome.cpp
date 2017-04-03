@@ -216,10 +216,10 @@ void Genome::draw_component( std::string reference, std::string direction, QGrap
             items[items.size()-1]->setBrush(Qt::blue); // blue
         }
         if(c2->item == "PJ1"){
-            items[items.size()-1]->setBrush(QColor(128,246,152));  // dark green
+            items[items.size()-1]->setBrush(QColor(128,246,152));  // light  green
         }
         if(c2->item == "PJ2"){
-            items[items.size()-1]->setBrush(QColor(34,122,27));  // light green
+            items[items.size()-1]->setBrush(QColor(34,122,27));  //  green dark
         }
         if(c2->item == "J1"){
             items[items.size()-1]->setBrush(QColor(182,186,184)); // light grey
@@ -416,13 +416,21 @@ void Genome::measurePhenotype(std::map<std::string, double> params){
     c = this->dgs.getRoot(); // root for the graph which logically represents the morphology
 
     this->initalizeMeasures(); // creates map with keys for measures as zero-valued
-    this->measureComponent(c,c); // roams graph accounting for metrics for the measures
+    std::cout<<" --- "<<this->id<<" measuring..."<<std::endl;
+    this->measureComponent( "bottom","root", c,c, params); // roams graph accounting for metrics for the measures
 
 
     // relative numbers of joints
     int joints = this->measures["total_fixed_joints_horizontal"] + this->measures["total_passive_joints_horizontal"] + this->measures["total_active_joints_horizontal"] + this->measures["total_fixed_joints_vertical"] + this->measures["total_passive_joints_vertical"] + this->measures["total_active_joints_vertical"];
     this->measures["joints_per_limb"] = roundf((this->measures["effective_joints"] / this->measures["connectivity1"])*100)/100;  // number of effective joints per total of limbs
-    if(joints > 0) { this->measures["effective_joints"] = roundf( (this->measures["effective_joints"]/joints)*100)/100; } // percentages for effective-joints per total of joints
+    if(joints > 0) {
+        this->measures["effective_joints"] = roundf( (this->measures["effective_joints"]/joints)*100)/100; // percentages of effective-joints per total of joints
+        if(this->measures["effective_ap_h_joints"] > 0) {
+            this->measures["viable_joints"] =
+                    roundf((this->measures["viable_joints"] / this->measures["effective_ap_h_joints"]) * 100) /
+                    100; // percentages of viable joints per effective horizontal- active/passive - joints
+        }
+    }
 
 
     // general total amount of components: core + bricks + joints
@@ -550,17 +558,23 @@ void Genome::measurePhenotype(std::map<std::string, double> params){
 
 
 
-void Genome::measureComponent(DecodedGeneticString::Vertex * c1, DecodedGeneticString::Vertex * c2){
+void Genome::measureComponent( std::string reference, std::string direction, DecodedGeneticString::Vertex * c1, DecodedGeneticString::Vertex * c2, std::map<std::string, double> params) {
 
-    if(c2 != NULL){ // condition to stop recursive calls
+    if (c2 != NULL) { // condition to stop recursive calls
 
         if (c2->item == "BNNN") { this->measures["total_bricks"]++; } // counts for each brick
-        if (c2->item == "J1") { this->measures["total_fixed_joints_horizontal"]++; } // counts for each horizontal fixed joint
-        if (c2->item == "PJ1") { this->measures["total_passive_joints_horizontal"]++; } // counts for each horizontal passive joint
-        if (c2->item == "AJ1") { this->measures["total_active_joints_horizontal"]++; } // counts for each horizontal active joint
-        if (c2->item == "J2") { this->measures["total_fixed_joints_vertical"]++; } // counts for each vertical fixed joint
-        if (c2->item == "PJ2") { this->measures["total_passive_joints_vertical"]++; } // counts for each vertical passive joint
-        if (c2->item == "AJ2") { this->measures["total_active_joints_vertical"]++; } // counts for each vertical active joint
+        if (c2->item ==
+            "J1") { this->measures["total_fixed_joints_horizontal"]++; } // counts for each horizontal fixed joint
+        if (c2->item ==
+            "PJ1") { this->measures["total_passive_joints_horizontal"]++; } // counts for each horizontal passive joint
+        if (c2->item ==
+            "AJ1") { this->measures["total_active_joints_horizontal"]++; } // counts for each horizontal active joint
+        if (c2->item ==
+            "J2") { this->measures["total_fixed_joints_vertical"]++; } // counts for each vertical fixed joint
+        if (c2->item ==
+            "PJ2") { this->measures["total_passive_joints_vertical"]++; } // counts for each vertical passive joint
+        if (c2->item ==
+            "AJ2") { this->measures["total_active_joints_vertical"]++; } // counts for each vertical active joint
 
         int connected_sides = 0;
         if (c1 != c2) {
@@ -575,24 +589,151 @@ void Genome::measureComponent(DecodedGeneticString::Vertex * c1, DecodedGeneticS
         if (connected_sides == 2) {
             this->measures["connectivity2"]++; // counts for only two sides are connected
 
-            if( (c2->item.substr(0,1) == "J" or c2->item.substr(0,2) == "PJ" or c2->item.substr(0,2) == "AJ")  and (c2->back->item == "CNNN" or c2->back->item == "BNNN") and (c2->front->item == "BNNN") ){
+            if ((c2->item.substr(0, 1) == "J" or c2->item.substr(0, 2) == "PJ" or c2->item.substr(0, 2) == "AJ") and
+                (c2->back->item == "CNNN" or c2->back->item == "BNNN") and (c2->front->item == "BNNN")) {
                 this->measures["effective_joints"]++;
             } // counts for joints connected by both sides to brick or core component
-        }
 
+
+            if ( (c2->item == "AJ1" or c2->item == "PJ1" ) and 
+                (c2->back->item == "CNNN" or c2->back->item == "BNNN") and (c2->front->item == "BNNN")) { 
+
+                this->measures["effective_ap_h_joints"]++; 
+            } // counts for horizontal- active/passive - joints connected by both sides to brick or core component (effective)
+        }
 
         if (connected_sides == 3) { this->measures["connectivity3"]++; } // counts for only three sides are connected
         if (connected_sides == 4) { this->measures["connectivity4"]++; } // counts for all four sides are connected
 
-        // recursively calls this function to roam the rest of the graphical because it was in violation
-        this->measureComponent(c1, c2->left);
-        this->measureComponent(c1, c2->front);
-        this->measureComponent(c1, c2->right);
-        if (c2 == c1) {
-            this->measureComponent(c1, c2->back);
+        if (c2 != c1) {
+
+            // counts viable horizontal-joints (horizontal joints with no neighbours)
+            std::cout << "item " << c2->item << "reference " << reference << " direction " << direction << std::endl;
+
+            int coor_x_l = 0;
+            int coor_x_r = 0;
+            int coor_y_l = 0;
+            int coor_y_r = 0;
+
+            if (direction == "left") { // direction is according to the command
+
+                if (reference == "bottom") {   // reference is according to the turtle path, starting in the bottom
+                    coor_x_l = c2->x;
+                    coor_y_l = c2->y + params["size_component"] + params["spacing"];
+                    coor_x_r = c2->x;
+                    coor_y_r = c2->y - params["size_component"] - params["spacing"];
+                    reference = "rside";
+                } else if (reference == "top") {
+                    coor_x_l = c2->x;
+                    coor_y_l = c2->y - params["size_component"] - params["spacing"];
+                    coor_x_r = c2->x;
+                    coor_y_r = c2->y + params["size_component"] + params["spacing"];
+                    reference = "lside";
+                } else if (reference == "lside") {
+                    coor_x_l = c2->x - params["size_component"] - params["spacing"];
+                    coor_y_l = c2->y;
+                    coor_x_r = c2->x + params["size_component"] + params["spacing"];
+                    coor_y_r = c2->y;
+                    reference = "bottom";
+                } else if (reference == "rside") {
+                    coor_x_l = c2->x + params["size_component"] + params["spacing"];
+                    coor_y_l = c2->y;
+                    coor_x_r = c2->x - params["size_component"] - params["spacing"];
+                    coor_y_r = c2->y;
+                    reference = "top";
+                }
+            }
+            if (direction == "right") {
+
+                if (reference == "bottom") {
+                    coor_x_l = c2->x;
+                    coor_y_l = c2->y - params["size_component"] - params["spacing"];
+                    coor_x_r = c2->x;
+                    coor_y_r = c2->y + params["size_component"] + params["spacing"];
+                    reference = "lside";
+                } else if (reference == "top") {
+                    coor_x_l = c2->x;
+                    coor_y_l = c2->y - params["size_component"] - params["spacing"];
+                    coor_x_r = c2->x;
+                    coor_y_r = c2->y + params["size_component"] + params["spacing"];
+                    reference = "rside";
+                } else if (reference == "lside") {
+                    coor_x_l = c2->x + params["size_component"] + params["spacing"];
+                    coor_y_l = c2->y;
+                    coor_x_r = c2->x - params["size_component"] - params["spacing"];
+                    coor_y_r = c2->y;
+                    reference = "top";
+                } else if (reference == "rside") {
+                    coor_x_l = c2->x - params["size_component"] - params["spacing"];
+                    coor_y_l = c2->y;
+                    coor_x_r = c2->x + params["size_component"] + params["spacing"];
+                    coor_y_r = c2->y;
+                    reference = "bottom";
+                }
+            }
+            if (direction == "front") {
+
+                if (reference == "bottom") {
+                    coor_x_l = c2->x - params["size_component"] - params["spacing"];
+                    coor_y_l = c2->y;
+                    coor_x_r = c2->x + params["size_component"] + params["spacing"];
+                    coor_y_r = c2->y;
+                } else if (reference == "top") {
+                    coor_x_l = c2->x + params["size_component"] + params["spacing"];
+                    coor_y_l = c2->y;
+                    coor_x_r = c2->x - params["size_component"] - params["spacing"];
+                    coor_y_r = c2->y;
+                } else if (reference == "lside") {
+                    coor_x_l = c2->x;
+                    coor_y_l = c2->y + params["size_component"] + params["spacing"];
+                    coor_x_r = c2->x;
+                    coor_y_r = c2->y - params["size_component"] - params["spacing"];
+                } else if (reference == "rside") {
+                    coor_x_l = c2->x;
+                    coor_y_l = c2->y - params["size_component"] - params["spacing"];
+                    coor_x_r = c2->x;
+                    coor_y_r = c2->y + params["size_component"] + params["spacing"];
+                }
+            }
+            if (direction == "root-back") {
+                coor_x_l = c2->x + params["size_component"] + params["spacing"];
+                coor_y_l = c2->y;
+                coor_x_r = c2->x - params["size_component"] - params["spacing"];
+                coor_y_r = c2->y;
+                reference = "top";
+            }
+
+            std::pair<int, int> coor_l_key = std::make_pair(coor_x_l, coor_y_l);
+            std::pair<int, int> coor_r_key = std::make_pair(coor_x_r, coor_y_r);
+            std::cout << " joint: x " << c2->x << " y " << c2->y << " left: x " << coor_x_l << " y " << coor_y_l
+                      << " right: x " << coor_x_r << " y " << coor_y_r << std::endl;
+
+            auto l_it = this->list_components.find(coor_l_key);
+            auto r_it = this->list_components.find(coor_r_key);
+
+            if (l_it == this->list_components.end() and
+                r_it == this->list_components.end()) { // if there are no components beside the joint (viable)
+
+                if (connected_sides == 2) {
+                    if ((c2->item == "PJ1" or c2->item == "AJ1") and (c2->back->item == "CNNN" or c2->back->item == "BNNN") and
+                        (c2->front->item == "BNNN")) { // if it is an effective joint
+                        this->measures["viable_joints"] += 1;
+                    }
+                }
+            }
+
         }
 
+
+        // recursively calls this function to roam the rest of the graphical because it was in violation
+        this->measureComponent(reference, "left", c1, c2->left, params);
+        this->measureComponent(reference, "front", c1, c2->front, params);
+        this->measureComponent(reference, "right", c1, c2->right, params);
+        if (c2 == c1) {
+            this->measureComponent(reference, "root-back", c1, c2->back, params);
+        }
     }
+
 
 }
 
@@ -612,6 +753,8 @@ void Genome::initalizeMeasures(){
     this->measures["connectivity3"] = 0; // total of components with three sides connected to another component
     this->measures["connectivity4"] = 0; //   total of components with four sides connected to another component
     this->measures["effective_joints"] = 0; //  total of joints connected by both sides to a brick or core component
+    this->measures["effective_ap_h_joints"] = 0; //  total of horizontal- active/passive- joints connected by both sides to a brick or core component 
+    this->measures["viable_joints"] = 0; //  total of effective joints which have no neighboards preventing movement
     this->measures["length_ratio"] = 0; // length of the shortest side dived by the longest
     this->measures["coverage"] = 0; // proportion of the expected area (given the horizontal e vertical lengths) that is covered with components
     this->measures["spreadness"] = 0; // average distance of each component from each other in the axises x/y
