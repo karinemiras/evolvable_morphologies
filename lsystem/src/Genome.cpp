@@ -2,10 +2,12 @@
 // Created by Karine Miras on 07/03/2017.
 //
 
+
+#include <fstream>
 #include <iostream>
 #include <random>
 #include <string>
-#include <fstream>
+
 
 #include "Genome.h"
 
@@ -21,17 +23,31 @@ GeneticString Genome::getGeneticString(){
     return this->gs;
 }
 
-std::vector<std::string> Genome::getAxiom(){
-    return this->axiom;
-}
-
 std::string Genome::getId(){
     return this->id;
 }
 
+DecodedGeneticString Genome::getDgs(){
+    return this->dgs;
+}
+
+std::map< std::string, double > Genome::getMeasures(){
+    return this->measures;
+};
+
+std::map< std::pair<int, int>, std::string >  Genome::getList_components(){
+    return this->list_components;
+};
+
+void Genome::updateMeasure(std::string key, double value){
+    this->measures[key] = value;
+}
 
 /**
 * Generates initial production rules for the alphabet.
+ * @param LS - Lsystem structure containing the alphabet.
+ * @param num_initial_comp - number of components to be included in the initial random production rules.
+ * @param add_backtoparent_prob - probability of adding a back-to-parent command to the genetic-string each time a letter is added.
 */
 void Genome::build_grammar(LSystem LS, int num_initial_comp, double add_backtoparent_prob) {
 
@@ -44,7 +60,7 @@ void Genome::build_grammar(LSystem LS, int num_initial_comp, double add_backtopa
 
     std::uniform_int_distribution<int> dist_1(1, num_initial_comp); // distribution for the number of components
     std::uniform_int_distribution<int> dist_2(0, alp_i.size()-1); // distribution for letters of the alphabet
-    std::uniform_int_distribution<int> dist_3(1, com.size()-1); // distribution for the hatching commands
+    std::uniform_int_distribution<int> dist_3(1, com.size()-1); // distribution for the mounting commands
 
 
     for (std::map< std::string, std::string >::const_iterator it = alp.begin(); it != alp.end(); ++it) { // for each letter of the alphabet
@@ -58,17 +74,17 @@ void Genome::build_grammar(LSystem LS, int num_initial_comp, double add_backtopa
             letter_items.push_back(letter);
         }
 
-        while(letter_items.size() < (dist_1(generator)*2) ){  // while raffled number of components is not achieved (times 2 because it must take the commands into account)
+        while(letter_items.size() < (dist_1(generator)*2) ){  // while a raffled number of components is not achieved (times 2 because it must take the commands into account)
 
             std::string item = alp_i[dist_2(generator)]; // raffles a letter to be included
 
             if (item != "CNNN") { // prevents core component of being (re)included in the rule
-                letter_items.push_back(com[dist_3(generator)]); // raffles a hatching command to be included
+                letter_items.push_back(com[dist_3(generator)]); // raffles a mounting command to be included
                 letter_items.push_back(item);
 
                 std::uniform_real_distribution<double> p_btp(0.0, 1.0); // distribution for back-to-parent command
                 double p = p_btp(generator);
-                if (p < add_backtoparent_prob){
+                if (p < add_backtoparent_prob){ // tries to add a back-to-parent command
                     letter_items.push_back(com[0]);
                 }
             }
@@ -76,10 +92,10 @@ void Genome::build_grammar(LSystem LS, int num_initial_comp, double add_backtopa
 
 
         GeneticString lgs;
-        lgs = build_genetic_string(lgs, letter_items);
-
+        lgs = build_genetic_string(lgs, letter_items); // build a genetic-string with the new production rule
         lgs.display_list();
-        this->grammar.emplace(letter, lgs);
+
+        this->grammar.emplace(letter, lgs); // adds letter and its production rule (made a genetic-string) to the grammar of the genome
 
 
     }
@@ -89,7 +105,9 @@ void Genome::build_grammar(LSystem LS, int num_initial_comp, double add_backtopa
 
 
 /**
- * Performs replacements with production rules for a number of iterations.
+ * Genome development: performs replacements in the main genetic-string with production rules for a number of iterations.
+ * @param replacement_iterations - number of iterations to perform replacements.
+ * @param export_genomes - flag for exporting the main genetic-string to a file.
  */
 void Genome::generate_final_string(int  replacement_iterations, int export_genomes){
 
@@ -103,10 +121,13 @@ void Genome::generate_final_string(int  replacement_iterations, int export_genom
     }
 }
 
+/**
+ * Exports the main-genetic string of a genome to a file.
+ */
 void Genome::exportGenome() {
 
     std::ofstream genome_file;
-    std::string path = "/Users/karinemiras/CLionProjects/lsystem-proto/tests/genome_"+this->id+".txt";
+    std::string path = "../../tests/genome_"+this->id+".txt";
     genome_file.open(path);
 
     GeneticString::Node *current;
@@ -120,6 +141,8 @@ void Genome::exportGenome() {
 
 /**
 * Builds a piece of genetic-string for a genome with the given items.
+ * @param _gs - new genetic-string to be populated with the vector of items.
+ * @param genetic_string_items - vector of items that will compose teh genetic-string.
  */
 GeneticString Genome::build_genetic_string(GeneticString _gs, std::vector<std::string> genetic_string_items){
 
@@ -128,7 +151,7 @@ GeneticString Genome::build_genetic_string(GeneticString _gs, std::vector<std::s
         return _gs;
 
     } catch (const std::exception& e) {
-        std::cout <<"ERROR building axiom: " << e.what() << std::endl;
+        std::cout <<"ERROR building genetic-string: " << e.what() << std::endl;
 
     }
 }
@@ -136,6 +159,7 @@ GeneticString Genome::build_genetic_string(GeneticString _gs, std::vector<std::s
 
 /**
  *  Decodes the genetic-string into a graph of components.
+ *  @param LS - Lsystem structure containing the alphabet.
  */
 void Genome::decodeGeneticString(LSystem LS){
 
@@ -152,13 +176,16 @@ void Genome::decodeGeneticString(LSystem LS){
 
 /**
  * Draws a chart from the graph.
+ * @param argc - command line parameter
+ * @param argv[] - command line parameter
+ * @param params - list of params read from configuration file.
  */
 void Genome::constructor(int argc, char* argv[], std::map<std::string, double> params) {
 
 
     QApplication app(argc, argv);
 
-    this->scene = new QGraphicsScene();
+    this->scene = new QGraphicsScene(); // scene that holds the chart representing the phenotype
 
     QGraphicsView * view = new QGraphicsView(scene);
     view->show();
@@ -168,16 +195,17 @@ void Genome::constructor(int argc, char* argv[], std::map<std::string, double> p
     DecodedGeneticString::Vertex * c = NULL;
     c = this->dgs.getRoot();
 
-    this->draw_component("bottom","root",this->scene,items,c,c, params); // from component on the root, draws all components in the graph
+    this->draw_component("bottom","root",this->scene,items,c,c, params); // from component on the root, draws all the components in the graph
 
     // exports drawn robot into image file
     if (params["export_phenotypes"] == 1) {
-        this->scene->clearSelection();                                                  // Selections would also render to the file
+
+        this->scene->clearSelection();                          // Selections would also render to the file
         this->scene->setSceneRect(
-                this->scene->itemsBoundingRect());                                      // Re-shrink the scene to it's bounding contents
+                this->scene->itemsBoundingRect());              // Re-shrink the scene to it's bounding contents
         QImage image(this->scene->sceneRect().size().toSize(),
-                     QImage::Format_ARGB32);                                      // Create the image with the exact size of the shrunk scene
-        image.fill(Qt::transparent);                                              // Start all pixels transparent
+                     QImage::Format_ARGB32);                    // Create the image with the exact size of the shrunk scene
+        image.fill(Qt::transparent);                            // Start all pixels transparent
         QPainter painter(&image);
         this->scene->render(&painter);
         QString qstr = QString::fromStdString("/Users/karinemiras/CLionProjects/lsystem-proto/tests/" + this->id + ".png");
@@ -193,6 +221,13 @@ void Genome::constructor(int argc, char* argv[], std::map<std::string, double> p
 
 /**
  * Roams the graph, drawing each component of the chart.
+ * @param reference - reference of origin-side for the turtle
+ * @param direction - direction to which to add the current component, relative to the previous component
+ * @param scene - object representing the phenotype
+ * @params items - list of components
+ * @param c1 - pointer to the root
+ * @param c2 - pointer to the current item
+ * @param params - list of params read from configuration file.
  */
 void Genome::draw_component( std::string reference, std::string direction, QGraphicsScene * scene, std::vector<QGraphicsRectItem *> items,  DecodedGeneticString::Vertex * c1, DecodedGeneticString::Vertex * c2, std::map<std::string, double> params){
 
@@ -201,7 +236,8 @@ void Genome::draw_component( std::string reference, std::string direction, QGrap
 
     if(c2 != NULL){ // condition to stop recursive calls
 
-        items.push_back(new QGraphicsRectItem()); // draws a new component
+        // draws a new component
+        items.push_back(new QGraphicsRectItem());
         items[items.size()-1]->setRect(0,0,size,size);
 
         QGraphicsTextItem * sign = new QGraphicsTextItem; // draws a sign (direction) from the component to its parent
@@ -341,8 +377,6 @@ void Genome::draw_component( std::string reference, std::string direction, QGrap
             return; // does not keep building from there
 
         }else{  // saves shortcut for coordinates of the item
-            this->coor_x.push_back(c2->x);
-            this->coor_y.push_back(c2->y);
 
             std::pair<int, int> key = std::make_pair(c2->x,c2->y);
             this->list_components[key] = c2->item;
@@ -386,9 +420,6 @@ void Genome::createEmbryo(){
 
 void Genome::developGenome(int argc, char* argv[], std::map<std::string, double> params, LSystem LS) {
 
-    // creates genetic-strings for production initial rules with the grammar
-    std::cout << " >> building grammar ..." << std::endl;
-    this->build_grammar(LS, params["num_initial_comp"], params["add_backtoparent_prob"]);
 
     // enhances the genetic-string according to grammar iteratively
     std::cout << " >> iterating replacements ..." << std::endl;
@@ -402,369 +433,4 @@ void Genome::developGenome(int argc, char* argv[], std::map<std::string, double>
     std::cout << " >> constructing ... " << std::endl;
     this->constructor(argc, argv, params);
 }
-
-
-
-/**
-*  Measures several metrics about the phenotype of an individual.
-**/
-void Genome::measurePhenotype(std::map<std::string, double> params){
-
-    int size = params["size_component"] + params["spacing"]; // size of the component plus the spacing between components
-
-    DecodedGeneticString::Vertex * c = NULL;
-    c = this->dgs.getRoot(); // root for the graph which logically represents the morphology
-
-    this->initalizeMeasures(); // creates map with keys for measures as zero-valued
-    std::cout<<" --- "<<this->id<<" measuring..."<<std::endl;
-    this->measureComponent( "bottom","root", c,c, params); // roams graph accounting for metrics for the measures
-
-
-    // relative numbers of joints
-    int joints = this->measures["total_fixed_joints_horizontal"] + this->measures["total_passive_joints_horizontal"] + this->measures["total_active_joints_horizontal"] + this->measures["total_fixed_joints_vertical"] + this->measures["total_passive_joints_vertical"] + this->measures["total_active_joints_vertical"];
-    this->measures["joints_per_limb"] = roundf((this->measures["effective_joints"] / this->measures["connectivity1"])*100)/100;  // number of effective joints per total of limbs
-    if(joints > 0) {
-        this->measures["effective_joints"] = roundf( (this->measures["effective_joints"]/joints)*100)/100; // percentages of effective-joints per total of joints
-        if(this->measures["effective_ap_h_joints"] > 0) {
-            this->measures["viable_joints"] =
-                    roundf((this->measures["viable_joints"] / this->measures["effective_ap_h_joints"]) * 100) /
-                    100; // percentages of viable joints per effective horizontal- active/passive - joints
-        }
-    }
-
-
-    // general total amount of components: core + bricks + joints
-    this->measures["total_components"] = 1 + this->measures["total_bricks"] + joints;
-
-
-    // transforms totals in percentages for joints and connectivity
-
-    this->measures["total_bricks"] = roundf(( this->measures["total_bricks"]/this->measures["total_components"])*100)/100;
-
-    this->measures["total_fixed_joints_horizontal"] = roundf((this->measures["total_fixed_joints_horizontal"]/this->measures["total_components"])*100)/100;
-    this->measures["total_passive_joints_horizontal"] = roundf((this->measures["total_passive_joints_horizontal"]/this->measures["total_components"])*100)/100;
-    this->measures["total_active_joints_horizontal"] = roundf((this->measures["total_active_joints_horizontal"]/this->measures["total_components"])*100)/100;
-
-    this->measures["total_fixed_joints_vertical"] = roundf((this->measures["total_fixed_joints_vertical"]/this->measures["total_components"])*100)/100;
-    this->measures["total_passive_joints_vertical"] = roundf((this->measures["total_passive_joints_vertical"]/this->measures["total_components"])*100)/100;
-    this->measures["total_active_joints_vertical"] = roundf((this->measures["total_active_joints_vertical"]/this->measures["total_components"])*100)/100;
-
-    this->measures["connectivity1"] = roundf ((this->measures["connectivity1"] / this->measures["total_components"])*100)/100;
-    this->measures["connectivity2"] = roundf ((this->measures["connectivity2"] / this->measures["total_components"])*100)/100;
-    this->measures["connectivity3"] = roundf ((this->measures["connectivity3"] / this->measures["total_components"])*100)/100;
-    this->measures["connectivity4"] = roundf ((this->measures["connectivity4"] / this->measures["total_components"])*100)/100;
-
-    // calculates the length ratio
-
-    std::vector<int>::iterator aux_pos;
-    aux_pos = std::max_element(this->coor_x.begin(), this->coor_x.end());
-    int max_x = this->coor_x[std::distance(this->coor_x.begin(), aux_pos)];
-    aux_pos = std::max_element(this->coor_y.begin(), this->coor_y.end());
-    int max_y = this->coor_y[std::distance(this->coor_y.begin(), aux_pos)];
-    aux_pos = std::min_element(this->coor_x.begin(), this->coor_x.end());
-    int min_x = this->coor_x[std::distance(this->coor_x.begin(), aux_pos)];
-    aux_pos = std::min_element(this->coor_y.begin(), this->coor_y.end());
-    int min_y = this->coor_y[std::distance(this->coor_y.begin(), aux_pos)];
-
-    int horizontal_length = max_x + size - min_x ; // length considering the components in the very left/right extremes
-    int vertical_length = max_y+size - min_y;   // length considering the components in the very top/bottom extremes
-
-    if( horizontal_length < vertical_length ) { // the shortest side by the longest
-        this->measures["length_ratio"] = roundf(  (horizontal_length / (double)vertical_length) * 100) / 100;
-    }else{
-        this->measures["length_ratio"] = roundf(  (vertical_length / (double)horizontal_length) * 100) / 100;
-    }
-
-    // calculates the covered area
-    int expected_components =  (horizontal_length / size) * (vertical_length / size); // number of components which would fit, given the expected area according to lenghts
-    this->measures["coverage"] = roundf( (this->measures["total_components"]/(double)expected_components)*100)/100;
-
-
-    // calculates the average distance among components
-    int comps = 0;
-    for(int i = 0; i < this->coor_x.size(); i++){  // for each component
-        int comp = 0;
-        for(int j=0; j < this->coor_x.size(); j++) {   // compare with all other component
-            if(i != j){ // does not compare to itself
-                comp += abs(abs(this->coor_x[i]) - abs(this->coor_x[j])) + abs(abs(this->coor_y[i]) - abs(this->coor_y[j])); // sum of distances for that component to all the others
-              }
-        }
-        comp /= this->coor_x.size() - 1; // average of the distances for the component
-        comps += comp; // sum of averages of all components
-    }
-    comps /= this->coor_x.size();  // average of the averages
-    this->measures["spreadness"] = roundf((comps/this->measures["total_components"])*100)/100;
-
-
-    // calculates the horizontal symmetry
-    int ncomp = 0;
-    for (std::map< std::pair<int, int>, std::string >::const_iterator it = this->list_components.begin(); it != this->list_components.end(); ++it) {
-        if( it->first.first < 0 or it->first.first >= size ) {
-            ncomp +=1;
-            std::pair<int, int> l_key = std::make_pair(it->first.first * (-1),
-                                                       it->first.second); // the horizontal-opposite coordinate
-            auto l_it = this->list_components.find(l_key);
-            if (l_it != this->list_components.end()) {
-
-                if (it->second == this->list_components[l_key]) { // if the component at the other side is the same type
-                    this->measures["horizontal_symmetry"]+= 1 ;
-                }
-            }
-        }
-    }
-    if(ncomp > 0){ this->measures["horizontal_symmetry"] = roundf( (this->measures["horizontal_symmetry"] / ncomp)*100)/100; }else{ this->measures["horizontal_symmetry"]=1; }
-
-
-    // calculates the vertical symmetry
-    ncomp = 0;
-    for (std::map< std::pair<int, int>, std::string >::const_iterator it = this->list_components.begin(); it != this->list_components.end(); ++it) {
-        if(it->first.second < 0 or it->first.second >= size ) {
-            ncomp +=1;
-            std::pair<int, int> l_key = std::make_pair(it->first.first,
-                                                       it->first.second * (-1)); // the vertical-opposite coordinate
-            auto l_it = this->list_components.find(l_key);
-            if (l_it != this->list_components.end()) {
-
-                if (it->second == this->list_components[l_key]) { // if the component at the other side is the same type
-                    this->measures["vertical_symmetry"]+= 1 ;
-                }
-            }
-        }
-    }
-    if(ncomp > 0){ this->measures["vertical_symmetry"] = roundf( (this->measures["vertical_symmetry"] / ncomp)*100 )/100; }else{ this->measures["vertical_symmetry"]=1; }
-
-
-    // exports measures to file (individual and populational)
-
-    std::ofstream measures_file_general;
-    std::string path = "/Users/karinemiras/CLionProjects/lsystem-proto/tests/measures.txt";
-    measures_file_general.open(path, std::ofstream::app);
-
-    std::ofstream measures_file;
-    path = "/Users/karinemiras/CLionProjects/lsystem-proto/tests/measures_"+this->id+".txt";
-    measures_file.open(path);
-    measures_file_general << this->id;
-
-    for (std::map< std::string, double >::const_iterator it = this->measures.begin(); it != this->measures.end(); ++it) {
-        measures_file << it->first << " : " << it->second << std::endl;
-        measures_file_general <<"\t"<< it->second;
-    }
-    measures_file_general << std::endl;
-
-    measures_file.close();
-    measures_file_general.close();
-}
-
-
-
-
-void Genome::measureComponent( std::string reference, std::string direction, DecodedGeneticString::Vertex * c1, DecodedGeneticString::Vertex * c2, std::map<std::string, double> params) {
-
-    if (c2 != NULL) { // condition to stop recursive calls
-
-        if (c2->item == "BNNN") { this->measures["total_bricks"]++; } // counts for each brick
-        if (c2->item ==
-            "J1") { this->measures["total_fixed_joints_horizontal"]++; } // counts for each horizontal fixed joint
-        if (c2->item ==
-            "PJ1") { this->measures["total_passive_joints_horizontal"]++; } // counts for each horizontal passive joint
-        if (c2->item ==
-            "AJ1") { this->measures["total_active_joints_horizontal"]++; } // counts for each horizontal active joint
-        if (c2->item ==
-            "J2") { this->measures["total_fixed_joints_vertical"]++; } // counts for each vertical fixed joint
-        if (c2->item ==
-            "PJ2") { this->measures["total_passive_joints_vertical"]++; } // counts for each vertical passive joint
-        if (c2->item ==
-            "AJ2") { this->measures["total_active_joints_vertical"]++; } // counts for each vertical active joint
-
-        int connected_sides = 0;
-        if (c1 != c2) {
-            connected_sides++; // counts for parent connectivity
-        } else {
-            if (c2->back != NULL) { connected_sides++; }
-        } // if it is root, and there is back-side connectivity
-        if (c2->left != NULL) { connected_sides++; } //  if theres left-side connectivity
-        if (c2->right != NULL) { connected_sides++; } // if theres right-side connectivity
-        if (c2->front != NULL) { connected_sides++; } //  if theres front-side connectivity
-        if (connected_sides == 1) { this->measures["connectivity1"]++; } // counts for only one side is connected
-        if (connected_sides == 2) {
-            this->measures["connectivity2"]++; // counts for only two sides are connected
-
-            if ((c2->item.substr(0, 1) == "J" or c2->item.substr(0, 2) == "PJ" or c2->item.substr(0, 2) == "AJ") and
-                (c2->back->item == "CNNN" or c2->back->item == "BNNN") and (c2->front->item == "BNNN")) {
-                this->measures["effective_joints"]++;
-            } // counts for joints connected by both sides to brick or core component
-
-
-            if ( (c2->item == "AJ1" or c2->item == "PJ1" ) and 
-                (c2->back->item == "CNNN" or c2->back->item == "BNNN") and (c2->front->item == "BNNN")) { 
-
-                this->measures["effective_ap_h_joints"]++; 
-            } // counts for horizontal- active/passive - joints connected by both sides to brick or core component (effective)
-        }
-
-        if (connected_sides == 3) { this->measures["connectivity3"]++; } // counts for only three sides are connected
-        if (connected_sides == 4) { this->measures["connectivity4"]++; } // counts for all four sides are connected
-
-        if (c2 != c1) {
-
-            // counts viable horizontal-joints (horizontal joints with no neighbours)
-            std::cout << "item " << c2->item << "reference " << reference << " direction " << direction << std::endl;
-
-            int coor_x_l = 0;
-            int coor_x_r = 0;
-            int coor_y_l = 0;
-            int coor_y_r = 0;
-
-            if (direction == "left") { // direction is according to the command
-
-                if (reference == "bottom") {   // reference is according to the turtle path, starting in the bottom
-                    coor_x_l = c2->x;
-                    coor_y_l = c2->y + params["size_component"] + params["spacing"];
-                    coor_x_r = c2->x;
-                    coor_y_r = c2->y - params["size_component"] - params["spacing"];
-                    reference = "rside";
-                } else if (reference == "top") {
-                    coor_x_l = c2->x;
-                    coor_y_l = c2->y - params["size_component"] - params["spacing"];
-                    coor_x_r = c2->x;
-                    coor_y_r = c2->y + params["size_component"] + params["spacing"];
-                    reference = "lside";
-                } else if (reference == "lside") {
-                    coor_x_l = c2->x - params["size_component"] - params["spacing"];
-                    coor_y_l = c2->y;
-                    coor_x_r = c2->x + params["size_component"] + params["spacing"];
-                    coor_y_r = c2->y;
-                    reference = "bottom";
-                } else if (reference == "rside") {
-                    coor_x_l = c2->x + params["size_component"] + params["spacing"];
-                    coor_y_l = c2->y;
-                    coor_x_r = c2->x - params["size_component"] - params["spacing"];
-                    coor_y_r = c2->y;
-                    reference = "top";
-                }
-            }
-            if (direction == "right") {
-
-                if (reference == "bottom") {
-                    coor_x_l = c2->x;
-                    coor_y_l = c2->y - params["size_component"] - params["spacing"];
-                    coor_x_r = c2->x;
-                    coor_y_r = c2->y + params["size_component"] + params["spacing"];
-                    reference = "lside";
-                } else if (reference == "top") {
-                    coor_x_l = c2->x;
-                    coor_y_l = c2->y - params["size_component"] - params["spacing"];
-                    coor_x_r = c2->x;
-                    coor_y_r = c2->y + params["size_component"] + params["spacing"];
-                    reference = "rside";
-                } else if (reference == "lside") {
-                    coor_x_l = c2->x + params["size_component"] + params["spacing"];
-                    coor_y_l = c2->y;
-                    coor_x_r = c2->x - params["size_component"] - params["spacing"];
-                    coor_y_r = c2->y;
-                    reference = "top";
-                } else if (reference == "rside") {
-                    coor_x_l = c2->x - params["size_component"] - params["spacing"];
-                    coor_y_l = c2->y;
-                    coor_x_r = c2->x + params["size_component"] + params["spacing"];
-                    coor_y_r = c2->y;
-                    reference = "bottom";
-                }
-            }
-            if (direction == "front") {
-
-                if (reference == "bottom") {
-                    coor_x_l = c2->x - params["size_component"] - params["spacing"];
-                    coor_y_l = c2->y;
-                    coor_x_r = c2->x + params["size_component"] + params["spacing"];
-                    coor_y_r = c2->y;
-                } else if (reference == "top") {
-                    coor_x_l = c2->x + params["size_component"] + params["spacing"];
-                    coor_y_l = c2->y;
-                    coor_x_r = c2->x - params["size_component"] - params["spacing"];
-                    coor_y_r = c2->y;
-                } else if (reference == "lside") {
-                    coor_x_l = c2->x;
-                    coor_y_l = c2->y + params["size_component"] + params["spacing"];
-                    coor_x_r = c2->x;
-                    coor_y_r = c2->y - params["size_component"] - params["spacing"];
-                } else if (reference == "rside") {
-                    coor_x_l = c2->x;
-                    coor_y_l = c2->y - params["size_component"] - params["spacing"];
-                    coor_x_r = c2->x;
-                    coor_y_r = c2->y + params["size_component"] + params["spacing"];
-                }
-            }
-            if (direction == "root-back") {
-                coor_x_l = c2->x + params["size_component"] + params["spacing"];
-                coor_y_l = c2->y;
-                coor_x_r = c2->x - params["size_component"] - params["spacing"];
-                coor_y_r = c2->y;
-                reference = "top";
-            }
-
-            std::pair<int, int> coor_l_key = std::make_pair(coor_x_l, coor_y_l);
-            std::pair<int, int> coor_r_key = std::make_pair(coor_x_r, coor_y_r);
-            std::cout << " joint: x " << c2->x << " y " << c2->y << " left: x " << coor_x_l << " y " << coor_y_l
-                      << " right: x " << coor_x_r << " y " << coor_y_r << std::endl;
-
-            auto l_it = this->list_components.find(coor_l_key);
-            auto r_it = this->list_components.find(coor_r_key);
-
-            if (l_it == this->list_components.end() and
-                r_it == this->list_components.end()) { // if there are no components beside the joint (viable)
-
-                if (connected_sides == 2) {
-                    if ((c2->item == "PJ1" or c2->item == "AJ1") and (c2->back->item == "CNNN" or c2->back->item == "BNNN") and
-                        (c2->front->item == "BNNN")) { // if it is an effective joint
-                        this->measures["viable_joints"] += 1;
-                    }
-                }
-            }
-
-        }
-
-
-        // recursively calls this function to roam the rest of the graphical because it was in violation
-        this->measureComponent(reference, "left", c1, c2->left, params);
-        this->measureComponent(reference, "front", c1, c2->front, params);
-        this->measureComponent(reference, "right", c1, c2->right, params);
-        if (c2 == c1) {
-            this->measureComponent(reference, "root-back", c1, c2->back, params);
-        }
-    }
-
-
-}
-
-
-void Genome::initalizeMeasures(){
-
-    this->measures["total_components"] = 0; //  total amount of components of all types
-    this->measures["total_bricks"] = 0; //  total amount of brick-components forming the robot
-    this->measures["total_fixed_joints_horizontal"] = 0; //  total amount of horizontal fixed-joint-components forming the robot
-    this->measures["total_passive_joints_horizontal"] = 0; // measure: total amount of horizontal passive-joint-components forming the robot
-    this->measures["total_active_joints_horizontal"] = 0; //   total amount of horizontal active-joint-components forming the robot
-    this->measures["total_fixed_joints_vertical"] = 0; //  total amount of vertical fixed-joint-components forming the robot
-    this->measures["total_passive_joints_vertical"] = 0; // measure: total amount of vertical passive-joint-components forming the robot
-    this->measures["total_active_joints_vertical"] = 0; //   total amount of vertical active-joint-components forming the robot
-    this->measures["connectivity1"] = 0; //   total of components with one side connected to another component
-    this->measures["connectivity2"] = 0; //  total of components with two sides connected to another component
-    this->measures["connectivity3"] = 0; // total of components with three sides connected to another component
-    this->measures["connectivity4"] = 0; //   total of components with four sides connected to another component
-    this->measures["effective_joints"] = 0; //  total of joints connected by both sides to a brick or core component
-    this->measures["effective_ap_h_joints"] = 0; //  total of horizontal- active/passive- joints connected by both sides to a brick or core component 
-    this->measures["viable_joints"] = 0; //  total of effective joints which have no neighboards preventing movement
-    this->measures["length_ratio"] = 0; // length of the shortest side dived by the longest
-    this->measures["coverage"] = 0; // proportion of the expected area (given the horizontal e vertical lengths) that is covered with components
-    this->measures["spreadness"] = 0; // average distance of each component from each other in the axises x/y
-    this->measures["horizontal_symmetry"] = 0; // proportion of components in the left side which match with the same type of component in the same relative position on the right side
-    this->measures["vertical_symmetry"] = 0; // proportion of components in the top side which match with the same type of component in the same relative position on the bottom side
-    this->measures["joints_per_limb"] = 0; //  total amount of effective joints per limb
-}
-
-std::map< std::string, double > Genome::getMeasures() {
-    return this->measures;
-}
-
 
