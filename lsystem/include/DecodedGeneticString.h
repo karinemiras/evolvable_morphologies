@@ -7,18 +7,17 @@
 
 #include <string>
 
-
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsRectItem>
 
-
-
 #include "GeneticString.h"
 #include "LSystem.h"
 
-
+/**
+ * Structure of the items composing the second developmental stage a genome. The structure is a graph of which the nodes represent components of the body.
+ */
 
 class DecodedGeneticString{
 

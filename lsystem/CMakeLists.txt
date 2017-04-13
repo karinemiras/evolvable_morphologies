@@ -53,6 +53,7 @@ file(GLOB_RECURSE SOURCES
      src/LSystem.cpp
      src/Evolution.cpp
      src/DecodedGeneticString.cpp
+     src/Measures.cpp
      )
 
 # Generate

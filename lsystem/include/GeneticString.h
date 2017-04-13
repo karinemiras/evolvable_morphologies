@@ -10,37 +10,37 @@
 #include<string>
 #include <vector>
 
-
 /**
- * Structure representing the itens of the genetic-string for each genome.
+ * Structure of the items composing the first developmental stage a genome. The structure is a list of which the items are letters and commands, which belong to the alphabet.
  */
-class GeneticString
-{
-public:
+class GeneticString {
 
-    struct Node
-    {
-        std::string item;
-        Node *next;
-        Node *prev;
-        Node() { next=prev=NULL; }
-    };
-
-    void create_list(std::vector<std::string> genetic_string_items);
-    void display_list();
-    int count();
-    void replaces(std::map< std::string, GeneticString >  grammar);
-    GeneticString::Node * getStart();
+    public:
 
 
-    GeneticString()
-    {
-        start = NULL;
-    }
+        // Structure representing the items of the genetic-strings (lists).
+        struct Node
+        {
+            std::string item; // string that represents the item
+            Node *next;
+            Node *prev;
+            Node() { next=prev=NULL; }
+        };
 
-private:
+        void create_list(std::vector<std::string> genetic_string_items);
+        void display_list();
+        int count();
+        void replaces(std::map< std::string, GeneticString >  grammar);
+        GeneticString::Node * getStart();
 
-    Node *start; // item of the genetic-string (doubly-linked list)
+        GeneticString()
+        {
+            start = NULL;
+        }
+
+    private:
+
+        Node *start; // item of the genetic-string (doubly-linked list)
 
 };
 

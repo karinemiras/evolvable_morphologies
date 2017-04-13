@@ -2,16 +2,17 @@
 // Created by Karine Miras on 07/03/2017.
 //
 
-#include "GeneticString.h"
-
 #include <iostream>
+
+#include "GeneticString.h"
 
 
 /**
- * Performs replacements in the genetic-string, giving the defined grammar and its production rules.
+ * Performs replacements in the genetic-string given the production rules of the grammar.
+ * @param grammar - contains the production rules for each letter of the alphabet.
  */
-void GeneticString::replaces(std::map< std::string, GeneticString >  grammar)
-{
+void GeneticString::replaces(std::map< std::string, GeneticString >  grammar){
+
     if (start == NULL)
     {
         std::cout<<"WARNING: List empty, nothing to replace."<<std::endl;
@@ -21,46 +22,46 @@ void GeneticString::replaces(std::map< std::string, GeneticString >  grammar)
     GeneticString::Node *current, *previous, *next, *inode, *current_replacement;
     current = start;
 
-    while (current != NULL) // for each item on the genetic string
-    {
+    while (current != NULL){ // for each letter on the main genetic-string of the genome, performs the due replacements (remotion/insertions) with other letters/commands
 
+        if (!(grammar.find(current->item) == grammar.end() )){ // checks if the item is a letter of the grammar
 
-        if (!(grammar.find(current->item) == grammar.end() )){ // if this item is part of the grammar and has production rules
+            current_replacement = grammar[current->item].start; // pointer to the first item of the genetic-string of the production rule for the letter (item)
 
-            current_replacement = grammar[current->item].start;
-
-            previous = current->prev; // removes item from the genetic-string list
+            // removes letter from the main genetic-string, once it will be replaced by other item/s
+            previous = current->prev;
             next = current->next;
 
-            if (previous != NULL) {
-                previous->next = next;
-            }else{
-                start = next;
-            }
-            if (next != NULL) {
-                next->prev = previous;
-            }
+//            if (previous != NULL) { //
+//                previous->next = next;
+//            }else{
+//                start = next;
+//            }
+//            if (next != NULL) { //
+//                next->prev = previous;
+//            }
 
-            while(current_replacement != NULL) { // for each item on the production string, adds new items to the list replacing the removed one
+            while(current_replacement != NULL) { // inserts the items of the genetic-string of the production rule to the main genetic-string
 
+                // the new item takes the place of the removed item
                 inode = new GeneticString::Node;
                 inode->item = current_replacement->item;
                 inode->prev = previous;
                 inode->next = next;
 
                 if (previous != NULL) {
-                    previous->next = inode;
+                    previous->next = inode;  // the item that was positioned before the removed item will point to the new item
                 }else{
-                    start = inode;
+                    start = inode; // in case the removed item was the first
                 }
                 if (next != NULL) {
-                    next->prev = inode;
+                    next->prev = inode;  // the item that was positioned after the removed item will point to the new item
                 }
 
-                previous = inode;
+                previous = inode; // moves forward in the main genetic-string, ahead the just-added item
                 next = inode->next;
 
-                current_replacement = current_replacement->next;
+                current_replacement = current_replacement->next; // moves forward in the genetic-string of the production rule
             }
         }
         current = current->next;
@@ -69,27 +70,25 @@ void GeneticString::replaces(std::map< std::string, GeneticString >  grammar)
 
 /**
  * Creates a doubly-linked list representing a piece of genetic-string.
+ * @param genetic_string_items - a vector containing all items (letters/commands) which will constitute the genetic-string to be built.
  */
 void GeneticString::create_list(std::vector<std::string> genetic_string_items)
 {
 
-    if (start == NULL)
-    {
+    if (start == NULL) {
         Node *current = NULL,*inode = NULL;
 
-        for (int i=0; i< genetic_string_items.size();i++) {   // adds each item of the axiom in the list
+        for (int i=0; i< genetic_string_items.size();i++) {   // adds each item of the vector in the list (genetic-string)
 
-            inode = new Node;
+            inode = new Node; // creates new node for the new item
             inode->item = genetic_string_items[i];
 
-            if (i==0)
-            {
+            if (i==0) { // initializes the list with its first item
                 inode->prev = NULL;
                 inode->next = NULL;
                 current = inode;
                 start = current;
-            }else
-            {
+            }else { // includes new item t the end of the list
                 current->next = inode;
                 inode->prev = current;
                 current = inode;
@@ -97,8 +96,7 @@ void GeneticString::create_list(std::vector<std::string> genetic_string_items)
         }
 
     }
-    else
-    {
+    else {
         std::cout<<"WARNING: List has been created already."<<std::endl;
         return;
     }
@@ -106,7 +104,7 @@ void GeneticString::create_list(std::vector<std::string> genetic_string_items)
 
 
 /**
- * Display elements of the List
+ * Display elements of the genetic-string.
  */
 void GeneticString::display_list()
 {
@@ -127,7 +125,7 @@ void GeneticString::display_list()
 }
 
 /**
- * Number of elements in the List
+ * Counts the of elements in the genetic-string.
  */
 int GeneticString::count()
 {
@@ -141,7 +139,10 @@ int GeneticString::count()
     return cnt;
 }
 
+
+/**
+ * @return pointer to the first item of the genetic-string
+ */
 GeneticString::Node * GeneticString::getStart(){
     return this->start;
-
 }
