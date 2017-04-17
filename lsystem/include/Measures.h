@@ -14,7 +14,7 @@
 #include "LSystem.h"
 
 /**
- *  Measures of a genome.
+ *  Measures of a genome's morphology.
  */
 
 class Measures{
@@ -30,7 +30,7 @@ class Measures{
 
     private:
 
-        Genome * gen; // pointer to the genome to be meausred
+        Genome * gen; // pointer to the genome to be measured
 
 
 };

@@ -11,6 +11,9 @@
 
 #include "Genome.h"
 
+/**
+ * Evolutionary algorithm.
+ */
 
 class Evolution{
 

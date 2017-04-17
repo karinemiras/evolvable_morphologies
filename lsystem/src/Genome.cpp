@@ -12,7 +12,7 @@
 #include "Genome.h"
 
 unsigned int Genome::getTo() {
-    return 3;
+    return 4;
 }
 
 void Genome::setGeneticString(GeneticString _gs){
@@ -111,8 +111,9 @@ void Genome::build_grammar(LSystem LS, int num_initial_comp, double add_backtopa
  */
 void Genome::generate_final_string(int  replacement_iterations, int export_genomes){
 
-    for(int i=1; i<=replacement_iterations ;i++) {
-        this->gs.replaces(this->grammar);
+    for(int i=1; i<=replacement_iterations ;i++) { // performs replacements for a number of iterations
+
+        this->gs.replaces(this->grammar); // replacement is made given the grammar
         std::cout << "string iteration " << i << std::endl;
         this->gs.display_list();
     }
@@ -131,13 +132,15 @@ void Genome::exportGenome() {
     genome_file.open(path);
 
     GeneticString::Node *current;
-    current = this->gs.getStart();
+    current = this->gs.getStart(); // recovers pointer to the beginning of the genetic-string
     while (current != NULL) {
+
         genome_file << current->item << " ";
         current = current->next;
     }
     genome_file.close();
 }
+
 
 /**
 * Builds a piece of genetic-string for a genome with the given items.
@@ -238,9 +241,9 @@ void Genome::draw_component( std::string reference, std::string direction, QGrap
 
         // draws a new component
         items.push_back(new QGraphicsRectItem());
-        items[items.size()-1]->setRect(0,0,size,size);
+        items[items.size()-1]->setRect(0,0,size,size); // initial default position of a component, which will be repositioned later
 
-        QGraphicsTextItem * sign = new QGraphicsTextItem; // draws a sign (direction) from the component to its parent
+        QGraphicsTextItem * sign = new QGraphicsTextItem; // draws a sign representing the direction (< > ^ v) from the component to its parent
         scene->addItem(sign);
 
         // defines colors for the components according to type  (light color has angle in axis x / dark color around z)
@@ -274,87 +277,92 @@ void Genome::draw_component( std::string reference, std::string direction, QGrap
         scene->addItem(items[items.size()-1]);  // adds new component to the scene
 
 
-        if(c2 != c1) {  // sets the component (and sign) in the proper position in the drawing
+        if(c2 != c1) {  // sets the component (and sign) at the proper position in the drawing
 
             std::string tsign;
 
-            if(direction == "left") { // direction is according to the command
+            // aligns component relative to parent's position, given the direction and reference
+            // direction is defined according to the mounting command
+            // reference is defined according to the turtle path, starting at the bottom
 
-                if(reference == "bottom") {   // reference is according to the turtle path, starting in the bottom
-                    items[items.size() - 1]->setPos(c2->back->x - size-space, c2->back->y);
-                    reference = "rside";
-                    tsign = ">";
+            if(direction == "left") { // if component is supposed to be mounted at the left-side of the parent
+
+                if(reference == "bottom") { // if the back of the turtle is at the bottom-side of the screen
+                    items[items.size() - 1]->setPos(c2->back->x - size-space, c2->back->y); // aligns the component relative to parent given direction and reference
+                    reference = "rside";  // updates the back of the turtle as right-side, after movement of the turtle
+                    tsign = ">";  // sign points to the direction of the parent (right)
                 }
-                else if(reference == "top") {
+                else if(reference == "top") { // if the back of the turtle is at the top-side of the screen
                     items[items.size() - 1]->setPos(c2->back->x + size+space, c2->back->y);
-                    reference = "lside";
-                    tsign = "<";
+                    reference = "lside"; // updates the back of the turtle as left-side, after movement of the turtle
+                    tsign = "<";  // sign points to the direction of the parent (left)
                 }
-                else if(reference == "lside") {
+                else if(reference == "lside") { // if the back of the turtle is at the lef- side of the screen
                     items[items.size() - 1]->setPos(c2->back->x , c2->back->y-size-space);
-                    reference = "bottom";
-                    tsign = "v";
+                    reference = "bottom";  // updates the back of the turtle as bottom-side, after movement of the turtle
+                    tsign = "v";  // sign points to the direction of the parent (down)
                 }
-                else if(reference == "rside") {
+                else if(reference == "rside") { // if the back of the turtle is at the right-side of the screen
                     items[items.size() - 1]->setPos(c2->back->x , c2->back->y+size+space);
-                    reference = "top";
-                    tsign = "^";
+                    reference = "top";  // updates the back of the turtle as top-side, after movement of the turtle
+                    tsign = "^";  // sign points to the direction of the parent (up)
                 }
             }
-            if(direction == "right") {
 
-                if(reference == "bottom") {
+            if(direction == "right") { // if component is supposed to be mounted at the right-side of the parent
+
+                if(reference == "bottom") { // if the back of the turtle is at the bottom-side of the screen
                     items[items.size() - 1]->setPos(c2->back->x + size+space, c2->back->y);
-                    reference = "lside";
-                    tsign = "<";
+                    reference = "lside";  // updates the back of the turtle as left-side, after movement of the turtle
+                    tsign = "<";  // sign points to the direction of the parent (left)
                 }
-                else if(reference == "top") {
+                else if(reference == "top") { // if the back of the turtle is at the top-side of the screen
                     items[items.size() - 1]->setPos(c2->back->x - size-space, c2->back->y);
-                    reference = "rside";
-                    tsign = ">";
+                    reference = "rside";  // updates the back of the turtle as right-side, after movement of the turtle
+                    tsign = ">";  // sign points to the direction of the parent (right)
                 }
-                else if(reference == "lside") {
+                else if(reference == "lside") { // if the back of the turtle is at the left-side of the screen
                     items[items.size() - 1]->setPos(c2->back->x , c2->back->y+size+space);
-                    reference = "top";
-                    tsign = "^";
+                    reference = "top";  // updates the back of the turtle as top-side, after movement of the turtle
+                    tsign = "^";  // sign points to the direction of the parent (up)
                 }
-                else if(reference == "rside") {
+                else if(reference == "rside") { // if the back of the turtle is at the right-side of the screen
                     items[items.size() - 1]->setPos(c2->back->x , c2->back->y-size-space);
-                    reference = "bottom";
-                    tsign = "v";
+                    reference = "bottom";  // updates the back of the turtle as bottom-side, after movement of the turtle
+                    tsign = "v";  // sign points to the direction of the parent (down)
                 }
             }
-            if(direction == "front") {
+            if(direction == "front") { // if component is supposed to be mounted at the front-side of the parent
 
-                if(reference == "bottom") {
+                if(reference == "bottom") { // if the back of the turtle is at the bottom-side of the screen
                     items[items.size() - 1]->setPos(c2->back->x, c2->back->y-size-space);
-                    tsign = "v";
+                    tsign = "v";   // sign points to the direction of the parent (down)
                 }
-                else if(reference == "top") {
+                else if(reference == "top") { // if the back of the turtle is at the top-side of the screen
                     items[items.size() - 1]->setPos(c2->back->x, c2->back->y+size+space);
-                    tsign = "^";
+                    tsign = "^";   // sign points to the direction of the parent (up)
                 }
-                else if(reference == "lside") {
+                else if(reference == "lside") { // if the back of the turtle is at the left-side of the screen
                     items[items.size() - 1]->setPos(c2->back->x+size+space , c2->back->y);
-                    tsign = "<";
+                    tsign = "<";   // sign points to the direction of the parent (left)
                 }
-                else if(reference == "rside") {
+                else if(reference == "rside") { // if the back of the turtle is at the right-side of the screen
                     items[items.size() - 1]->setPos(c2->back->x -size-space, c2->back->y);
-                    tsign = ">";
+                    tsign = ">";   // sign points to the direction of the parent (right)
                 }
             }
-            if(direction == "root-back" ) {
+            if(direction == "root-back" ) { // if component is supposed to be mounted at the back-side of the parent
 
                 items[items.size() - 1]->setPos(c2->back->x , c2->back->y+size+space);
-                reference = "top";
-                tsign = "^";
+                reference = "top";  // updates the back of the turtle as top-side, after movement of the turtle
+                tsign = "^";   // sign points to the direction of the parent (up)
             }
 
-            sign->setPos(items[items.size() - 1]->x()+15 , items[items.size() - 1]->y()+15); // set position for the sign, relative to its component
-            sign->setPlainText(QString::fromStdString(tsign));
+            sign->setPos(items[items.size() - 1]->x()+15 , items[items.size() - 1]->y()+15); // aligns the position of the sign, relative to its component
+            sign->setPlainText(QString::fromStdString(tsign)); // draws sign over the component
 
         }else{
-                items[items.size() - 1]->setPos(0, 0);
+                items[items.size() - 1]->setPos(0, 0); // core-compoemnt is aligned in the 0-0 position
         }
 
         c2->x = items[items.size()-1]->x(); // saves x coordinate in the graph for the component
@@ -363,7 +371,8 @@ void Genome::draw_component( std::string reference, std::string direction, QGrap
         QList < QGraphicsItem * > coll;
         coll =  items[items.size()-1]->collidingItems();
 
-        if(coll.size() > 1) { // if the new component is overlapping another component, it is deleted from the graphical
+        if(coll.size() > 1) { // if the new component is overlapping another component, it is deleted from the graphic
+
             scene->removeItem(items[items.size()-1]);
             scene->removeItem(sign);
 
@@ -416,6 +425,10 @@ void Genome::createEmbryo(){
 
 /**
 *  Develops the initial genetic-string according to the grammar and creates phenotype.
+* @param argc - command line parameter
+* @param argv[] - command line parameter
+ * * @param params - list of params read from configuration file.
+* @param LS - Lsystem structure containing the alphabet.
 **/
 
 void Genome::developGenome(int argc, char* argv[], std::map<std::string, double> params, LSystem LS) {
