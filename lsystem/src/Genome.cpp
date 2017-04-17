@@ -43,6 +43,8 @@ void Genome::updateMeasure(std::string key, double value){
     this->measures[key] = value;
 }
 
+
+
 /**
 * Generates initial production rules for the alphabet.
  * @param LS - Lsystem structure containing the alphabet.

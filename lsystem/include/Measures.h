@@ -26,6 +26,7 @@ class Measures{
         void measureComponent(std::string reference, std::string direction, DecodedGeneticString::Vertex * c1, DecodedGeneticString::Vertex * c2, std::map<std::string, double> params);
         std::map< std::string, double> getMeasures();
         void setGenome(Genome * gen);
+        Genome * getGenome();
 
 
     private:

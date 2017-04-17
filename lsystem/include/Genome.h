@@ -52,6 +52,7 @@ class Genome{
         std::map< std::pair<int, int>, std::string >  getList_components();
         void updateMeasure(std::string key, double value);
 
+
     private:
 
         std::string id; // id identifying the genome

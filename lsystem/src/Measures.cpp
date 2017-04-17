@@ -46,7 +46,7 @@ void Measures::measurePhenotype(std::map<std::string, double> params){
 
 
     // calculates number of effective joints per total of limbs
-    this->gen->updateMeasure("joints_per_limb", roundf((this->gen->getMeasures()["effective_joints"] / this->gen->getMeasures()["connectivity1"])*100)/100);
+    this->gen->updateMeasure("joints_per_limb", roundf((this->gen->getMeasures()["effective_joints"] / (double)this->gen->getMeasures()["connectivity1"])*100)/100);
 
     // total of all types of joint
     int joints = this->gen->getMeasures()["total_fixed_joints_horizontal"] + this->gen->getMeasures()["total_passive_joints_horizontal"] + this->gen->getMeasures()["total_active_joints_horizontal"] + this->gen->getMeasures()["total_fixed_joints_vertical"] + this->gen->getMeasures()["total_passive_joints_vertical"] + this->gen->getMeasures()["total_active_joints_vertical"];
@@ -54,12 +54,12 @@ void Measures::measurePhenotype(std::map<std::string, double> params){
     if(joints > 0) {
 
         // proportion of effective-joints in the total of joints
-        this->gen->updateMeasure("effective_joints", roundf( (this->gen->getMeasures()["effective_joints"]/joints)*100)/100);
+        this->gen->updateMeasure("effective_joints", roundf( (this->gen->getMeasures()["effective_joints"] / (double)joints)*100)/100);
 
         if(this->gen->getMeasures()["effective_ap_h_joints"] > 0) { // if there is any horizontal active/passive joint
 
             this->gen->getMeasures()["viable_joints"] =
-                    roundf((this->gen->getMeasures()["viable_joints"] / this->gen->getMeasures()["effective_ap_h_joints"]) * 100) /
+                    roundf((this->gen->getMeasures()["viable_joints"] / (double)this->gen->getMeasures()["effective_ap_h_joints"]) * 100) /
                     100; // proportion of viable joints in effective horizontal- active/passive - joints
         }
     }
@@ -70,20 +70,20 @@ void Measures::measurePhenotype(std::map<std::string, double> params){
 
     // transforms totals in percentages for joints and connectivity
 
-    this->gen->updateMeasure("total_bricks", roundf(( this->gen->getMeasures()["total_bricks"]/this->gen->getMeasures()["total_components"])*100)/100 );
+    this->gen->updateMeasure("total_bricks", roundf(( this->gen->getMeasures()["total_bricks"] / (double)this->gen->getMeasures()["total_components"])*100)/100 );
 
-    this->gen->updateMeasure("total_fixed_joints_horizontal", roundf((this->gen->getMeasures()["total_fixed_joints_horizontal"]/this->gen->getMeasures()["total_components"])*100)/100);
-    this->gen->updateMeasure("total_passive_joints_horizontal", roundf((this->gen->getMeasures()["total_passive_joints_horizontal"]/this->gen->getMeasures()["total_components"])*100)/100);
-    this->gen->updateMeasure("total_active_joints_horizontal", roundf((this->gen->getMeasures()["total_active_joints_horizontal"]/this->gen->getMeasures()["total_components"])*100)/100);
+    this->gen->updateMeasure("total_fixed_joints_horizontal", roundf((this->gen->getMeasures()["total_fixed_joints_horizontal"] / (double)this->gen->getMeasures()["total_components"])*100)/100);
+    this->gen->updateMeasure("total_passive_joints_horizontal", roundf((this->gen->getMeasures()["total_passive_joints_horizontal"] / (double)this->gen->getMeasures()["total_components"])*100)/100);
+    this->gen->updateMeasure("total_active_joints_horizontal", roundf((this->gen->getMeasures()["total_active_joints_horizontal"] / (double)this->gen->getMeasures()["total_components"])*100)/100);
 
-    this->gen->updateMeasure("total_fixed_joints_vertical", roundf((this->gen->getMeasures()["total_fixed_joints_vertical"]/this->gen->getMeasures()["total_components"])*100)/100);
-    this->gen->updateMeasure("total_passive_joints_vertical", roundf((this->gen->getMeasures()["total_passive_joints_vertical"]/this->gen->getMeasures()["total_components"])*100)/100);
-    this->gen->updateMeasure("total_active_joints_vertical", roundf((this->gen->getMeasures()["total_active_joints_vertical"]/this->gen->getMeasures()["total_components"])*100)/100);
+    this->gen->updateMeasure("total_fixed_joints_vertical", roundf((this->gen->getMeasures()["total_fixed_joints_vertical"] / (double)this->gen->getMeasures()["total_components"])*100)/100);
+    this->gen->updateMeasure("total_passive_joints_vertical", roundf((this->gen->getMeasures()["total_passive_joints_vertical"] / (double)this->gen->getMeasures()["total_components"])*100)/100);
+    this->gen->updateMeasure("total_active_joints_vertical", roundf((this->gen->getMeasures()["total_active_joints_vertical"] / (double)this->gen->getMeasures()["total_components"])*100)/100);
 
-    this->gen->updateMeasure("connectivity1", roundf ((this->gen->getMeasures()["connectivity1"] / this->gen->getMeasures()["total_components"])*100)/100);
-    this->gen->updateMeasure("connectivity2", roundf ((this->gen->getMeasures()["connectivity2"] / this->gen->getMeasures()["total_components"])*100)/100);
-    this->gen->updateMeasure("connectivity3", roundf ((this->gen->getMeasures()["connectivity3"] / this->gen->getMeasures()["total_components"])*100)/100);
-    this->gen->updateMeasure("connectivity4", roundf ((this->gen->getMeasures()["connectivity4"] / this->gen->getMeasures()["total_components"])*100)/100);
+    this->gen->updateMeasure("connectivity1", roundf ((this->gen->getMeasures()["connectivity1"] / (double)this->gen->getMeasures()["total_components"])*100)/100);
+    this->gen->updateMeasure("connectivity2", roundf ((this->gen->getMeasures()["connectivity2"] / (double)this->gen->getMeasures()["total_components"])*100)/100);
+    this->gen->updateMeasure("connectivity3", roundf ((this->gen->getMeasures()["connectivity3"] / (double)this->gen->getMeasures()["total_components"])*100)/100);
+    this->gen->updateMeasure("connectivity4", roundf ((this->gen->getMeasures()["connectivity4"] / (double)this->gen->getMeasures()["total_components"])*100)/100);
 
     // calculates the length ratio
 
@@ -92,13 +92,31 @@ void Measures::measurePhenotype(std::map<std::string, double> params){
     int min_x = 0;
     int min_y = 0;
 
-    // finds out the values for the extreme x/y coordinates
+    int avg_x = 0;
+    int avg_y = 0;
+
+
     for( const auto& iter : this->gen->getList_components() ){
+
+        // finds out the values for the extreme x/y coordinates
         if (iter.first.first > max_x){ max_x = iter.first.first; }
         if (iter.first.first < min_x){ min_x = iter.first.first; }
         if (iter.first.second > max_y){ max_y = iter.first.second; }
         if (iter.first.second < min_y){ min_y = iter.first.second; }
+
+        // accounts for center of mass
+        avg_x += iter.first.first;
+        avg_y += iter.first.second;
     }
+
+    // calculates center of mass of the body
+
+    avg_x = avg_x / (double)this->gen->getList_components().size();
+    avg_y = avg_y / (double)this->gen->getList_components().size();
+    avg_x = avg_x + (size/2);
+    avg_y = avg_y + (size/2);
+    std::cout<<" >> x "<<avg_x<<" y "<<avg_y<<std::endl;
+
 
     int horizontal_length = max_x + size - min_x ; // horizontal length, considering the components in the very left/right extremes
     int vertical_length = max_y + size - min_y;   // vertical, length considering the components in the very top/bottom extremes
@@ -115,7 +133,7 @@ void Measures::measurePhenotype(std::map<std::string, double> params){
     int expected_components =  (horizontal_length / size) * (vertical_length / size);
 
     // actual number of components per expected number of components
-    this->gen->updateMeasure("coverage", roundf( (this->gen->getMeasures()["total_components"]/(double)expected_components)*100)/100);
+    this->gen->updateMeasure("coverage", roundf( (this->gen->getMeasures()["total_components"] / (double)expected_components)*100)/100);
 
 
     // calculates the average distance among components
@@ -135,7 +153,11 @@ void Measures::measurePhenotype(std::map<std::string, double> params){
 
     comps /= this->gen->getList_components().size();  // average of all the averages
     // normalizes according to the number of components
-    this->gen->updateMeasure("spreadness", roundf((comps/this->gen->getMeasures()["total_components"])*100)/100);
+    this->gen->updateMeasure("spreadness", roundf((comps / (double)this->gen->getMeasures()["total_components"])*100)/100);
+
+
+    // calculates symmetry
+
 
 
 
@@ -198,9 +220,6 @@ void Measures::measurePhenotype(std::map<std::string, double> params){
     measures_file_general.close();
 
 
-
-
-
 }
 
 
@@ -221,11 +240,11 @@ void Measures::measureComponent( std::string reference, std::string direction, D
         //  calculates amounts of types of components
 
         if (c2->item == "BNNN") {
-            this->gen->updateMeasure("total_bricks" ,this->gen->getMeasures()["total_bricks"]+1);
+            this->gen->updateMeasure("total_bricks", this->gen->getMeasures()["total_bricks"]+1);
         } // counts for each brick
 
         if (c2->item == "J1") {
-            this->gen->updateMeasure("total_fixed_joints_horizontal",this->gen->getMeasures()["total_fixed_joints_horizontal"]+1);
+            this->gen->updateMeasure("total_fixed_joints_horizontal", this->gen->getMeasures()["total_fixed_joints_horizontal"]+1);
         } // counts for each horizontal fixed joint
 
         if (c2->item == "PJ1") {
@@ -281,7 +300,7 @@ void Measures::measureComponent( std::string reference, std::string direction, D
             if ( (c2->item == "AJ1" or c2->item == "PJ1" ) and 
             (c2->back->item == "CNNN" or c2->back->item == "BNNN") and (c2->front->item == "BNNN")) { 
 
-                this->gen->updateMeasure("effective_ap_h_joints",this->gen->getMeasures()["effective_ap_h_joints"]+1); 
+                this->gen->updateMeasure("effective_ap_h_joints", this->gen->getMeasures()["effective_ap_h_joints"]+1); 
             } // counts for horizontal- active/passive - joints connected by both sides to brick or core component (effective)
         }
 
