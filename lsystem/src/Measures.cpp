@@ -115,7 +115,7 @@ void Measures::measurePhenotype(std::map<std::string, double> params){
     avg_y = avg_y / (double)this->gen->getList_components().size();
     avg_x = avg_x + (size/2);
     avg_y = avg_y + (size/2);
-    std::cout<<" >> x "<<avg_x<<" y "<<avg_y<<std::endl;
+   // std::cout<<" >> x "<<avg_x<<" y "<<avg_y<<std::endl;
 
 
     int horizontal_length = max_x + size - min_x ; // horizontal length, considering the components in the very left/right extremes
@@ -155,6 +155,11 @@ void Measures::measurePhenotype(std::map<std::string, double> params){
     // normalizes according to the number of components
     this->gen->updateMeasure("spreadness", roundf((comps / (double)this->gen->getMeasures()["total_components"])*100)/100);
 
+
+    for( const auto& p : this->points ) {
+         std::cout<<" x "<<p.first.first<<" y "<<p.first.second<<" "<<p.second<<std::endl;
+
+    }
 
     // calculates symmetry
 
@@ -221,6 +226,7 @@ void Measures::measurePhenotype(std::map<std::string, double> params){
 
 
 }
+
 
 
 /**
@@ -314,9 +320,12 @@ void Measures::measureComponent( std::string reference, std::string direction, D
 
 
 
+
         // calculates viable (no neighbours preventing movement) horizontal- passive/active joints
+        int size = (int) params["size_component"] + params["spacing"];
 
         if (c2 != c1) {
+
 
             // finds out the x/y coordinates of both supposed neighbours of the joint: l - neighbour on the left / r - neighbour on the right
 
@@ -330,99 +339,219 @@ void Measures::measureComponent( std::string reference, std::string direction, D
                 if (reference == "bottom") {   // reference is according to the turtle path, starting in the bottom
                     // calculates coordinates for a supposed neighboard on the left of the joint
                     coor_x_l = c2->x;
-                    coor_y_l = c2->y + params["size_component"] + params["spacing"];
+                    coor_y_l = c2->y + size;
                     // calculates coordinates for a supposed neighboard on the right of the joint
                     coor_x_r = c2->x;
-                    coor_y_r = c2->y - params["size_component"] - params["spacing"];
+                    coor_y_r = c2->y - size;
                     reference = "rside";
+
+                    // finds out outlining points of the component
+
+                    if (c2->left == NULL and c2->front == NULL) {           this->points.emplace( std::make_pair(c2->x, c2->y + size), c2->item); }
+                    if (c2->right == NULL and c2->front == NULL) {          this->points.emplace( std::make_pair(c2->x, c2->y), c2->item); }
+                    std::pair<int, int> coor_ang_l_key = std::make_pair(coor_x_l + size, coor_y_l); // coordinates for a supposed angle on the left of the component
+                    std::pair<int, int> coor_ang_r_key = std::make_pair(coor_x_r + size, coor_y_r); // coordinates for a supposed angle on the right of the component
+                    if (c2->left == NULL and this->gen->getList_components().count(coor_ang_l_key)>0) { this->points.emplace( std::make_pair(c2->x + size, c2->y + size), c2->item); } // if  the supposed left angle was not found
+                    if (c2->right == NULL and this->gen->getList_components().count(coor_ang_r_key)>0) { this->points.emplace( std::make_pair(c2->x + size, c2->y ), c2->item);  } // if  the supposed right angle was not found
 
                 } else if (reference == "top") {
                     coor_x_l = c2->x;
-                    coor_y_l = c2->y - params["size_component"] - params["spacing"];
+                    coor_y_l = c2->y - size;
                     coor_x_r = c2->x;
-                    coor_y_r = c2->y + params["size_component"] + params["spacing"];
+                    coor_y_r = c2->y + size;
                     reference = "lside";
 
+                    // finds out outlining points of the component
+                    if (c2->left == NULL and c2->front == NULL) {           this->points.emplace( std::make_pair(c2->x + size, c2->y), c2->item); }
+                    if (c2->right == NULL and c2->front == NULL) {          this->points.emplace( std::make_pair(c2->x + size, c2->y + size), c2->item); }
+                    std::pair<int, int> coor_ang_l_key = std::make_pair(coor_x_l - size, coor_y_l); // coordinates for a supposed angle on the left of the component
+                    std::pair<int, int> coor_ang_r_key = std::make_pair(coor_x_r - size, coor_y_r); // coordinates for a supposed angle on the right of the component
+                    if (c2->left == NULL and  this->gen->getList_components().count(coor_ang_l_key)>0) { this->points.emplace( std::make_pair(c2->x , c2->y ), c2->item); } // if  the supposed left angle was not found
+                    if (c2->right == NULL and this->gen->getList_components().count(coor_ang_r_key)>0) { this->points.emplace( std::make_pair(c2->x , c2->y + size ), c2->item);  } // if  the supposed right angle was not found
+
+
                 } else if (reference == "lside") {
-                    coor_x_l = c2->x - params["size_component"] - params["spacing"];
+                    coor_x_l = c2->x - size;
                     coor_y_l = c2->y;
-                    coor_x_r = c2->x + params["size_component"] + params["spacing"];
+                    coor_x_r = c2->x + size;
                     coor_y_r = c2->y;
                     reference = "bottom";
 
+                    // finds out outlining points of the component
+                    if (c2->left == NULL and c2->front == NULL) {           this->points.emplace( std::make_pair(c2->x, c2->y), c2->item); }
+                    if (c2->right == NULL and c2->front == NULL) {          this->points.emplace( std::make_pair(c2->x + size, c2->y ), c2->item); }
+                    std::pair<int, int> coor_ang_l_key = std::make_pair(coor_x_l , coor_y_l + size); // coordinates for a supposed angle on the left of the component
+                    std::pair<int, int> coor_ang_r_key = std::make_pair(coor_x_r , coor_y_r + size); // coordinates for a supposed angle on the right of the component
+                    if (c2->left == NULL and this->gen->getList_components().count(coor_ang_l_key)>0) { this->points.emplace( std::make_pair(c2->x , c2->y + size ), c2->item); } // if  the supposed left angle was not found
+                    if (c2->right == NULL and this->gen->getList_components().count(coor_ang_r_key)>0) { this->points.emplace( std::make_pair(c2->x +size , c2->y + size ), c2->item);  } // if  the supposed right angle was not found
+
+
                 } else if (reference == "rside") {
-                    coor_x_l = c2->x + params["size_component"] + params["spacing"];
+                    coor_x_l = c2->x + size;
                     coor_y_l = c2->y;
-                    coor_x_r = c2->x - params["size_component"] - params["spacing"];
+                    coor_x_r = c2->x - size;
                     coor_y_r = c2->y;
                     reference = "top";
+
+                    // finds out outlining points of the component
+                    if (c2->left == NULL and c2->front == NULL) {           this->points.emplace( std::make_pair(c2->x +size, c2->y + size), c2->item); }
+                    if (c2->right == NULL and c2->front == NULL) {          this->points.emplace( std::make_pair(c2->x , c2->y + size), c2->item); }
+                    std::pair<int, int> coor_ang_l_key = std::make_pair(coor_x_l , coor_y_l - size); // coordinates for a supposed angle on the left of the component
+                    std::pair<int, int> coor_ang_r_key = std::make_pair(coor_x_r , coor_y_r - size); // coordinates for a supposed angle on the right of the component
+                    if (c2->left == NULL and this->gen->getList_components().count(coor_ang_l_key)>0) { this->points.emplace( std::make_pair(c2->x +size , c2->y), c2->item); } // if  the supposed left angle was not found
+                    if (c2->right == NULL and this->gen->getList_components().count(coor_ang_r_key)>0) { this->points.emplace( std::make_pair(c2->x , c2->y), c2->item);  } // if  the supposed right angle was not found
+
                 }
             }
             if (direction == "right") {
 
                 if (reference == "bottom") {
                     coor_x_l = c2->x;
-                    coor_y_l = c2->y - params["size_component"] - params["spacing"];
+                    coor_y_l = c2->y - size;
                     coor_x_r = c2->x;
-                    coor_y_r = c2->y + params["size_component"] + params["spacing"];
+                    coor_y_r = c2->y + size;
                     reference = "lside";
+
+                    // finds out outlining points of the component
+                    if (c2->left == NULL and c2->front == NULL) {           this->points.emplace( std::make_pair(c2->x +size, c2->y ), c2->item); }
+                    if (c2->right == NULL and c2->front == NULL) {          this->points.emplace( std::make_pair(c2->x + size , c2->y + size), c2->item); }
+                    std::pair<int, int> coor_ang_l_key = std::make_pair(coor_x_l - size , coor_y_l  ); // coordinates for a supposed angle on the left of the component
+                    std::pair<int, int> coor_ang_r_key = std::make_pair(coor_x_r - size , coor_y_r ); // coordinates for a supposed angle on the right of the component
+                    if (c2->left == NULL and this->gen->getList_components().count(coor_ang_l_key)>0) { this->points.emplace( std::make_pair(c2->x  , c2->y), c2->item); } // if  the supposed left angle was not found
+                    if (c2->right == NULL  and this->gen->getList_components().count(coor_ang_r_key)>0) { this->points.emplace( std::make_pair(c2->x , c2->y +size), c2->item);  } // if  the supposed right angle was not found
+
 
                 } else if (reference == "top") {
                     coor_x_l = c2->x;
-                    coor_y_l = c2->y - params["size_component"] - params["spacing"];
+                    coor_y_l = c2->y - size;
                     coor_x_r = c2->x;
-                    coor_y_r = c2->y + params["size_component"] + params["spacing"];
+                    coor_y_r = c2->y + size;
                     reference = "rside";
 
+                    // finds out outlining points of the component
+                    if (c2->left == NULL and c2->front == NULL) {           this->points.emplace( std::make_pair(c2->x , c2->y + size), c2->item); }
+                    if (c2->right == NULL and c2->front == NULL) {          this->points.emplace( std::make_pair(c2->x  , c2->y ), c2->item); }
+                    std::pair<int, int> coor_ang_l_key = std::make_pair(coor_x_l + size , coor_y_l  ); // coordinates for a supposed angle on the left of the component
+                    std::pair<int, int> coor_ang_r_key = std::make_pair(coor_x_r + size , coor_y_r ); // coordinates for a supposed angle on the right of the component
+                    if (c2->left == NULL and this->gen->getList_components().count(coor_ang_l_key)>0) { this->points.emplace( std::make_pair(c2->x + size  , c2->y + size), c2->item); } // if  the supposed left angle was not found
+                    if (c2->right == NULL and this->gen->getList_components().count(coor_ang_r_key)>0) { this->points.emplace( std::make_pair(c2->x +size, c2->y ), c2->item);  } // if  the supposed right angle was not found
+
+
                 } else if (reference == "lside") {
-                    coor_x_l = c2->x + params["size_component"] + params["spacing"];
+                    coor_x_l = c2->x + size;
                     coor_y_l = c2->y;
-                    coor_x_r = c2->x - params["size_component"] - params["spacing"];
+                    coor_x_r = c2->x - size;
                     coor_y_r = c2->y;
                     reference = "top";
 
+                    // finds out outlining points of the component
+                    if (c2->left == NULL and c2->front == NULL) {           this->points.emplace( std::make_pair(c2->x +size , c2->y + size), c2->item); }
+                    if (c2->right == NULL and c2->front == NULL) {          this->points.emplace( std::make_pair(c2->x  , c2->y+size ), c2->item); }
+                    std::pair<int, int> coor_ang_l_key = std::make_pair(coor_x_l  , coor_y_l - size ); // coordinates for a supposed angle on the left of the component
+                    std::pair<int, int> coor_ang_r_key = std::make_pair(coor_x_r  , coor_y_r - size); // coordinates for a supposed angle on the right of the component
+                    if (c2->left == NULL and this->gen->getList_components().count(coor_ang_l_key)>0) { this->points.emplace( std::make_pair(c2->x + size  , c2->y ), c2->item); } // if  the supposed left angle was not found
+                    if (c2->right == NULL and this->gen->getList_components().count(coor_ang_r_key)>0) { this->points.emplace( std::make_pair(c2->x , c2->y  ), c2->item);  } // if  the supposed right angle was not found
+
+
                 } else if (reference == "rside") {
-                    coor_x_l = c2->x - params["size_component"] - params["spacing"];
+                    coor_x_l = c2->x - size;
                     coor_y_l = c2->y;
-                    coor_x_r = c2->x + params["size_component"] + params["spacing"];
+                    coor_x_r = c2->x + size;
                     coor_y_r = c2->y;
                     reference = "bottom";
+
+                    // finds out outlining points of the component
+                    if (c2->left == NULL and c2->front == NULL) {           this->points.emplace( std::make_pair(c2->x  , c2->y ), c2->item); }
+                    if (c2->right == NULL and c2->front == NULL) {          this->points.emplace( std::make_pair(c2->x +size , c2->y ), c2->item); }
+                    std::pair<int, int> coor_ang_l_key = std::make_pair(coor_x_l  , coor_y_l + size ); // coordinates for a supposed angle on the left of the component
+                    std::pair<int, int> coor_ang_r_key = std::make_pair(coor_x_r  , coor_y_r + size); // coordinates for a supposed angle on the right of the component
+                    if (c2->left == NULL and this->gen->getList_components().count(coor_ang_l_key)>0) { this->points.emplace( std::make_pair(c2->x  , c2->y +size), c2->item); } // if  the supposed left angle was not found
+                    if (c2->right == NULL and this->gen->getList_components().count(coor_ang_r_key)>0) { this->points.emplace( std::make_pair(c2->x +size, c2->y +size ), c2->item);  } // if  the supposed right angle was not found
+
+
                 }
             }
             if (direction == "front") {
 
                 if (reference == "bottom") {
-                    coor_x_l = c2->x - params["size_component"] - params["spacing"];
+                    coor_x_l = c2->x - size;
                     coor_y_l = c2->y;
-                    coor_x_r = c2->x + params["size_component"] + params["spacing"];
+                    coor_x_r = c2->x + size;
                     coor_y_r = c2->y;
 
+                    // finds out outlining points of the component
+                    if (c2->left == NULL and c2->front == NULL) {           this->points.emplace( std::make_pair(c2->x  , c2->y ), c2->item); }
+                    if (c2->right == NULL and c2->front == NULL) {          this->points.emplace( std::make_pair(c2->x +size , c2->y ), c2->item); }
+                    std::pair<int, int> coor_ang_l_key = std::make_pair(coor_x_l  , coor_y_l + size ); // coordinates for a supposed angle on the left of the component
+                    std::pair<int, int> coor_ang_r_key = std::make_pair(coor_x_r  , coor_y_r + size); // coordinates for a supposed angle on the right of the component
+                    if (c2->left == NULL and this->gen->getList_components().count(coor_ang_l_key)>0) { this->points.emplace( std::make_pair(c2->x  , c2->y +size), c2->item); } // if  the supposed left angle was not found
+                    if (c2->right == NULL and this->gen->getList_components().count(coor_ang_r_key)>0) { this->points.emplace( std::make_pair(c2->x +size, c2->y +size ), c2->item);  } // if  the supposed right angle was not found
+
+
                 } else if (reference == "top") {
-                    coor_x_l = c2->x + params["size_component"] + params["spacing"];
+                    coor_x_l = c2->x + size;
                     coor_y_l = c2->y;
-                    coor_x_r = c2->x - params["size_component"] - params["spacing"];
+                    coor_x_r = c2->x - size;
                     coor_y_r = c2->y;
+
+                    // finds out outlining points of the component
+                    if (c2->left == NULL and c2->front == NULL) {           this->points.emplace( std::make_pair(c2->x +size , c2->y + size), c2->item); }
+                    if (c2->right == NULL and c2->front == NULL) {          this->points.emplace( std::make_pair(c2->x  , c2->y+size ), c2->item); }
+                    std::pair<int, int> coor_ang_l_key = std::make_pair(coor_x_l  , coor_y_l - size ); // coordinates for a supposed angle on the left of the component
+                    std::pair<int, int> coor_ang_r_key = std::make_pair(coor_x_r  , coor_y_r - size); // coordinates for a supposed angle on the right of the component
+                    if (c2->left == NULL and this->gen->getList_components().count(coor_ang_l_key)>0) { this->points.emplace( std::make_pair(c2->x + size  , c2->y ), c2->item); } // if  the supposed left angle was not found
+                    if (c2->right == NULL and this->gen->getList_components().count(coor_ang_r_key)>0) { this->points.emplace( std::make_pair(c2->x , c2->y  ), c2->item);  } // if  the supposed right angle was not found
 
                 } else if (reference == "lside") {
                     coor_x_l = c2->x;
-                    coor_y_l = c2->y + params["size_component"] + params["spacing"];
+                    coor_y_l = c2->y + size;
                     coor_x_r = c2->x;
-                    coor_y_r = c2->y - params["size_component"] - params["spacing"];
+                    coor_y_r = c2->y - size;
+
+                    // finds out outlining points of the component
+                    if (c2->left == NULL and c2->front == NULL) {           this->points.emplace( std::make_pair(c2->x +size, c2->y ), c2->item); }
+                    if (c2->right == NULL and c2->front == NULL) {          this->points.emplace( std::make_pair(c2->x + size , c2->y + size), c2->item); }
+                    std::pair<int, int> coor_ang_l_key = std::make_pair(coor_x_l -size , coor_y_l  ); // coordinates for a supposed angle on the left of the component
+                    std::pair<int, int> coor_ang_r_key = std::make_pair(coor_x_r -size , coor_y_r ); // coordinates for a supposed angle on the right of the component
+                    if (c2->left == NULL and this->gen->getList_components().count(coor_ang_l_key)>0) { this->points.emplace( std::make_pair(c2->x  , c2->y), c2->item); } // if  the supposed left angle was not found
+                    if (c2->right == NULL and this->gen->getList_components().count(coor_ang_r_key)>0) { this->points.emplace( std::make_pair(c2->x , c2->y +size ), c2->item);  } // if  the supposed right angle was not found
+
 
                 } else if (reference == "rside") {
                     coor_x_l = c2->x;
-                    coor_y_l = c2->y - params["size_component"] - params["spacing"];
+                    coor_y_l = c2->y + size;
                     coor_x_r = c2->x;
-                    coor_y_r = c2->y + params["size_component"] + params["spacing"];
+                    coor_y_r = c2->y -size;
+
+                    // finds out outlining points of the component
+                    if (c2->left == NULL and c2->front == NULL) {           this->points.emplace( std::make_pair(c2->x, c2->y + size), c2->item); }
+                    if (c2->right == NULL and c2->front == NULL) {          this->points.emplace( std::make_pair(c2->x, c2->y), c2->item); }
+                    std::pair<int, int> coor_ang_l_key = std::make_pair(coor_x_l +size , coor_y_l  ); // coordinates for a supposed angle on the left of the component
+                    std::pair<int, int> coor_ang_r_key = std::make_pair(coor_x_r +size , coor_y_r ); // coordinates for a supposed angle on the right of the component
+                    if (c2->left == NULL and this->gen->getList_components().count(coor_ang_l_key)>0) { this->points.emplace( std::make_pair(c2->x + size, c2->y + size), c2->item); } // if  the supposed left angle was not found
+                    if (c2->right == NULL and this->gen->getList_components().count(coor_ang_r_key)>0) { this->points.emplace( std::make_pair(c2->x + size, c2->y ), c2->item);  } // if  the supposed right angle was not found
+
+
                 }
             }
             if (direction == "root-back") {
-                coor_x_l = c2->x + params["size_component"] + params["spacing"];
+                coor_x_l = c2->x + size;
                 coor_y_l = c2->y;
-                coor_x_r = c2->x - params["size_component"] - params["spacing"];
+                coor_x_r = c2->x - size;
                 coor_y_r = c2->y;
                 reference = "top";
+
+                // finds out outlining points of the component
+                if (c2->left == NULL and c2->front == NULL) {           this->points.emplace( std::make_pair(c2->x + size, c2->y + size), c2->item); }
+                if (c2->right == NULL and c2->front == NULL) {          this->points.emplace( std::make_pair(c2->x, c2->y + size), c2->item); }
+                std::pair<int, int> coor_ang_l_key = std::make_pair(coor_x_l  , coor_y_l - size  ); // coordinates for a supposed angle on the left of the component
+                std::pair<int, int> coor_ang_r_key = std::make_pair(coor_x_r  , coor_y_r - size); // coordinates for a supposed angle on the right of the component
+                if (c2->left == NULL and this->gen->getList_components().count(coor_ang_l_key)>0) { this->points.emplace( std::make_pair(c2->x + size, c2->y), c2->item); } // if  the supposed left angle was not found
+                if (c2->right == NULL and this->gen->getList_components().count(coor_ang_r_key)>0) { this->points.emplace( std::make_pair(c2->x , c2->y ), c2->item);  } // if  the supposed right angle was not found
+
+
             }
+            std::cout<<c2->item<<" l x "<<coor_x_l  << " l y" << (coor_y_l - size)<<" r x "<<coor_x_r  << " r y" << (coor_y_r - size)<<std::endl;
 
             std::pair<int, int> coor_l_key = std::make_pair(coor_x_l, coor_y_l); // coordinates for a supposed neighboard on the left of the joint
             std::pair<int, int> coor_r_key = std::make_pair(coor_x_r, coor_y_r); // coordinates for a supposed neighboard on the right of the joint
@@ -443,6 +572,12 @@ void Measures::measureComponent( std::string reference, std::string direction, D
                 }
             }
 
+        }else{
+            // finds out outlining points of the component
+            if (c2->left == NULL and c2->front == NULL) {           this->points.emplace( std::make_pair(c2->x, c2->y ), c2->item); }
+            if (c2->right == NULL and c2->front == NULL) {          this->points.emplace( std::make_pair(c2->x + size, c2->y), c2->item); }
+            if (c2->left == NULL and c2->back == NULL) {            this->points.emplace( std::make_pair(c2->x , c2->y + size), c2->item); }
+            if (c2->right == NULL and c2->back == NULL) {    this->points.emplace( std::make_pair(c2->x + size, c2->y + size), c2->item); }
         }
 
 

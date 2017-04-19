@@ -27,11 +27,13 @@ class Measures{
         std::map< std::string, double> getMeasures();
         void setGenome(Genome * gen);
         Genome * getGenome();
+        std::pair<int, int> find_points(DecodedGeneticString::Vertex * c1, DecodedGeneticString::Vertex * c2,  int x, int y);
 
 
     private:
 
         Genome * gen; // pointer to the genome to be measured
+        std::map< std::pair<int, int> , std::string> points = std::map< std::pair<int, int> , std::string>(); // points outlining the polygon formed by the morphology through the components
 
 
 };
