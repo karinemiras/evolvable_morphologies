@@ -92,10 +92,6 @@ void Measures::measurePhenotype(std::map<std::string, double> params){
     int min_x = 0;
     int min_y = 0;
 
-    int avg_x = 0;
-    int avg_y = 0;
-
-
     for( const auto& iter : this->gen->getList_components() ){
 
         // finds out the values for the extreme x/y coordinates
@@ -104,18 +100,21 @@ void Measures::measurePhenotype(std::map<std::string, double> params){
         if (iter.first.second > max_y){ max_y = iter.first.second; }
         if (iter.first.second < min_y){ min_y = iter.first.second; }
 
-        // accounts for center of mass
-        avg_x += iter.first.first;
-        avg_y += iter.first.second;
     }
+
 
     // calculates center of mass of the body
 
-    avg_x = avg_x / (double)this->gen->getList_components().size();
-    avg_y = avg_y / (double)this->gen->getList_components().size();
-    avg_x = avg_x + (size/2);
-    avg_y = avg_y + (size/2);
-   // std::cout<<" >> x "<<avg_x<<" y "<<avg_y<<std::endl;
+    int avg_x = 0;
+    int avg_y = 0;
+    for( const auto& iter : this->points ){
+        avg_x += iter.first.first;
+        avg_y += iter.first.second;
+    }
+    avg_x = avg_x / (double)this->points.size();
+    avg_y = avg_y / (double)this->points.size();
+
+    std::cout<<" >> x "<<avg_x<<" y "<<avg_y<<std::endl;
 
 
     int horizontal_length = max_x + size - min_x ; // horizontal length, considering the components in the very left/right extremes
@@ -551,7 +550,6 @@ void Measures::measureComponent( std::string reference, std::string direction, D
 
 
             }
-            std::cout<<c2->item<<" l x "<<coor_x_l  << " l y" << (coor_y_l - size)<<" r x "<<coor_x_r  << " r y" << (coor_y_r - size)<<std::endl;
 
             std::pair<int, int> coor_l_key = std::make_pair(coor_x_l, coor_y_l); // coordinates for a supposed neighboard on the left of the joint
             std::pair<int, int> coor_r_key = std::make_pair(coor_x_r, coor_y_r); // coordinates for a supposed neighboard on the right of the joint
