@@ -213,7 +213,7 @@ void Genome::constructor(int argc, char* argv[], std::map<std::string, double> p
         image.fill(Qt::transparent);                            // Start all pixels transparent
         QPainter painter(&image);
         this->scene->render(&painter);
-        QString qstr = QString::fromStdString("/Users/karinemiras/CLionProjects/lsystem-proto/tests/" + this->id + ".png");
+        QString qstr = QString::fromStdString("../../tests/" + this->id + ".png");
         image.save(qstr);
     }
 

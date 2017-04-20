@@ -22,18 +22,18 @@ int main(int argc, char* argv[]) {
     LS.build_commands();
     LS.build_alphabet();
 
-    std::cout<<" test - step 2";
+//    std::cout<<" test - step 2";
     Evolution * e = new Evolution();
     e->readParams();
     std::cout<<" test- step 3";
+//
+//    e->initPopulation(argc, argv, LS);
+//
+//    std::cout<<" test- step 4";
+//    e->measurePopulation( argc, argv);
 
-    e->initPopulation(argc, argv, LS);
 
-    std::cout<<" test- step 4";
-    e->measurePopulation();
-
-    // Evolution e;
-   // e.testGeneticString(argc, argv,"fixed_morph/gecko.txt", LS);
+    e->testGeneticString(argc, argv,"gecko3", LS);
 
 
 

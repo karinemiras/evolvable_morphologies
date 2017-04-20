@@ -69,7 +69,7 @@ void Evolution::initPopulation(int argc, char* argv[], LSystem LS){ // default a
 /**
  * Measures all the individuals of the population for several metrics.
  **/
- void Evolution::measurePopulation(){
+ void Evolution::measurePopulation(int argc, char* argv[]){
 
     std::ofstream measures_file_general;
     std::string path = "../../tests/measures.txt";
@@ -79,7 +79,7 @@ void Evolution::initPopulation(int argc, char* argv[], LSystem LS){ // default a
 
         Measures * m = new Measures();
         m->setGenome(this->population[i]);
-        m->measurePhenotype(this->params);
+        m->measurePhenotype(argc, argv,this->params);
     }
     measures_file_general.close();
 
@@ -134,7 +134,7 @@ void Evolution::loadPopulation(int argc, char* argv[],int size_pop, std::string 
 void Evolution::testGeneticString(int argc, char* argv[],std::string test_genome, LSystem LS) {
 
     std::string line;
-    std::ifstream myfile("../../" + test_genome);
+    std::ifstream myfile("../../fixed_morph/" + test_genome+ ".txt");
     if (myfile.is_open()) {
         getline(myfile, line);
         std::vector<std::string> tokens;
@@ -146,7 +146,7 @@ void Evolution::testGeneticString(int argc, char* argv[],std::string test_genome
         }
 
         // creates new genome with id equal 1, using the just read genetic-string
-        Genome * gen = new Genome("1");
+        Genome * gen = new Genome(test_genome);
         gen->setGeneticString(gen->build_genetic_string(gen->getGeneticString(), gs));
         gen->getGeneticString().display_list();
 
@@ -161,7 +161,7 @@ void Evolution::testGeneticString(int argc, char* argv[],std::string test_genome
         // measures all metrics od the genome
         Measures m;
         m.setGenome(gen);
-        m.measurePhenotype(this->params);
+        m.measurePhenotype(argc, argv, this->params);
 
         myfile.close();
     }else{

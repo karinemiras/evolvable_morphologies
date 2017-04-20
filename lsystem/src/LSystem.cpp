@@ -24,7 +24,7 @@ void LSystem::build_alphabet(){
 
 
     alphabet["CNNN"]  = "CNNN";  // core component (no sensors)
-    alphabet["J1"] = "J1";       // fixed joint - horizontal                                                             f§
+    alphabet["J1"] = "J1";       // fixed joint - horizontal
     alphabet["J2"] = "J2";       // fixed joint - vertical
     alphabet["AJ1"] = "AJ1";     // active joint - horizontal
     alphabet["AJ2"] = "AJ2";     // active joint - vertical

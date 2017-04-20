@@ -26,7 +26,7 @@ class Evolution{
         void developGenome(int argc, char* argv[], Genome * gen, LSystem LS);
         void loadPopulation(int argc, char* argv[],int size_pop, std::string test_folder, LSystem LS);
         void testGeneticString(int argc, char* argv[],std::string test_genome, LSystem LS);
-        void measurePopulation();
+        void measurePopulation(int argc, char* argv[]);
 
     private:
 

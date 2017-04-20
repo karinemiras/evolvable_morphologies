@@ -22,7 +22,7 @@ class Measures{
     public:
 
         void initalizeMeasures();
-        void measurePhenotype(std::map<std::string, double> params);
+        void measurePhenotype(int argc, char* argv[], std::map<std::string, double> params);
         void measureComponent(std::string reference, std::string direction, DecodedGeneticString::Vertex * c1, DecodedGeneticString::Vertex * c2, std::map<std::string, double> params);
         std::map< std::string, double> getMeasures();
         void setGenome(Genome * gen);
@@ -33,7 +33,7 @@ class Measures{
     private:
 
         Genome * gen; // pointer to the genome to be measured
-        std::map< std::pair<int, int> , std::string> points = std::map< std::pair<int, int> , std::string>(); // points outlining the polygon formed by the morphology through the components
+        std::map< std::pair<int, int> , double> points = std::map< std::pair<int, int> , double>(); // points outlining the polygon formed by the morphology through the components
 
 
 };
