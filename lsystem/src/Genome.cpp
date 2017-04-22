@@ -8,6 +8,7 @@
 #include <random>
 #include <string>
 
+#include <math.h>
 
 #include "Genome.h"
 
@@ -44,6 +45,10 @@ void Genome::updateMeasure(std::string key, double value){
 }
 
 
+double Genome::getFitness(){
+
+    return this->fitness;
+}
 
 /**
 * Generates initial production rules for the alphabet.
@@ -63,7 +68,6 @@ void Genome::build_grammar(LSystem LS, int num_initial_comp, double add_backtopa
     std::uniform_int_distribution<int> dist_1(1, num_initial_comp); // distribution for the number of components
     std::uniform_int_distribution<int> dist_2(0, alp_i.size()-1); // distribution for letters of the alphabet
     std::uniform_int_distribution<int> dist_3(1, com.size()-1); // distribution for the mounting commands
-
 
     for (std::map< std::string, std::string >::const_iterator it = alp.begin(); it != alp.end(); ++it) { // for each letter of the alphabet
 
@@ -447,5 +451,19 @@ void Genome::developGenome(int argc, char* argv[], std::map<std::string, double>
     // generates robot-graphics
     std::cout << " >> constructing ... " << std::endl;
     this->constructor(argc, argv, params);
+}
+
+
+/**
+ * Calculates the fitness of a genome as the euclidean distance from its measures to the population's average measures.
+ * @param pop_measures - average for the measures of all the population
+ */
+void Genome::calculateFitness(std::map< std::string, double > pop_measures){
+
+    for( const auto& it : this->measures ){ // for each measure
+
+        this->fitness += pow((pop_measures[it.first] - it.second), 2); // sum of square differences between individual and population
+    }
+    this->fitness = sqrt(this->fitness); // square root of the sum
 }
 

@@ -30,7 +30,6 @@ class Genome{
 
         Genome(std::string _id){
             id = _id;
-
         }
 
         unsigned int getTo();
@@ -51,11 +50,14 @@ class Genome{
         std::map< std::string, double > getMeasures();
         std::map< std::pair<int, int>, std::string >  getList_components();
         void updateMeasure(std::string key, double value);
+        void calculateFitness(std::map< std::string, double > pop_measures);
+        double getFitness();
 
 
     private:
 
         std::string id; // id identifying the genome
+        double fitness = 0; // fitness of the genome
         GeneticString gs; // main genetic-string of the genome
         DecodedGeneticString dgs; // graph that logically represents the connections among the components forming the body
         QGraphicsScene * scene; // scene holding the phenotype

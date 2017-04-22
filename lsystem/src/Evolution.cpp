@@ -2,9 +2,11 @@
 // Created by Karine Miras on 21/03/2017.
 //
 
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <random>
 #include <string>
 #include <sstream>
 #include <vector>
@@ -68,6 +70,8 @@ void Evolution::initPopulation(int argc, char* argv[], LSystem LS){ // default a
 
 /**
  * Measures all the individuals of the population for several metrics.
+ *  @param argc - command line parameter
+ *  @param argv[] - command line parameter
  **/
  void Evolution::measurePopulation(int argc, char* argv[]){
 
@@ -75,7 +79,7 @@ void Evolution::initPopulation(int argc, char* argv[], LSystem LS){ // default a
     std::string path = "../../tests/measures.txt";
     measures_file_general.open(path);
 
-    for(int i=0; i < this->params["pop_size"]; i++) {  // for each genome of the population
+    for(int i=0; i < this->population.size(); i++) {  // for each genome of the population
 
         Measures * m = new Measures();
         m->setGenome(this->population[i]);
@@ -83,6 +87,95 @@ void Evolution::initPopulation(int argc, char* argv[], LSystem LS){ // default a
     }
     measures_file_general.close();
 
+}
+
+
+/**
+ * Initializes the averages of the measures of the population with zero.
+ */
+
+void Evolution::initPop_measures(){
+
+
+    this->pop_measures.emplace("total_components", 0); //  total amount of components of all types  in the body
+    this->pop_measures.emplace("total_bricks", 0); //  total amount of brick-components
+    this->pop_measures.emplace("total_fixed_joints_horizontal", 0); //  total amount of horizontal fixed-joint-components
+    this->pop_measures.emplace("total_passive_joints_horizontal", 0); // measure: total amount of horizontal passive-joint-components
+    this->pop_measures.emplace("total_active_joints_horizontal", 0); //   total amount of horizontal active-joint-components
+    this->pop_measures.emplace("total_fixed_joints_vertical", 0); //  total amount of vertical fixed-joint-components
+    this->pop_measures.emplace("total_passive_joints_vertical", 0); // measure: total amount of vertical passive-joint-components
+    this->pop_measures.emplace("total_active_joints_vertical", 0); //   total amount of vertical active-joint-components
+    this->pop_measures.emplace("connectivity1", 0); //   total of components with one side connected to another component
+    this->pop_measures.emplace("connectivity2",0); //  total of components with two sides connected to another component
+    this->pop_measures.emplace("connectivity3", 0); // total of components with three sides connected to another component
+    this->pop_measures.emplace("connectivity4", 0); //   total of components with four sides connected to another component
+    this->pop_measures.emplace("effective_joints", 0); //  total of joints connected by both sides to a brick or core component
+    this->pop_measures.emplace("effective_ap_h_joints", 0); //  total of horizontal- active/passive- joints connected by both sides to a brick or core component 
+    this->pop_measures.emplace("viable_joints", 0); //  total of effective joints which have no neighboards preventing movement
+    this->pop_measures.emplace("length_ratio", 0); // length of the shortest side dived by the longest
+    this->pop_measures.emplace("coverage", 0); // proportion of the expected area (given the horizontal e vertical lengths) that is covered with components
+    this->pop_measures.emplace("spreadness", 0); // average distance of each component from each other in the axises x/y
+    this->pop_measures.emplace("horizontal_symmetry",  0); // proportion of components in the left side which match with the same type of component in the same relative position on the right side
+    this->pop_measures.emplace("vertical_symmetry", 0); // proportion of components in the top side which match with the same type of component in the same relative position on the bottom side
+    this->pop_measures.emplace("joints_per_limb", 0); //  total amount of effective joints per limb
+}
+
+
+
+/**
+ * Calculates the fitness of the population of genomes.
+ */
+
+void Evolution::evaluatePopulation(){
+
+    for(int i=0; i < this->population.size(); i++) {  // for each genome of the population
+
+        this->population[i]->calculateFitness(this->pop_measures); // calculates its fitness
+        std::cout<<"fitness "<<this->population[i]->getFitness()<<std::endl;
+    }
+    this->updatePop_measures();  // updates the average measures for the population
+}
+
+
+/**
+ * Calculates the average of the measures among all genomes.
+ */
+
+void Evolution::updatePop_measures(){
+
+    for( const auto& it : this->pop_measures ){  // for each measure
+
+        this->pop_measures[it.first] = 0;  // cleans the old value
+
+        for(int i=0; i < this->population.size(); i++) {
+
+            this->pop_measures[it.first] += this->population[i]->getMeasures()[it.first]; // sums the values of all individuals for the measure
+        }
+
+        this->pop_measures[it.first] /= (double)this->population.size(); // divides by the total
+    }
+}
+
+
+/**
+ * Selects two random genomes and compares their fitness, choosing the winner.
+ * @return - the index of the winner genome
+ */
+
+int Evolution::tournament(){
+
+    std::random_device rd;
+    std::default_random_engine generator(rd());
+    std::uniform_int_distribution<int> dist_1(0, this->population.size()-1);
+
+    int genome1 =  dist_1(generator);
+    int genome2 =  dist_1(generator);
+
+    if (this->population[genome1]->getFitness() > this->population[genome2]->getFitness()){ // if genome1 has a better fitness, it is selected
+        return genome1;
+    }else{
+        return genome2;
+    }
 }
 
 
@@ -169,3 +262,41 @@ void Evolution::testGeneticString(int argc, char* argv[],std::string test_genome
     }
 }
 
+/**
+*  Selection of genomes in a population.
+**/
+
+void Evolution::selection() {
+
+    std::vector<Genome *>  selected = std::vector<Genome *>();
+
+    for(int i=0; i < this->params["pop_size"]; i++) { // selects a subset of fit genomes
+
+        selected.push_back(this->population[this->tournament()]);
+    }
+
+    this->population = selected; // substitutes current population for the selected subset
+}
+
+
+/**
+*   Performs crossover among individuals in the population.
+**/
+
+void Evolution::crossover(){
+
+    for(int i=0; i < this->params["offspring_size"]; i++) { // creates new individuals via crossover
+
+        int parent1 = this->tournament();
+        int parent2 = this->tournament();
+
+        this->population.push_back(this->population[parent1]); // temp !!! substitute parent1 for offspring !!
+    }
+ }
+
+
+
+std::vector<Genome *> Evolution::getPopulation(){
+
+    return this->population;
+}

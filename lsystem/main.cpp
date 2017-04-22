@@ -22,18 +22,27 @@ int main(int argc, char* argv[]) {
     LS.build_commands();
     LS.build_alphabet();
 
-//    std::cout<<" test - step 2";
+    std::cout<<" test - step 2";
     Evolution * e = new Evolution();
     e->readParams();
     std::cout<<" test- step 3";
-//
-//    e->initPopulation(argc, argv, LS);
-//
-//    std::cout<<" test- step 4";
-//    e->measurePopulation( argc, argv);
 
+    e->initPopulation(argc, argv, LS);
 
-    e->testGeneticString(argc, argv,"gecko3", LS);
+    std::cout<<" test- step 4";
+    e->measurePopulation( argc, argv);
+
+    std::cout<<" test- step 5";
+    e->evaluatePopulation();
+    e->selection();
+
+    std::cout<<e->getPopulation().size()<<std::endl;
+    e->crossover();
+    std::cout<<e->getPopulation().size()<<std::endl;
+    e->crossover();
+    std::cout<<e->getPopulation().size()<<std::endl;
+
+   // e->testGeneticString(argc, argv,"gecko3", LS);
 
 
 

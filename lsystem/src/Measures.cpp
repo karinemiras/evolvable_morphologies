@@ -638,7 +638,6 @@ void Measures::initalizeMeasures(){
 
     this->gen->updateMeasure("total_components", 0); //  total amount of components of all types  in the body
     this->gen->updateMeasure("total_bricks", 0); //  total amount of brick-components
-    this->gen->updateMeasure("total_joints", 0); //  total amount joints
     this->gen->updateMeasure("total_fixed_joints_horizontal", 0); //  total amount of horizontal fixed-joint-components
     this->gen->updateMeasure("total_passive_joints_horizontal", 0); // measure: total amount of horizontal passive-joint-components
     this->gen->updateMeasure("total_active_joints_horizontal", 0); //   total amount of horizontal active-joint-components
