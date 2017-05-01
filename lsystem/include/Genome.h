@@ -38,20 +38,21 @@ class Genome{
         GeneticString getGeneticString();
         void setGeneticString(GeneticString _gs);
         std::vector<std::string> getAxiom();
-        void generate_final_string(int  replacement_iterations, int export_genomes);
+        void generate_final_string(int  replacement_iterations, int export_genomes, int generation);
         void decodeGeneticString(LSystem LS);
-        void constructor(int argc, char* argv[], std::map<std::string, double> params);
+        void constructor(int argc, char* argv[], std::map<std::string, double> params, int generation);
         void draw_component(std::string reference, std::string direction, QGraphicsScene * scene, std::vector<QGraphicsRectItem *>  items,DecodedGeneticString::Vertex * c1, DecodedGeneticString::Vertex * c2, std::map<std::string, double> params);
         std::string getId();
-        void exportGenome();
+        void exportGenome(int generation);
         void createEmbryo();
-        void developGenome(int argc, char* argv[], std::map<std::string, double> params, LSystem LS);
+        void developGenome(int argc, char* argv[], std::map<std::string, double> params, LSystem LS, int generation);
         DecodedGeneticString getDgs();
         std::map< std::string, double > getMeasures();
         std::map< std::pair<int, int>, std::string >  getList_components();
         void updateMeasure(std::string key, double value);
         void calculateFitness(std::map< std::string, double > pop_measures);
         double getFitness();
+        std::map< std::string, GeneticString > getGrammar();
 
 
     private:

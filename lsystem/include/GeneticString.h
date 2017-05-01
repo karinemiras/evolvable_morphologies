@@ -32,6 +32,7 @@ class GeneticString {
         int count();
         void replaces(std::map< std::string, GeneticString >  grammar);
         GeneticString::Node * getStart();
+        void alter(int pos, std::vector<std::string> genetic_string_items);
 
         GeneticString()
         {

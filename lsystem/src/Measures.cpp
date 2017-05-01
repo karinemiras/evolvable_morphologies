@@ -34,7 +34,7 @@ void Measures::setGenome(Genome * gen){
  * @param params - list of params read from configuration file.
  */
 
-void Measures::measurePhenotype(int argc, char* argv[],std::map<std::string, double> params){
+void Measures::measurePhenotype(int argc, char* argv[],std::map<std::string, double> params, int generation){
 
     std::cout<<" --- "<<this->gen->getId()<<" measuring..."<<std::endl;
     int size = params["size_component"] + params["spacing"]; // size of the component plus the spacing between components
@@ -172,9 +172,6 @@ void Measures::measurePhenotype(int argc, char* argv[],std::map<std::string, dou
 
 
 
-
-
-
     // calculates the covered area
 
     // number of components which would fit in the area calculated by the verified lengths
@@ -252,7 +249,7 @@ void Measures::measurePhenotype(int argc, char* argv[],std::map<std::string, dou
     measures_file_general.open(path, std::ofstream::app);
 
     std::ofstream measures_file;
-    path = "../../tests/measures_"+this->gen->getId()+".txt";
+    path = "../../tests/measures"+this->gen->getId()+"_g"+ std::to_string(generation)+".txt";
     measures_file.open(path);
     measures_file_general << this->gen->getId();
 

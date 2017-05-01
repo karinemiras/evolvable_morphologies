@@ -15,37 +15,33 @@ using namespace std;
 int main(int argc, char* argv[]) {
 
 
-
-
-    std::cout<<" test - step 1";
     LSystem LS;
     LS.build_commands();
     LS.build_alphabet();
 
-    std::cout<<" test - step 2";
+
     Evolution * e = new Evolution();
     e->readParams();
-    std::cout<<" test- step 3";
 
     e->initPopulation(argc, argv, LS);
 
-    std::cout<<" test- step 4";
-    e->measurePopulation( argc, argv);
+    e->developPopulation(argc, argv, LS, 1);
 
-    std::cout<<" test- step 5";
+    e->measurePopulation(argc, argv, 1);
+
     e->evaluatePopulation();
-    e->selection();
 
-    std::cout<<e->getPopulation().size()<<std::endl;
-    e->crossover();
-    std::cout<<e->getPopulation().size()<<std::endl;
-    e->crossover();
-    std::cout<<e->getPopulation().size()<<std::endl;
+    e->mutation(LS);
+
+    e->developPopulation(argc, argv, LS, 2);
+
+    e->measurePopulation(argc, argv, 2);
+
+    e->evaluatePopulation();
+
+
 
    // e->testGeneticString(argc, argv,"gecko3", LS);
-
-
-
 
     return 0;
 

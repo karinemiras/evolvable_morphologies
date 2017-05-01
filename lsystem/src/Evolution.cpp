@@ -50,21 +50,32 @@ void Evolution::readParams(){
  **/
 void Evolution::initPopulation(int argc, char* argv[], LSystem LS){ // default arguments and Lsystem
 
-    for(int i=1; i <= this->params["pop_size"]; i++) {
+    for(int i=1; i <= this->params["pop_size"]; i++) { // repeats according to population size
 
         std::cout<<" ------ genome "<<i<<std::endl;
         Genome * gen = new Genome(std::to_string(i));
 
-        gen->createEmbryo();  // creates main genetic-string for axiom (initial developmental state of the genome)
-
         std::cout << " >> building grammar ..." << std::endl;
         gen->build_grammar(LS, this->params["num_initial_comp"], this->params["add_backtoparent_prob"]); // creates genetic-strings for the production rules of the letters in the grammar (initial random rules)
 
-        gen->developGenome(argc, argv, this->params, LS);  // 1- grows genetic-string of teh genome according to grammar, 2- decodes it, 3- constructs the phenotype
-
-        this->population.push_back(gen);  // add genome to the population
+        this->population.push_back(gen);  // adds genome to the population
     }
 
+}
+
+
+
+/**
+* Develops genomes of the population: 1- grows genetic-string of the genome according to grammar, 2- decodes it, 3- constructs the phenotype
+* @param LS - Lsystem structure containing the alphabet.
+**/
+void Evolution::developPopulation(int argc, char* argv[], LSystem LS, int generation){ // default arguments and Lsystem
+
+    for(int i=0; i < this->params["pop_size"]; i++) {
+
+        this->getPopulation()[i]->developGenome(argc, argv, this->params, LS,  generation);  // develops genome
+
+    }
 }
 
 
@@ -73,7 +84,7 @@ void Evolution::initPopulation(int argc, char* argv[], LSystem LS){ // default a
  *  @param argc - command line parameter
  *  @param argv[] - command line parameter
  **/
- void Evolution::measurePopulation(int argc, char* argv[]){
+ void Evolution::measurePopulation(int argc, char* argv[], int generation){
 
     std::ofstream measures_file_general;
     std::string path = "../../tests/measures.txt";
@@ -83,7 +94,7 @@ void Evolution::initPopulation(int argc, char* argv[], LSystem LS){ // default a
 
         Measures * m = new Measures();
         m->setGenome(this->population[i]);
-        m->measurePhenotype(argc, argv,this->params);
+        m->measurePhenotype(argc, argv,this->params, generation);
     }
     measures_file_general.close();
 
@@ -249,12 +260,12 @@ void Evolution::testGeneticString(int argc, char* argv[],std::string test_genome
 
         // generates robot-graphics
         std::cout << " >> constructing ... " << std::endl;
-        gen->constructor(argc, argv, this->params);
+        gen->constructor(argc, argv, this->params, 1);
 
         // measures all metrics od the genome
         Measures m;
         m.setGenome(gen);
-        m.measurePhenotype(argc, argv, this->params);
+        m.measurePhenotype(argc, argv, this->params, 1);
 
         myfile.close();
     }else{
@@ -285,7 +296,7 @@ void Evolution::selection() {
 
 void Evolution::crossover(){
 
-    for(int i=0; i < this->params["offspring_size"]; i++) { // creates new individuals via crossover
+    for(int i=0; i <  int(this->params["pop_size"]*this->params["offspring_size"]); i++) { // creates new individuals via crossover (size of offspring is relative to the size of population)
 
         int parent1 = this->tournament();
         int parent2 = this->tournament();
@@ -295,8 +306,59 @@ void Evolution::crossover(){
  }
 
 
+/**
+ * Performs mutation to individuals of the population.
+ * @param LS - Lsystem structure containing the alphabet.
+ */
+
+void Evolution::mutation(LSystem LS){
+
+    std::random_device rd;
+    std::default_random_engine generator(rd());
+
+    std::uniform_int_distribution<int> dist_letter(0, LS.getAlphabetIndex().size()-1); // distribution for letters of the alphabet
+    std::uniform_int_distribution<int> dist_command(1, LS.getCommands().size()-1); // distribution for the mounting commands
+    std::uniform_real_distribution<double> prob(0.0, 1.0); // distribution for probabilities
+
+    for(int i=0; i < this->population.size(); i++) {  // for each genome of the population
+
+        std::cout << "----- mut g " << i << std::endl;
+
+        for ( auto &it : this->population[i]->getGrammar()) { // for each letter in the grammar
+
+            std::cout << "letter " << it.first << std::endl;
+            std::cout << "before " <<std::endl;
+            it.second.display_list();
+
+            std::vector<std::string> genetic_string_items = std::vector<std::string>();
+            std::uniform_real_distribution<double> pos(0, it.second.count()-1); // distribution for position of new items in the genetic-string
+
+            if (prob(generator) <= this->params["mutation_alter_prob"]) { // if raffled probability is within the constrained probability
+                genetic_string_items.push_back(LS.getCommands()[dist_command(generator)]); // raffles a command to add
+            }
+            if (prob(generator) <= this->params["mutation_alter_prob"]) { // if raffled probability is within the constrained probability
+                genetic_string_items.push_back(LS.getAlphabetIndex()[dist_letter(generator)]); // raffles a letter to add
+            }
+            if (prob(generator) <= this->params["add_backtoparent_prob"]) { // if raffled probability is within the constrained probability
+                genetic_string_items.push_back("<"); // adds back-to-parent command
+            }
+
+            it.second.alter(pos(generator), genetic_string_items); // alters (possibly) genetic-string (production rule)
+
+            std::cout << "after " <<std::endl;
+            it.second.display_list();
+        }
+
+    }
+
+}
+
 
 std::vector<Genome *> Evolution::getPopulation(){
 
     return this->population;
+}
+
+std::map<std::string, double> Evolution::getParams(){
+    return params;
 }

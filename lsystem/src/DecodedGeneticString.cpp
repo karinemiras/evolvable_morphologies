@@ -141,20 +141,38 @@ void DecodedGeneticString::decode(GeneticString gs, LSystem LS) {
 
         } else { // the item is a command
 
-            command = current_gs_item->item.substr(current_gs_item->item.size()-1,1); // discovers teh type of command, to be used with the next component to be mounted later on
-            std::cout<<current_gs_item->item<<" "<<command << "-- not alpha" << std::endl;
+//            command = current_gs_item->item.substr(current_gs_item->item.size()-1,1); // discovers teh type of command, to be used with the next component to be mounted later on
+//            std::cout<<current_gs_item->item<<" "<<command << "-- not alpha" << std::endl;
+//
+//            if(command == "<"){ // if it is a move-command
+//
+//                if (current_component != root) { // if it is not root, moves back to parent component in the graph
+//
+//                    current_component = current_component->back;
+//                    command = ""; // cleans variable of command
+//                    std::cout << " move back to parent " << current_component->item<<std::endl;
+//                }else{
+//                    std::cout<< "-- back-to-parent violation!" << std::endl;
+//                }
+//            }
 
-            if(command == "<"){ // if it is a move-command
+
+            if(current_gs_item->item.substr(current_gs_item->item.size()-1,1) == "<"){ // if it is a move-command
 
                 if (current_component != root) { // if it is not root, moves back to parent component in the graph
 
                     current_component = current_component->back;
-                    command = ""; // cleans variable of command
                     std::cout << " move back to parent " << current_component->item<<std::endl;
                 }else{
                     std::cout<< "-- back-to-parent violation!" << std::endl;
                 }
+            }else{ // if it is a mounting command
+
+                command = current_gs_item->item.substr(current_gs_item->item.size()-1,1); // discovers the type of command, to be used with the next component to be mounted later on
+                std::cout<<current_gs_item->item<<" "<<command << "-- not alpha" << std::endl;
             }
+
+
         }
         current_gs_item = current_gs_item->next;
     }

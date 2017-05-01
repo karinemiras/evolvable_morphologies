@@ -96,13 +96,11 @@ void Genome::build_grammar(LSystem LS, int num_initial_comp, double add_backtopa
             }
         }
 
-
         GeneticString lgs;
         lgs = build_genetic_string(lgs, letter_items); // build a genetic-string with the new production rule
         lgs.display_list();
 
         this->grammar.emplace(letter, lgs); // adds letter and its production rule (made a genetic-string) to the grammar of the genome
-
 
     }
 
@@ -115,7 +113,7 @@ void Genome::build_grammar(LSystem LS, int num_initial_comp, double add_backtopa
  * @param replacement_iterations - number of iterations to perform replacements.
  * @param export_genomes - flag for exporting the main genetic-string to a file.
  */
-void Genome::generate_final_string(int  replacement_iterations, int export_genomes){
+void Genome::generate_final_string(int  replacement_iterations, int export_genomes, int generation){
 
     for(int i=1; i<=replacement_iterations ;i++) { // performs replacements for a number of iterations
 
@@ -124,17 +122,17 @@ void Genome::generate_final_string(int  replacement_iterations, int export_genom
         this->gs.display_list();
     }
     if(export_genomes == 1){
-        this->exportGenome();
+        this->exportGenome(generation);
     }
 }
 
 /**
  * Exports the main-genetic string of a genome to a file.
  */
-void Genome::exportGenome() {
+void Genome::exportGenome(int generation) {
 
     std::ofstream genome_file;
-    std::string path = "../../tests/genome_"+this->id+".txt";
+    std::string path = "../../tests/genome" + this->id+ "_g" + std::to_string(generation) +".txt";
     genome_file.open(path);
 
     GeneticString::Node *current;
@@ -173,6 +171,7 @@ GeneticString Genome::build_genetic_string(GeneticString _gs, std::vector<std::s
 void Genome::decodeGeneticString(LSystem LS){
 
     try {
+        this->dgs = DecodedGeneticString();
         this->dgs.decode(this->gs,LS);
 
     } catch (const std::exception& e) {
@@ -189,7 +188,7 @@ void Genome::decodeGeneticString(LSystem LS){
  * @param argv[] - command line parameter
  * @param params - list of params read from configuration file.
  */
-void Genome::constructor(int argc, char* argv[], std::map<std::string, double> params) {
+void Genome::constructor(int argc, char* argv[], std::map<std::string, double> params, int generation ) {
 
 
     QApplication app(argc, argv);
@@ -217,7 +216,8 @@ void Genome::constructor(int argc, char* argv[], std::map<std::string, double> p
         image.fill(Qt::transparent);                            // Start all pixels transparent
         QPainter painter(&image);
         this->scene->render(&painter);
-        QString qstr = QString::fromStdString("../../tests/" + this->id + ".png");
+
+        QString qstr = QString::fromStdString("../../tests/body" + this->id +"_g" + std::to_string(generation) + ".png");
         image.save(qstr);
     }
 
@@ -419,7 +419,8 @@ void Genome::createEmbryo(){
     axiom.push_back("CNNN");
 
     // initializes the genetic-string with the axiom
-    this->setGeneticString(this->build_genetic_string(this->getGeneticString(), axiom));
+    GeneticString gs;
+    this->setGeneticString(this->build_genetic_string(gs, axiom));
 
     std::cout << " >> building axiom ..." << std::endl;
     this->getGeneticString().display_list();
@@ -437,12 +438,14 @@ void Genome::createEmbryo(){
 * @param LS - Lsystem structure containing the alphabet.
 **/
 
-void Genome::developGenome(int argc, char* argv[], std::map<std::string, double> params, LSystem LS) {
+void Genome::developGenome(int argc, char* argv[], std::map<std::string, double> params, LSystem LS, int generation) {
 
+    // creates main genetic-string for axiom (initial developmental state of the genome)
+    this->createEmbryo();
 
     // enhances the genetic-string according to grammar iteratively
     std::cout << " >> iterating replacements ..." << std::endl;
-    this->generate_final_string(params["replacement_iterations"], params["export_genomes"]);
+    this->generate_final_string(params["replacement_iterations"], params["export_genomes"], generation);
 
     // decodes the final genetic-string into a tree of components
     std::cout << " >> decoding ... " << std::endl;
@@ -450,7 +453,7 @@ void Genome::developGenome(int argc, char* argv[], std::map<std::string, double>
 
     // generates robot-graphics
     std::cout << " >> constructing ... " << std::endl;
-    this->constructor(argc, argv, params);
+    this->constructor(argc, argv, params,  generation);
 }
 
 
@@ -467,3 +470,8 @@ void Genome::calculateFitness(std::map< std::string, double > pop_measures){
     this->fitness = sqrt(this->fitness); // square root of the sum
 }
 
+
+std::map< std::string, GeneticString > Genome::getGrammar(){
+
+    return this->grammar;
+}

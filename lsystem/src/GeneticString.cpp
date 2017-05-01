@@ -7,6 +7,44 @@
 #include "GeneticString.h"
 
 
+
+/**
+ * Add items to the genetic-string.
+ * @param genetic_string_items - contains the items which will be added to the genetic-string in an specific position.
+ */
+void GeneticString::alter(int pos, std::vector<std::string> genetic_string_items) {
+
+    GeneticString::Node *current, *next, *inode, *previous;
+    current = start;
+    int current_pos = 0;
+
+    while (current_pos != pos) { // looks for chosen position, as items will be inserted after that position
+        current = current->next;
+        current_pos++;
+    }
+
+    previous = current;
+    next = current->next;
+
+    for (int i = 0; i < genetic_string_items.size(); i++) {
+
+        // the new item
+        inode = new GeneticString::Node;
+        inode->item = genetic_string_items[i];
+        inode->prev = previous;
+        inode->next = next;
+
+        previous->next = inode;
+
+        if (next != NULL) {
+            next->prev = inode;
+        }
+
+        previous = inode;
+        next = inode->next;
+    }
+}
+
 /**
  * Performs replacements in the genetic-string given the production rules of the grammar.
  * @param grammar - contains the production rules for each letter of the alphabet.
@@ -31,15 +69,6 @@ void GeneticString::replaces(std::map< std::string, GeneticString >  grammar){
             // removes letter from the main genetic-string, once it will be replaced by other item/s
             previous = current->prev;
             next = current->next;
-
-//            if (previous != NULL) { //
-//                previous->next = next;
-//            }else{
-//                start = next;
-//            }
-//            if (next != NULL) { //
-//                next->prev = previous;
-//            }
 
             while(current_replacement != NULL) { // inserts the items of the genetic-string of the production rule to the main genetic-string
 
@@ -127,7 +156,7 @@ void GeneticString::display_list()
 /**
  * Counts the of elements in the genetic-string.
  */
-int GeneticString::count()
+    int GeneticString::count()
 {
     Node *current = start;
     int cnt = 0;
