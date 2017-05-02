@@ -24,13 +24,28 @@ void LSystem::build_alphabet(){
 
 
     alphabet["CNNN"]  = "CNNN";  // core component (no sensors)
+    alphabet_index.push_back("CNNN");
+
     alphabet["J1"] = "J1";       // fixed joint - horizontal
+    alphabet_index.push_back("J1");
+
     alphabet["J2"] = "J2";       // fixed joint - vertical
+    alphabet_index.push_back("J2");
+
     alphabet["AJ1"] = "AJ1";     // active joint - horizontal
+    alphabet_index.push_back("AJ1");
+
     alphabet["AJ2"] = "AJ2";     // active joint - vertical
+    alphabet_index.push_back("AJ2");
+
     alphabet["PJ1"] = "PJ1";     // passive joint - horizontal
+    alphabet_index.push_back("PJ1");
+    
     alphabet["PJ2"] = "PJ2";     // passive joint - vertical
+    alphabet_index.push_back("PJ2");
+
     alphabet["BNNN"] = "BNNN";   // brick (no sensors)
+    alphabet_index.push_back("BNNN");
 
  /**
  *  B--- : brick component with possibility of sensors I (infra-red) or L (light) or N (none)
@@ -54,9 +69,9 @@ void LSystem::build_alphabet(){
 //        }
 //    }
 
-    for (std::map< std::string, std::string >::const_iterator it = alphabet.begin(); it != alphabet.end(); ++it) {
-        alphabet_index.push_back(it->first);
-    }
+
+
+
 }
 
 

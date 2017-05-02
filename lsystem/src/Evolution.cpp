@@ -29,6 +29,19 @@ void Evolution::readParams(){
     std::string line;
     std::ifstream myfile ("../../lsystem/configuration.txt");
 
+//    pop_size - size of the population of genomes
+//    add_backtoparent_prob - probability of adding a back-to-parent command to genetic-strings
+//    num_initial_comp - number of initial (random) components in the production rules of the grammar
+//    show_phenotypes - flag to show the phenotype graphic
+//    export_phenotypes - flag to export the phenotypes to  images
+//    export_genomes - flag to export the genomes to files
+//    replacement_iterations - number of replacement iterations for the l-system
+//    size_component - size of each component in pixels
+//    spacing - spacing between components in pixels
+//    offspring_size - proportion of the size of the population to calculate the number of individuals of the offsfpring
+//    num_generations - number of generations of the evolution
+//    mutation_alter_prob - probability of adding items (letters/commands) to the genetic-string in the mutation
+
     if (myfile.is_open()) {
         while ( getline (myfile,line) ) {
             std::vector<std::string> tokens;
@@ -69,7 +82,7 @@ void Evolution::initPopulation(int argc, char* argv[], LSystem LS){ // default a
 * Develops genomes of the population: 1- grows genetic-string of the genome according to grammar, 2- decodes it, 3- constructs the phenotype
 * @param LS - Lsystem structure containing the alphabet.
 **/
-void Evolution::developPopulation(int argc, char* argv[], LSystem LS, int generation){ // default arguments and Lsystem
+void Evolution::developPopulation(int argc, char* argv[], LSystem LS, int generation){ // default arguments and L-system
 
     for(int i=0; i < this->params["pop_size"]; i++) {
 
@@ -316,13 +329,13 @@ void Evolution::mutation(LSystem LS){
     std::random_device rd;
     std::default_random_engine generator(rd());
 
-    std::uniform_int_distribution<int> dist_letter(0, LS.getAlphabetIndex().size()-1); // distribution for letters of the alphabet
-    std::uniform_int_distribution<int> dist_command(1, LS.getCommands().size()-1); // distribution for the mounting commands
+    std::uniform_int_distribution<int> dist_letter(1, LS.getAlphabetIndex().size()-1); // distribution for letters of the alphabet (does not include position 0, which is core-component)
+    std::uniform_int_distribution<int> dist_command(1, LS.getCommands().size()-1); // distribution for the mounting commands (positions 1-3)
     std::uniform_real_distribution<double> prob(0.0, 1.0); // distribution for probabilities
 
     for(int i=0; i < this->population.size(); i++) {  // for each genome of the population
 
-        std::cout << "----- mut g " << i << std::endl;
+        std::cout << "----- mut g " << i+1 << std::endl;
 
         for ( auto &it : this->population[i]->getGrammar()) { // for each letter in the grammar
 
@@ -330,20 +343,42 @@ void Evolution::mutation(LSystem LS){
             std::cout << "before " <<std::endl;
             it.second.display_list();
 
+            //  if there is more than one item, and if the raffled probability is within the constrained probability
+            if (it.second.count() >= 2 and prob(generator) <= this->params["mutation_alter_prob"]) {
+
+                std::cout << " remove " << std::endl;
+                std::uniform_real_distribution<double> pos_d(1, it.second.count()); // distribution for position of deletion in the genetic-string
+                int pos_deletion = pos_d(generator);
+std::cout<<it.first<<pos_deletion;
+                if(!(it.first == "CNNN" and pos_deletion == 0)){ // if it is the production rule of the core-component, prevents core-component from being deleted, preserving the root
+                    it.second.remove(pos_deletion); // removes from random position
+                }
+            }
+
             std::vector<std::string> genetic_string_items = std::vector<std::string>();
-            std::uniform_real_distribution<double> pos(0, it.second.count()-1); // distribution for position of new items in the genetic-string
+            std::uniform_real_distribution<double> pos_i(0, it.second.count()); // distribution for position of insertion in the genetic-string
 
             if (prob(generator) <= this->params["mutation_alter_prob"]) { // if raffled probability is within the constrained probability
                 genetic_string_items.push_back(LS.getCommands()[dist_command(generator)]); // raffles a command to add
             }
             if (prob(generator) <= this->params["mutation_alter_prob"]) { // if raffled probability is within the constrained probability
-                genetic_string_items.push_back(LS.getAlphabetIndex()[dist_letter(generator)]); // raffles a letter to add
+                int test = dist_letter(generator);
+                std::cout<<"akiiiiiiiii"<<LS.getAlphabetIndex()[test]<<test<<std::endl;
+
+                genetic_string_items.push_back(LS.getAlphabetIndex()[test]); // raffles a letter to add
             }
             if (prob(generator) <= this->params["add_backtoparent_prob"]) { // if raffled probability is within the constrained probability
-                genetic_string_items.push_back("<"); // adds back-to-parent command
+                genetic_string_items.push_back(LS.getCommands()[0]); // adds back-to-parent command (position 0 )
             }
 
-            it.second.alter(pos(generator), genetic_string_items); // alters (possibly) genetic-string (production rule)
+            int pos_insertion = pos_i(generator);
+            if(it.first == "CNNN" and pos_insertion == 0){ // if it is the production rule of the core-component, prevents new items from being inserted at the beginning, preserving the root
+                pos_insertion++;
+            }
+
+            //  (possibly) alters genetic-string (production rule) adding items (moving command, letter or back-to-parent command).
+            //  in case of letter, never includes core-component, because that is the only component which should certainly be included only once
+            it.second.add(pos_insertion, genetic_string_items);
 
             std::cout << "after " <<std::endl;
             it.second.display_list();

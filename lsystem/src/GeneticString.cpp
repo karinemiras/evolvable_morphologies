@@ -12,19 +12,26 @@
  * Add items to the genetic-string.
  * @param genetic_string_items - contains the items which will be added to the genetic-string in an specific position.
  */
-void GeneticString::alter(int pos, std::vector<std::string> genetic_string_items) {
+void GeneticString::add(int pos, std::vector<std::string> genetic_string_items) {
 
     GeneticString::Node *current, *next, *inode, *previous;
     current = start;
-    int current_pos = 0;
+    int current_pos = 1;
 
-    while (current_pos != pos) { // looks for chosen position, as items will be inserted after that position
+    while (current_pos < pos) { // looks for chosen position, as items will be inserted after that position, unless pos is 0, in case which the items will be the first ones
         current = current->next;
         current_pos++;
     }
 
-    previous = current;
-    next = current->next;
+    if (pos > 0){ // if insertion will NOT be done at the beginning
+
+        previous = current;
+        next = current->next;
+    }else{ // if insertion will be done at the beginning
+
+        previous = NULL;
+        next = current;
+    }
 
     for (int i = 0; i < genetic_string_items.size(); i++) {
 
@@ -34,14 +41,46 @@ void GeneticString::alter(int pos, std::vector<std::string> genetic_string_items
         inode->prev = previous;
         inode->next = next;
 
-        previous->next = inode;
+        if (previous != NULL) {
+            previous->next = inode;  // the item that comes before the chosen position points forward to the new one
+        }else{
+            start = inode; // in case the added item should become the first
+        }
 
-        if (next != NULL) {
+        if (next != NULL) { // the item that comes after the chosen position points back to the new one
             next->prev = inode;
         }
 
-        previous = inode;
+        previous = inode; // passes by (forward) the new node
         next = inode->next;
+    }
+}
+
+/**
+ * Deletes item from the genetic-string.
+ * @param genetic_string_items - contains the items which will be added to the genetic-string in an specific position.
+ */
+void GeneticString::remove(int pos) {
+
+    GeneticString::Node *current, *next, *previous;
+    current = start;
+    int current_pos = 1;
+//std::cout<<" akiiiii "<<pos<<std::endl;
+    while (current_pos < pos) { // looks for chosen position, as items will be inserted after that position
+        current = current->next;
+        current_pos++;
+    }
+
+    previous = current->prev;
+    next = current->next;
+
+    if (previous != NULL) {
+        previous->next = next;  // that item that comes before the deleted item will point forward to the next item
+    }else{
+        start = next; // in case the removed item is the first, the next will be the first
+    }
+    if (next != NULL) {
+        next->prev = previous;  // the item that was positioned after the removed item will point to the new item
     }
 }
 

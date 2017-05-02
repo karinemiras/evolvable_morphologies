@@ -27,17 +27,17 @@ int main(int argc, char* argv[]) {
 
     e->developPopulation(argc, argv, LS, 1);
 
-    e->measurePopulation(argc, argv, 1);
+    //e->measurePopulation(argc, argv, 1);
 
-    e->evaluatePopulation();
+    //e->evaluatePopulation();
 
     e->mutation(LS);
 
     e->developPopulation(argc, argv, LS, 2);
 
-    e->measurePopulation(argc, argv, 2);
+    //e->measurePopulation(argc, argv, 2);
 
-    e->evaluatePopulation();
+    //e->evaluatePopulation();
 
 
 
