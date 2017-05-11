@@ -53,6 +53,7 @@ class Genome{
         void calculateFitness(std::map< std::string, double > pop_measures);
         double getFitness();
         std::map< std::string, GeneticString > getGrammar();
+        void setGrammar(std::map< std::string, GeneticString > grammar);
 
 
     private:

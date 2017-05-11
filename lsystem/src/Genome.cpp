@@ -45,8 +45,11 @@ void Genome::updateMeasure(std::string key, double value){
 }
 
 
-double Genome::getFitness(){
+void Genome::setGrammar(std::map<std::string, GeneticString> grammar) {
+    this->grammar = grammar;
+}
 
+double Genome::getFitness(){
     return this->fitness;
 }
 
@@ -97,7 +100,7 @@ void Genome::build_grammar(LSystem LS, int num_initial_comp, double add_backtopa
         }
 
         GeneticString lgs;
-        lgs = build_genetic_string(lgs, letter_items); // build a genetic-string with the new production rule
+        lgs = this->build_genetic_string(lgs, letter_items); // build a genetic-string with the new production rule
         lgs.display_list();
 
         this->grammar.emplace(letter, lgs); // adds letter and its production rule (made a genetic-string) to the grammar of the genome

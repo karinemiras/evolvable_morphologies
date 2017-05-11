@@ -27,17 +27,19 @@ int main(int argc, char* argv[]) {
 
     e->developPopulation(argc, argv, LS, 1);
 
-    //e->measurePopulation(argc, argv, 1);
+//    std::cout<<" -------------------------- crossover "<<std::endl;
+//    e->crossover(LS);
+//
+//    for(int i=0; i<e->getPopulation().size(); i++){
+//        std::cout<<"id "<<e->getPopulation()[i]->getId()<<std::endl;
+//    }
+//
+//    e->developPopulation(argc, argv, LS, 2);
 
-    //e->evaluatePopulation();
+    e->measurePopulation(argc, argv, 1);
 
-    e->mutation(LS);
+    e->evaluatePopulation();
 
-    e->developPopulation(argc, argv, LS, 2);
-
-    //e->measurePopulation(argc, argv, 2);
-
-    //e->evaluatePopulation();
 
 
 

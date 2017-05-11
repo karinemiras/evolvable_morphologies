@@ -40,7 +40,7 @@ void LSystem::build_alphabet(){
 
     alphabet["PJ1"] = "PJ1";     // passive joint - horizontal
     alphabet_index.push_back("PJ1");
-    
+
     alphabet["PJ2"] = "PJ2";     // passive joint - vertical
     alphabet_index.push_back("PJ2");
 

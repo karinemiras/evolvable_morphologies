@@ -65,6 +65,7 @@ void Evolution::initPopulation(int argc, char* argv[], LSystem LS){ // default a
 
     for(int i=1; i <= this->params["pop_size"]; i++) { // repeats according to population size
 
+        this->max_id++;
         std::cout<<" ------ genome "<<i<<std::endl;
         Genome * gen = new Genome(std::to_string(i));
 
@@ -84,12 +85,13 @@ void Evolution::initPopulation(int argc, char* argv[], LSystem LS){ // default a
 **/
 void Evolution::developPopulation(int argc, char* argv[], LSystem LS, int generation){ // default arguments and L-system
 
-    for(int i=0; i < this->params["pop_size"]; i++) {
+    for(int i=0; i < this->population.size(); i++) {
 
         this->getPopulation()[i]->developGenome(argc, argv, this->params, LS,  generation);  // develops genome
 
     }
 }
+
 
 
 /**
@@ -134,14 +136,15 @@ void Evolution::initPop_measures(){
     this->pop_measures.emplace("connectivity3", 0); // total of components with three sides connected to another component
     this->pop_measures.emplace("connectivity4", 0); //   total of components with four sides connected to another component
     this->pop_measures.emplace("effective_joints", 0); //  total of joints connected by both sides to a brick or core component
-    this->pop_measures.emplace("effective_ap_h_joints", 0); //  total of horizontal- active/passive- joints connected by both sides to a brick or core component 
-    this->pop_measures.emplace("viable_joints", 0); //  total of effective joints which have no neighboards preventing movement
+    this->pop_measures.emplace("symmetry", 0); //  maximum of horizontal and vertical symmetry
+    this->pop_measures.emplace("viable_horizontal_joints", 0); //  total of effective joints which have no neighboards preventing movement
     this->pop_measures.emplace("length_ratio", 0); // length of the shortest side dived by the longest
     this->pop_measures.emplace("coverage", 0); // proportion of the expected area (given the horizontal e vertical lengths) that is covered with components
     this->pop_measures.emplace("spreadness", 0); // average distance of each component from each other in the axises x/y
     this->pop_measures.emplace("horizontal_symmetry",  0); // proportion of components in the left side which match with the same type of component in the same relative position on the right side
     this->pop_measures.emplace("vertical_symmetry", 0); // proportion of components in the top side which match with the same type of component in the same relative position on the bottom side
     this->pop_measures.emplace("joints_per_limb", 0); //  total amount of effective joints per limb
+
 }
 
 
@@ -307,15 +310,84 @@ void Evolution::selection() {
 *   Performs crossover among individuals in the population.
 **/
 
-void Evolution::crossover(){
+void Evolution::crossover(LSystem LS){
 
-    for(int i=0; i <  int(this->params["pop_size"]*this->params["offspring_size"]); i++) { // creates new individuals via crossover (size of offspring is relative to the size of population)
+    std::vector<Genome *>  offspring = std::vector<Genome *>();
+
+    for(int i = 0; i < ceil(this->params["pop_size"] * this->params["offspring_size"]); i++) { // creates new individuals via crossover (size of offspring is relative to the size of population)
 
         int parent1 = this->tournament();
         int parent2 = this->tournament();
 
-        this->population.push_back(this->population[parent1]); // temp !!! substitute parent1 for offspring !!
+        std::cout<<" p1 "<<parent1+1<<" p2 "<<parent2+1<<std::endl;
+
+        this->max_id++;
+        Genome * gen = new Genome(std::to_string(this->max_id));
+
+        std::map< std::string, GeneticString >  grammar = std::map< std::string, GeneticString >();
+
+        std::random_device rd;
+        std::default_random_engine generator(rd());
+
+        std::uniform_real_distribution<double> prob(0.0, 1.0); // distribution for probabilities
+
+        for ( auto &it : LS.getAlphabet()) { // for each letter in the grammar of the parents
+
+           // std::uniform_int_distribution<int> dist_type_cross(1, 3); //type 3 is disruptive
+            std::uniform_int_distribution<int> dist_type_cross(1, 2);
+            int  type_cross = dist_type_cross(generator);
+
+            std::cout<<" ----------- typecross "<<it.first<<" "<<type_cross<<" "<<std::endl;
+
+            if (type_cross == 1) { // gets the genetic-string from a single parent (parent1)
+
+                grammar.emplace(it.first, this->population[parent1]->getGrammar()[it.first]);
+            }
+
+            if (type_cross == 2) { // gets the genetic-string from a single parent (parent2)
+
+                grammar.emplace(it.first, this->population[parent2]->getGrammar()[it.first]);
+            }
+
+            if (type_cross == 3) { // gets a random part of the genetic-string from each parent
+
+                std::uniform_int_distribution<int> dist_pos_parent1_ini(1, this->population[parent1]->getGrammar()[it.first].count()); // distribution for parent1 initial position
+                std::uniform_int_distribution<int> dist_pos_parent2_ini(1, this->population[parent2]->getGrammar()[it.first].count()); // distribution for parent2 initial position
+
+                int pos_parent1_ini = dist_pos_parent1_ini(generator);
+                int pos_parent2_ini = dist_pos_parent2_ini(generator);
+
+                std::uniform_int_distribution<int> dist_pos_parent1_end(pos_parent1_ini, this->population[parent1]->getGrammar()[it.first].count()); // distribution for parent1 final position
+                std::uniform_int_distribution<int> dist_pos_parent2_end(pos_parent2_ini, this->population[parent2]->getGrammar()[it.first].count()); // distribution for parent2 final position
+
+                int pos_parent1_end = dist_pos_parent1_end(generator);
+                int pos_parent2_end = dist_pos_parent2_end(generator);
+
+                GeneticString gs;
+
+                std::cout<<" ------- pos "<<pos_parent1_ini<<" "<<pos_parent1_end<<" "<<pos_parent2_ini<<" "<<pos_parent2_end <<std::endl;
+
+                gs.create_joined_list(pos_parent1_ini, pos_parent2_ini, pos_parent1_end, pos_parent2_end, this->population[parent1]->getGrammar()[it.first], this->population[parent2]->getGrammar()[it.first]);
+
+
+                grammar.emplace(it.first, gs);
+            }
+
+            grammar[it.first].display_list();
+        }
+
+        gen->setGrammar(grammar);
+
+        offspring.push_back(gen); // adds new individual to the offspring
+
     }
+
+    for(int i=0; i<offspring.size(); i++){
+
+        this->population.push_back(offspring[i]);
+    }
+
+
  }
 
 
@@ -349,7 +421,7 @@ void Evolution::mutation(LSystem LS){
                 std::cout << " remove " << std::endl;
                 std::uniform_real_distribution<double> pos_d(1, it.second.count()); // distribution for position of deletion in the genetic-string
                 int pos_deletion = pos_d(generator);
-std::cout<<it.first<<pos_deletion;
+
                 if(!(it.first == "CNNN" and pos_deletion == 0)){ // if it is the production rule of the core-component, prevents core-component from being deleted, preserving the root
                     it.second.remove(pos_deletion); // removes from random position
                 }
@@ -363,7 +435,6 @@ std::cout<<it.first<<pos_deletion;
             }
             if (prob(generator) <= this->params["mutation_alter_prob"]) { // if raffled probability is within the constrained probability
                 int test = dist_letter(generator);
-                std::cout<<"akiiiiiiiii"<<LS.getAlphabetIndex()[test]<<test<<std::endl;
 
                 genetic_string_items.push_back(LS.getAlphabetIndex()[test]); // raffles a letter to add
             }

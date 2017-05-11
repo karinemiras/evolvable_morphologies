@@ -36,7 +36,7 @@ class Evolution{
         void updatePop_measures();
         int tournament();
         void selection();
-        void crossover();
+        void crossover(LSystem LS);
         void mutation(LSystem LS);
         std::vector<Genome *>  getPopulation();
         std::map<std::string, double> getParams();
@@ -47,7 +47,7 @@ class Evolution{
         std::vector<Genome *>  population = std::vector<Genome *>(); // contains the genomes of all the individuals of the population
         std::map<std::string, double> params =  std::map<std::string, double>(); // contains the list of parameters loaded from parameter file
         std::map< std::string, double >  pop_measures = std::map< std::string, double >(); // average of the measures for the population
-
+        int max_id = 0;
 
 };
 

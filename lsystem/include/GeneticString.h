@@ -34,6 +34,7 @@ class GeneticString {
         GeneticString::Node * getStart();
         void add(int pos, std::vector<std::string> genetic_string_items);
         void remove(int pos);
+        void create_joined_list(int pos_parent1_ini, int pos_parent2_ini, int pos_parent1_end, int pos_parent2_end,  GeneticString  gs_parent1, GeneticString  gs_parent2);
 
         GeneticString()
         {

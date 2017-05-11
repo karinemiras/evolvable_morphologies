@@ -51,7 +51,7 @@ file(GLOB_RECURSE SOURCES
      src/GeneticString.cpp
      src/Genome.cpp
      src/LSystem.cpp
-     src/Evolution.cpp
+        src/Evolution.cpp
      src/DecodedGeneticString.cpp
      src/Measures.cpp
 

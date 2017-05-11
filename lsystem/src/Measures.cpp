@@ -46,31 +46,18 @@ void Measures::measurePhenotype(int argc, char* argv[],std::map<std::string, dou
 
     this->measureComponent( "bottom","root", c,c, params); // roams graph calculating all measures
 
+    this->gen->updateMeasure("effective_joints", this->gen->getMeasures()["effective_joints"] + this->gen->getMeasures()["viable_horizontal_joints"]);
 
     // calculates number of effective joints per total of limbs
     this->gen->updateMeasure("joints_per_limb", roundf((this->gen->getMeasures()["effective_joints"] / (double)this->gen->getMeasures()["connectivity1"])*100)/100);
 
-    // total of all types of joint
+    // total of all types of joints
     int joints = this->gen->getMeasures()["total_fixed_joints_horizontal"] + this->gen->getMeasures()["total_passive_joints_horizontal"] + this->gen->getMeasures()["total_active_joints_horizontal"] + this->gen->getMeasures()["total_fixed_joints_vertical"] + this->gen->getMeasures()["total_passive_joints_vertical"] + this->gen->getMeasures()["total_active_joints_vertical"];
-
-    if(joints > 0) {
-
-        // proportion of effective-joints in the total of joints
-        this->gen->updateMeasure("effective_joints", roundf( (this->gen->getMeasures()["effective_joints"] / (double)joints)*100)/100);
-
-        if(this->gen->getMeasures()["effective_ap_h_joints"] > 0) { // if there is any horizontal active/passive joint
-
-            this->gen->updateMeasure("viable_joints",
-                    roundf((this->gen->getMeasures()["viable_joints"] / (double)this->gen->getMeasures()["effective_ap_h_joints"]) * 100) /
-                    100 ); // proportion of viable joints in effective horizontal- active/passive - joints
-        }
-    }
 
     // general total amount of components: core + bricks + joints
     this->gen->updateMeasure("total_components", 1 + this->gen->getMeasures()["total_bricks"] + joints);
 
-
-    // transforms totals in percentages for joints and connectivity
+    // normalizes percentages
 
     this->gen->updateMeasure("total_bricks", roundf(( this->gen->getMeasures()["total_bricks"] / (double)this->gen->getMeasures()["total_components"])*100)/100 );
 
@@ -86,6 +73,7 @@ void Measures::measurePhenotype(int argc, char* argv[],std::map<std::string, dou
     this->gen->updateMeasure("connectivity2", roundf ((this->gen->getMeasures()["connectivity2"] / (double)this->gen->getMeasures()["total_components"])*100)/100);
     this->gen->updateMeasure("connectivity3", roundf ((this->gen->getMeasures()["connectivity3"] / (double)this->gen->getMeasures()["total_components"])*100)/100);
     this->gen->updateMeasure("connectivity4", roundf ((this->gen->getMeasures()["connectivity4"] / (double)this->gen->getMeasures()["total_components"])*100)/100);
+
 
     // calculates the length ratio
 
@@ -201,8 +189,6 @@ void Measures::measurePhenotype(int argc, char* argv[],std::map<std::string, dou
     this->gen->updateMeasure("spreadness", roundf((comps / (double)this->gen->getMeasures()["total_components"])*100)/100);
 
 
-
-
     // calculates the horizontal symmetry
     int ncomp = 0;
     for( const auto& it : this->gen->getList_components() ){
@@ -241,6 +227,14 @@ void Measures::measurePhenotype(int argc, char* argv[],std::map<std::string, dou
     if(ncomp > 0){ this->gen->updateMeasure("vertical_symmetry", roundf( (this->gen->getMeasures()["vertical_symmetry"] / ncomp)*100 )/100); }else{ this->gen->updateMeasure("vertical_symmetry", 1); }
 
 
+    this->gen->updateMeasure("symmetry", std::max(this->gen->getMeasures()["vertical_symmetry"], this->gen->getMeasures()["horizontal_symmetry"]) );
+
+    this->gen->updateMeasure("total_components", this->gen->getMeasures()["total_components"] / params["max_comps"]);
+
+
+// total_bricks total_fixed_joints_horizontal total_passive_joints_horizontal total_active_joints_horizontal total_fixed_joints_vertical
+// total_passive_joints_vertical total_active_joints_vertical connectivity2 connectivity3 connectivity4 viable_horizontal_joints coverage
+// horizontal_symmetry vertical_symmetry
 
     // exports measures to file (individual and populational)
 
@@ -334,19 +328,20 @@ void Measures::measureComponent( std::string reference, std::string direction, D
         if (connected_sides == 2) { // if both sides have connections
             this->gen->updateMeasure("connectivity2", this->gen->getMeasures()["connectivity2"]+1); // counts for: two sides are connected
 
-            // if item is a joint and is connected to brick/core
-            if ((c2->item.substr(0, 1) == "J" or c2->item.substr(0, 2) == "PJ" or c2->item.substr(0, 2) == "AJ") and
-                (c2->back->item == "CNNN" or c2->back->item == "BNNN") and (c2->front->item == "BNNN")) {
+
+            // if item is a joint (apart from active/passive horizontal ones) and is connected to brick/core
+            if ((c2->item == "J1" or c2->item == "J2" or c2->item == "PJ2" or c2->item == "AJ2") and
+                    (c2->back->item == "CNNN" or c2->back->item == "BNNN") and (c2->front->item == "BNNN")) {
 
                 this->gen->updateMeasure("effective_joints", this->gen->getMeasures()["effective_joints"]+1);
             } // counts for joints effective joints: joints connected by both sides to brick/core component
 
+            // if item is an active/passive horizontal joint and is connected to brick/core
+           // if ( (c2->item == "AJ1" or c2->item == "PJ1" ) and 
+            //(c2->back->item == "CNNN" or c2->back->item == "BNNN") and (c2->front->item == "BNNN")) { 
 
-            if ( (c2->item == "AJ1" or c2->item == "PJ1" ) and 
-            (c2->back->item == "CNNN" or c2->back->item == "BNNN") and (c2->front->item == "BNNN")) { 
-
-                this->gen->updateMeasure("effective_ap_h_joints", this->gen->getMeasures()["effective_ap_h_joints"]+1); 
-            } // counts for horizontal- active/passive - joints connected by both sides to brick or core component (effective)
+              //  this->gen->updateMeasure("effective_ap_h_joints", this->gen->getMeasures()["effective_ap_h_joints"]+1); 
+           // } // counts for horizontal- active/passive - joints connected by both sides to brick or core component (effective)
         }
 
         if (connected_sides == 3) {
@@ -599,9 +594,9 @@ void Measures::measureComponent( std::string reference, std::string direction, D
                 if (connected_sides == 2) { // if the joint is connect at both sides
 
                     if ((c2->item == "PJ1" or c2->item == "AJ1") and (c2->back->item == "CNNN" or c2->back->item == "BNNN") and
-                        (c2->front->item == "BNNN")) { // if it is an effective joint
+                        (c2->front->item == "BNNN")) { // if it is an effective joint (both sides conencted)
 
-                        this->gen->updateMeasure("viable_joints", this->gen->getMeasures()["viable_joints"] + 1);
+                        this->gen->updateMeasure("viable_horizontal_joints", this->gen->getMeasures()["viable_horizontal_joints"] + 1);
                     }
                 }
             }
@@ -646,8 +641,8 @@ void Measures::initalizeMeasures(){
     this->gen->updateMeasure("connectivity3", 0); // total of components with three sides connected to another component
     this->gen->updateMeasure("connectivity4", 0); //   total of components with four sides connected to another component
     this->gen->updateMeasure("effective_joints", 0); //  total of joints connected by both sides to a brick or core component
-    this->gen->updateMeasure("effective_ap_h_joints", 0); //  total of horizontal- active/passive- joints connected by both sides to a brick or core component 
-    this->gen->updateMeasure("viable_joints", 0); //  total of effective joints which have no neighboards preventing movement
+    this->gen->updateMeasure("symmetry", 0); //  maximum of horizontal and vertical symmetry
+    this->gen->updateMeasure("viable_horizontal_joints", 0); //  total of effective joints which have no neighboards preventing movement
     this->gen->updateMeasure("length_ratio", 0); // length of the shortest side dived by the longest
     this->gen->updateMeasure("coverage", 0); // proportion of the expected area (given the horizontal e vertical lengths) that is covered with components
     this->gen->updateMeasure("spreadness", 0); // average distance of each component from each other in the axises x/y
@@ -655,7 +650,6 @@ void Measures::initalizeMeasures(){
     this->gen->updateMeasure("vertical_symmetry", 0); // proportion of components in the top side which match with the same type of component in the same relative position on the bottom side
     this->gen->updateMeasure("joints_per_limb", 0); //  total amount of effective joints per limb
 }
-
 
 
 

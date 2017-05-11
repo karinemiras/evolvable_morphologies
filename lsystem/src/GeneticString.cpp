@@ -56,6 +56,77 @@ void GeneticString::add(int pos, std::vector<std::string> genetic_string_items) 
     }
 }
 
+
+/**
+ * Joins parts of genetic-strings of two parents together.
+ * @param gs_parent1 - genetic-string of parent1
+ * @param gs_parent2 - genetic-string of parent2
+ */
+void GeneticString::create_joined_list(int pos_parent1_ini, int pos_parent2_ini, int pos_parent1_end, int pos_parent2_end, GeneticString gs_parent1,  GeneticString gs_parent2)
+{
+
+    GeneticString::Node *current, *inode, *current_parent1, *current_parent2;
+
+    int pos_parent1 = 1;
+    int pos_parent2 = 1;
+
+    current = start; // genetic-string of the offspring
+    current_parent1 = gs_parent1.start; // genetic-string of the parent1
+    current_parent2 = gs_parent2.start; // genetic-string of the parent2
+
+    while(pos_parent1 <= pos_parent1_end){
+
+        if (pos_parent1 >= pos_parent1_ini){
+
+            inode = new GeneticString::Node; // new item, copied from parent 1
+            inode->item = current_parent1->item;
+            inode->prev = current;
+            inode->next = NULL;
+
+            if (current != NULL) {
+                current->next = inode;
+            }
+            current = inode; // new item becomes the current
+
+            if(start == NULL){
+                start = current; // if it is the first element of the genetic-string
+            }
+
+        }
+        current_parent1 = current_parent1->next;
+
+
+        pos_parent1++;
+    }
+
+
+
+    while(pos_parent2 <= pos_parent2_end){
+
+        if (pos_parent2 >= pos_parent2_ini){
+
+            inode = new GeneticString::Node; // new item, copied from parent 2
+            inode->item = current_parent2->item;
+            inode->prev = current;
+            inode->next = NULL;
+
+            if (current != NULL) {
+                current->next = inode;
+            }
+            current = inode; // new item becomes the current
+
+            if(start == NULL){
+                start = current; // if it is the first element of the genetic-string
+            }
+
+        }
+        current_parent2 = current_parent2->next;
+
+        pos_parent2++;
+    }
+
+}
+
 /**
  * Deletes item from the genetic-string.
  * @param genetic_string_items - contains the items which will be added to the genetic-string in an specific position.
@@ -65,7 +136,7 @@ void GeneticString::remove(int pos) {
     GeneticString::Node *current, *next, *previous;
     current = start;
     int current_pos = 1;
-//std::cout<<" akiiiii "<<pos<<std::endl;
+
     while (current_pos < pos) { // looks for chosen position, as items will be inserted after that position
         current = current->next;
         current_pos++;
