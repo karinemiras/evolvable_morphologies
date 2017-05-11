@@ -232,9 +232,24 @@ void Measures::measurePhenotype(int argc, char* argv[],std::map<std::string, dou
     this->gen->updateMeasure("total_components", this->gen->getMeasures()["total_components"] / params["max_comps"]);
 
 
-// total_bricks total_fixed_joints_horizontal total_passive_joints_horizontal total_active_joints_horizontal total_fixed_joints_vertical
-// total_passive_joints_vertical total_active_joints_vertical connectivity2 connectivity3 connectivity4 viable_horizontal_joints coverage
-// horizontal_symmetry vertical_symmetry
+    // removes temporary measures
+
+    this->gen->removeMeasure("total_bricks");
+    this->gen->removeMeasure("total_fixed_joints_horizontal");
+    this->gen->removeMeasure("total_passive_joints_horizontal");
+    this->gen->removeMeasure("total_active_joints_horizontal");
+    this->gen->removeMeasure("total_fixed_joints_vertical");
+    this->gen->removeMeasure("total_passive_joints_vertical");
+    this->gen->removeMeasure("total_active_joints_vertical");
+    this->gen->removeMeasure("connectivity2");
+    this->gen->removeMeasure("connectivity3");
+    this->gen->removeMeasure("connectivity4");
+    this->gen->removeMeasure("viable_horizontal_joints");
+    this->gen->removeMeasure("coverage");
+    this->gen->removeMeasure("horizontal_symmetry");
+    this->gen->removeMeasure("vertical_symmetry");
+
+
 
     // exports measures to file (individual and populational)
 

@@ -44,6 +44,15 @@ void Genome::updateMeasure(std::string key, double value){
     this->measures[key] = value;
 }
 
+void Genome::removeMeasure(std::string key){
+
+    std::map< std::string, double >::iterator it;
+
+    it = this->measures.find(key);
+    this->measures.erase(it);
+
+}
+
 
 void Genome::setGrammar(std::map<std::string, GeneticString> grammar) {
     this->grammar = grammar;

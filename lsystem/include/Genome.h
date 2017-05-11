@@ -54,7 +54,7 @@ class Genome{
         double getFitness();
         std::map< std::string, GeneticString > getGrammar();
         void setGrammar(std::map< std::string, GeneticString > grammar);
-
+        void removeMeasure(std::string key);
 
     private:
 
