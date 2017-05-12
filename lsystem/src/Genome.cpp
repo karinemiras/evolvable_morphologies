@@ -255,7 +255,7 @@ void Genome::draw_component( std::string reference, std::string direction, QGrap
     int size = params["size_component"];
     int space = params["spacing"];
 
-    if(c2 != NULL){ // condition to stop recursive calls
+    if(c2 != NULL and this->list_components.size() < params["max_comps"]){ // condition to stop recursive calls, and also limit the number of components in the phenotype
 
         // draws a new component
         items.push_back(new QGraphicsRectItem());
@@ -434,7 +434,7 @@ void Genome::createEmbryo(){
     GeneticString gs;
     this->setGeneticString(this->build_genetic_string(gs, axiom));
 
-    std::cout << " >> building axiom ..." << std::endl;
+    //std::cout << " >> building axiom ..." << std::endl;
     this->getGeneticString().display_list();
 
 }
@@ -454,17 +454,18 @@ void Genome::developGenome(int argc, char* argv[], std::map<std::string, double>
 
     // creates main genetic-string for axiom (initial developmental state of the genome)
     this->createEmbryo();
+    std::cout << " ----------------- genome "<<this->getId()<<std::endl;
 
     // enhances the genetic-string according to grammar iteratively
-    std::cout << " >> iterating replacements ..." << std::endl;
+    //std::cout << " >> iterating replacements ..." << std::endl;
     this->generate_final_string(params["replacement_iterations"], params["export_genomes"], generation);
 
     // decodes the final genetic-string into a tree of components
-    std::cout << " >> decoding ... " << std::endl;
+    //std::cout << " >> decoding ... " << std::endl;
     this->decodeGeneticString(LS);
 
     // generates robot-graphics
-    std::cout << " >> constructing ... " << std::endl;
+   // std::cout << " >> constructing ... " << std::endl;
     this->constructor(argc, argv, params,  generation);
 }
 
@@ -481,6 +482,7 @@ void Genome::calculateFitness(std::map< std::string, double > pop_measures){
     }
     this->fitness = sqrt(this->fitness); // square root of the sum
 }
+
 
 
 std::map< std::string, GeneticString > Genome::getGrammar(){

@@ -36,7 +36,7 @@ void Measures::setGenome(Genome * gen){
 
 void Measures::measurePhenotype(int argc, char* argv[],std::map<std::string, double> params, int generation){
 
-    std::cout<<" --- "<<this->gen->getId()<<" measuring..."<<std::endl;
+    // std::cout<<" --- "<<this->gen->getId()<<" measuring..."<<std::endl;
     int size = params["size_component"] + params["spacing"]; // size of the component plus the spacing between components
 
     DecodedGeneticString::Vertex * c = NULL;
@@ -74,6 +74,7 @@ void Measures::measurePhenotype(int argc, char* argv[],std::map<std::string, dou
     this->gen->updateMeasure("connectivity3", roundf ((this->gen->getMeasures()["connectivity3"] / (double)this->gen->getMeasures()["total_components"])*100)/100);
     this->gen->updateMeasure("connectivity4", roundf ((this->gen->getMeasures()["connectivity4"] / (double)this->gen->getMeasures()["total_components"])*100)/100);
 
+    this->gen->updateMeasure("effective_joints", roundf(( this->gen->getMeasures()["effective_joints"] / (double)this->gen->getMeasures()["total_components"])*100)/100 );
 
     // calculates the length ratio
 
@@ -121,7 +122,7 @@ void Measures::measurePhenotype(int argc, char* argv[],std::map<std::string, dou
     avg_x = avg_x / (double)this->points.size();
     avg_y = avg_y / (double)this->points.size();
 
-    std::cout<<" >>mass x "<<avg_x<<" y "<<avg_y<<std::endl;
+    //std::cout<<" >>mass x "<<avg_x<<" y "<<avg_y<<std::endl;
 
     // orders the set of points clockwise
 
@@ -153,10 +154,10 @@ void Measures::measurePhenotype(int argc, char* argv[],std::map<std::string, dou
     }
 
 
-    for(int i = 0 ; i < x.size() ; i++) {
+   // for(int i = 0 ; i < x.size() ; i++) {
 
-        std::cout<<"point: a "<<a[i]<<"  x " <<x[i]<<" y "<<y[i]<<std::endl;
-    }
+     //   std::cout<<"point: a "<<a[i]<<"  x " <<x[i]<<" y "<<y[i]<<std::endl;
+   // }
 
 
 
@@ -351,12 +352,6 @@ void Measures::measureComponent( std::string reference, std::string direction, D
                 this->gen->updateMeasure("effective_joints", this->gen->getMeasures()["effective_joints"]+1);
             } // counts for joints effective joints: joints connected by both sides to brick/core component
 
-            // if item is an active/passive horizontal joint and is connected to brick/core
-           // if ( (c2->item == "AJ1" or c2->item == "PJ1" ) and 
-            //(c2->back->item == "CNNN" or c2->back->item == "BNNN") and (c2->front->item == "BNNN")) { 
-
-              //  this->gen->updateMeasure("effective_ap_h_joints", this->gen->getMeasures()["effective_ap_h_joints"]+1); 
-           // } // counts for horizontal- active/passive - joints connected by both sides to brick or core component (effective)
         }
 
         if (connected_sides == 3) {

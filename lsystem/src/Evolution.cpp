@@ -69,7 +69,7 @@ void Evolution::initPopulation(int argc, char* argv[], LSystem LS){ // default a
         std::cout<<" ------ genome "<<i<<std::endl;
         Genome * gen = new Genome(std::to_string(i));
 
-        std::cout << " >> building grammar ..." << std::endl;
+        // std::cout << " >> building grammar ..." << std::endl;
         gen->build_grammar(LS, this->params["num_initial_comp"], this->params["add_backtoparent_prob"]); // creates genetic-strings for the production rules of the letters in the grammar (initial random rules)
 
         this->population.push_back(gen);  // adds genome to the population
@@ -80,14 +80,18 @@ void Evolution::initPopulation(int argc, char* argv[], LSystem LS){ // default a
 
 
 /**
-* Develops genomes of the population: 1- grows genetic-string of the genome according to grammar, 2- decodes it, 3- constructs the phenotype
-* @param LS - Lsystem structure containing the alphabet.
+*  Develops genomes of the population: 1- grows genetic-string of the genome according to grammar, 2- decodes it, 3- constructs the phenotype
+*  argc - default argument
+*  argv[] - default argument
+*  @param LS - Lsystem structure containing the alphabet
+*  individuals - array with genomes
 **/
-void Evolution::developPopulation(int argc, char* argv[], LSystem LS, int generation){ // default arguments and L-system
+void Evolution::developIndividuals(int argc, char* argv[], LSystem LS, int generation, std::vector<Genome *> * individuals){
 
-    for(int i=0; i < this->population.size(); i++) {
+    for(int i=0; i < individuals->size(); i++) {
 
-        this->getPopulation()[i]->developGenome(argc, argv, this->params, LS,  generation);  // develops genome
+        std::cout<<" ------ develops genome "<< individuals->at(i)->getId() <<std::endl;
+        individuals->at(i)->developGenome(argc, argv, this->params, LS,  generation);  // develops genome
 
     }
 }
@@ -98,17 +102,21 @@ void Evolution::developPopulation(int argc, char* argv[], LSystem LS, int genera
  * Measures all the individuals of the population for several metrics.
  *  @param argc - command line parameter
  *  @param argv[] - command line parameter
+ *  generation - number of the generation
+ *  individuals - array with genomes
  **/
- void Evolution::measurePopulation(int argc, char* argv[], int generation){
+ void Evolution::measureIndividuals(int argc, char* argv[], int generation, std::vector<Genome *>  * individuals){
 
     std::ofstream measures_file_general;
     std::string path = "../../tests/measures.txt";
     measures_file_general.open(path);
 
-    for(int i=0; i < this->population.size(); i++) {  // for each genome of the population
+    for(int i=0; i < individuals->size(); i++) {  // for each genome of the population
+
+        std::cout<<" ------ measures genome "<< individuals->at(i)->getId() <<std::endl;
 
         Measures * m = new Measures();
-        m->setGenome(this->population[i]);
+        m->setGenome(individuals->at(i));
         m->measurePhenotype(argc, argv,this->params, generation);
     }
     measures_file_general.close();
@@ -153,12 +161,14 @@ void Evolution::initPop_measures(){
  * Calculates the fitness of the population of genomes.
  */
 
-void Evolution::evaluatePopulation(){
+void Evolution::evaluateIndividuals(std::vector<Genome *> * individuals){
 
-    for(int i=0; i < this->population.size(); i++) {  // for each genome of the population
+    this->updatePop_measures_minmax();
 
-        this->population[i]->calculateFitness(this->pop_measures); // calculates its fitness
-        std::cout<<"fitness "<<this->population[i]->getFitness()<<std::endl;
+    for(int i=0; i < individuals->size(); i++) {  // for each genome of the population
+
+        individuals->at(i)->calculateFitness(this->pop_measures); // calculates its fitness
+        std::cout<<"fitness "<<individuals->at(i)->getId()<<" "<<individuals->at(i)->getFitness()<<std::endl;
     }
     this->updatePop_measures();  // updates the average measures for the population
 }
@@ -172,7 +182,7 @@ void Evolution::updatePop_measures(){
 
     for( const auto& it : this->pop_measures ){  // for each measure
 
-        this->pop_measures[it.first] = 0;  // cleans the old value
+        this->pop_measures[it.first] = 0;  // cleans the old value of mean
 
         for(int i=0; i < this->population.size(); i++) {
 
@@ -183,6 +193,34 @@ void Evolution::updatePop_measures(){
     }
 }
 
+
+/**
+ * Calculates the minimum/maximum of some measures among all genomes.
+ */
+
+void Evolution::updatePop_measures_minmax(){
+
+    for(int i=0; i < this->population.size(); i++) {
+
+        if(i==0){
+            auxiliar_normalization.push_back(this->population[i]->getMeasures()["spreadness"]); //initializes positions in the vector
+            auxiliar_normalization.push_back(this->population[i]->getMeasures()["spreadness"]);
+        }
+
+        // minimum and maximum for spreadness
+        if ( this->population[i]->getMeasures()["spreadness"] < this->auxiliar_normalization[0]){ // updates minimum
+            this->auxiliar_normalization[0] = this->population[i]->getMeasures()["spreadness"];
+        }
+        if ( this->population[i]->getMeasures()["spreadness"] > this->auxiliar_normalization[1]) {  // updates maximum
+            this->auxiliar_normalization[1] = this->population[i]->getMeasures()["spreadness"];
+        }
+    }
+
+    for(int i=0; i < this->population.size(); i++) { // normalizes the measure
+        this->population[i]->updateMeasure("spreadness", (this->population[i]->getMeasures()["spreadness"] - this->auxiliar_normalization[0] ) / (float)(this->auxiliar_normalization[1]-this->auxiliar_normalization[0]) );
+    }
+
+}
 
 /**
  * Selects two random genomes and compares their fitness, choosing the winner.
@@ -271,11 +309,11 @@ void Evolution::testGeneticString(int argc, char* argv[],std::string test_genome
         gen->getGeneticString().display_list();
 
         // decodes the final genetic-string into a tree of components
-        std::cout << " >> decoding ... " << std::endl;
+        //std::cout << " >> decoding ... " << std::endl;
         gen->decodeGeneticString(LS);
 
         // generates robot-graphics
-        std::cout << " >> constructing ... " << std::endl;
+        //std::cout << " >> constructing ... " << std::endl;
         gen->constructor(argc, argv, this->params, 1);
 
         // measures all metrics od the genome
@@ -307,12 +345,65 @@ void Evolution::selection() {
 
 
 /**
+*  Evolution in the search for novelty.
+**/
+
+void Evolution::noveltySearch(int argc, char* argv[]) {
+
+
+    // loads alphabet with letters and commands
+    LSystem LS;
+    LS.build_commands();
+    LS.build_alphabet();
+
+    this->readParams(); // read parameters for the experiment
+
+    std::cout<<" generation 1"<<std::endl;
+
+
+    this->initPopulation(argc, argv, LS); // initializes population
+
+    std::vector<Genome *> * pop =  new std::vector<Genome *>();
+    for(int i=0; i < this->getPopulation().size(); i++){
+        pop->push_back(this->getPopulation()[i]);
+    }
+
+    this->developIndividuals(argc, argv, LS, 1, pop);  // develops genomes of the initial population
+    this->measureIndividuals(argc, argv, 1, pop); // measures phenotypes of the individuals
+    this->evaluateIndividuals(pop); // evaluates fitness of the individuals
+
+
+    for(int i=2; i <= params["generations"]; i++) { // evolves population through generations
+
+        std::cout<<" generation "<<i<<std::endl;
+
+        std::vector<Genome *> * offspring =  new std::vector<Genome *>();
+
+        this->crossover(LS, offspring);
+
+        this->developIndividuals(argc, argv, LS, i, offspring);  // develops genomes of the generation
+        this->measureIndividuals(argc, argv, i, offspring); // measures phenotypes of the individuals
+        this->evaluateIndividuals(offspring); // evaluates fitness of the individuals
+
+
+        for(int i=0; i < offspring->size(); i++){  // adds new individuals to population
+
+            this->population.push_back(offspring->at(i));
+       }
+
+        this->selection();
+    }
+
+    std::cout<<"taaaaaaa"<<this->population.size();
+}
+
+
+/**
 *   Performs crossover among individuals in the population.
 **/
 
-void Evolution::crossover(LSystem LS){
+void Evolution::crossover(LSystem LS, std::vector<Genome *>  * offspring){
 
-    std::vector<Genome *>  offspring = std::vector<Genome *>();
 
     for(int i = 0; i < ceil(this->params["pop_size"] * this->params["offspring_size"]); i++) { // creates new individuals via crossover (size of offspring is relative to the size of population)
 
@@ -378,25 +469,23 @@ void Evolution::crossover(LSystem LS){
 
         gen->setGrammar(grammar);
 
-        offspring.push_back(gen); // adds new individual to the offspring
+        offspring->push_back(gen); // adds new individual to the offspring
 
     }
 
-    for(int i=0; i<offspring.size(); i++){
 
-        this->population.push_back(offspring[i]);
-    }
+    this->mutation(LS, offspring); // mutates new individuals
 
 
  }
 
 
 /**
- * Performs mutation to individuals of the population.
+ * Performs mutation to individuals of the offspring.
  * @param LS - Lsystem structure containing the alphabet.
  */
 
-void Evolution::mutation(LSystem LS){
+void Evolution::mutation(LSystem LS, std::vector<Genome *> * offspring){
 
     std::random_device rd;
     std::default_random_engine generator(rd());
@@ -405,11 +494,12 @@ void Evolution::mutation(LSystem LS){
     std::uniform_int_distribution<int> dist_command(1, LS.getCommands().size()-1); // distribution for the mounting commands (positions 1-3)
     std::uniform_real_distribution<double> prob(0.0, 1.0); // distribution for probabilities
 
-    for(int i=0; i < this->population.size(); i++) {  // for each genome of the population
+    for(int i=0; i < offspring->size(); i++) {  // for each genome of the offspring
 
-        std::cout << "----- mut g " << i+1 << std::endl;
 
-        for ( auto &it : this->population[i]->getGrammar()) { // for each letter in the grammar
+        std::cout << "----- mut g " << offspring->at(i)->getId() << std::endl;
+
+        for ( auto &it : offspring->at(i)->getGrammar()) { // for each letter in the grammar
 
             std::cout << "letter " << it.first << std::endl;
             std::cout << "before " <<std::endl;

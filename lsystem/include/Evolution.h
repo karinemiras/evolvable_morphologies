@@ -30,17 +30,19 @@ class Evolution{
         void developGenome(int argc, char* argv[], Genome * gen, LSystem LS);
         void loadPopulation(int argc, char* argv[],int size_pop, std::string test_folder, LSystem LS);
         void testGeneticString(int argc, char* argv[],std::string test_genome, LSystem LS);
-        void measurePopulation(int argc, char* argv[],  int generation);
-        void evaluatePopulation();
+        void measureIndividuals(int argc, char* argv[],  int generation, std::vector<Genome *>  * individuals);
+        void evaluateIndividuals(std::vector<Genome *> * individuals);
         void initPop_measures();
         void updatePop_measures();
-        int tournament();
+        void updatePop_measures_minmax();
+        int  tournament();
         void selection();
-        void crossover(LSystem LS);
-        void mutation(LSystem LS);
+        void crossover(LSystem LS, std::vector<Genome *> * offspring);
+        void mutation(LSystem LS, std::vector<Genome *> * offspring);
         std::vector<Genome *>  getPopulation();
         std::map<std::string, double> getParams();
-        void developPopulation(int argc, char* argv[], LSystem LS, int generation);
+        void developIndividuals(int argc, char* argv[], LSystem LS, int generation, std::vector<Genome *>  * individuals);
+        void noveltySearch(int argc, char* argv[]);
 
     private:
 
@@ -48,6 +50,7 @@ class Evolution{
         std::map<std::string, double> params =  std::map<std::string, double>(); // contains the list of parameters loaded from parameter file
         std::map< std::string, double >  pop_measures = std::map< std::string, double >(); // average of the measures for the population
         int max_id = 0;
+        std::vector<double> auxiliar_normalization = std::vector<double> (); // saves minimum and maximum values of the measure of spreadness
 
 };
 
