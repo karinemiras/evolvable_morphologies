@@ -84,7 +84,7 @@ void Genome::build_grammar(LSystem LS, int num_initial_comp, double add_backtopa
     for (std::map< std::string, std::string >::const_iterator it = alp.begin(); it != alp.end(); ++it) { // for each letter of the alphabet
 
         std::string letter = it->first;
-        std::cout<<"letter "<<letter<<std::endl;
+        //std::cout<<"letter "<<letter<<std::endl;
 
         std::vector<std::string> letter_items;
 
@@ -110,7 +110,7 @@ void Genome::build_grammar(LSystem LS, int num_initial_comp, double add_backtopa
 
         GeneticString lgs;
         lgs = this->build_genetic_string(lgs, letter_items); // build a genetic-string with the new production rule
-        lgs.display_list();
+        //lgs.display_list();
 
         this->grammar.emplace(letter, lgs); // adds letter and its production rule (made a genetic-string) to the grammar of the genome
 
@@ -130,8 +130,8 @@ void Genome::generate_final_string(int  replacement_iterations, int export_genom
     for(int i=1; i<=replacement_iterations ;i++) { // performs replacements for a number of iterations
 
         this->gs.replaces(this->grammar); // replacement is made given the grammar
-        std::cout << "string iteration " << i << std::endl;
-        this->gs.display_list();
+       // std::cout << "string iteration " << i << std::endl;
+       // this->gs.display_list();
     }
     if(export_genomes == 1){
         this->exportGenome(generation);
@@ -435,7 +435,7 @@ void Genome::createEmbryo(){
     this->setGeneticString(this->build_genetic_string(gs, axiom));
 
     //std::cout << " >> building axiom ..." << std::endl;
-    this->getGeneticString().display_list();
+    //this->getGeneticString().display_list();
 
 }
 
@@ -454,7 +454,7 @@ void Genome::developGenome(int argc, char* argv[], std::map<std::string, double>
 
     // creates main genetic-string for axiom (initial developmental state of the genome)
     this->createEmbryo();
-    std::cout << " ----------------- genome "<<this->getId()<<std::endl;
+    //std::cout << " ----------------- genome "<<this->getId()<<std::endl;
 
     // enhances the genetic-string according to grammar iteratively
     //std::cout << " >> iterating replacements ..." << std::endl;

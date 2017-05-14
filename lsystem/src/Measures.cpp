@@ -49,7 +49,11 @@ void Measures::measurePhenotype(int argc, char* argv[],std::map<std::string, dou
     this->gen->updateMeasure("effective_joints", this->gen->getMeasures()["effective_joints"] + this->gen->getMeasures()["viable_horizontal_joints"]);
 
     // calculates number of effective joints per total of limbs
-    this->gen->updateMeasure("joints_per_limb", roundf((this->gen->getMeasures()["effective_joints"] / (double)this->gen->getMeasures()["connectivity1"])*100)/100);
+    if(this->gen->getMeasures()["connectivity1"]>0) {
+        this->gen->updateMeasure("joints_per_limb", roundf((this->gen->getMeasures()["effective_joints"] /
+                                                            (double) this->gen->getMeasures()["connectivity1"]) * 100) /
+                                                    100);
+    }
 
     // total of all types of joints
     int joints = this->gen->getMeasures()["total_fixed_joints_horizontal"] + this->gen->getMeasures()["total_passive_joints_horizontal"] + this->gen->getMeasures()["total_active_joints_horizontal"] + this->gen->getMeasures()["total_fixed_joints_vertical"] + this->gen->getMeasures()["total_passive_joints_vertical"] + this->gen->getMeasures()["total_active_joints_vertical"];
@@ -185,7 +189,9 @@ void Measures::measurePhenotype(int argc, char* argv[],std::map<std::string, dou
 
     }
 
-    comps /= this->gen->getList_components().size();  // average of all the averages
+    if( this->gen->getList_components().size()>0) {
+        comps /= this->gen->getList_components().size();  // average of all the averages
+    }
     // normalizes according to the number of components
     this->gen->updateMeasure("spreadness", roundf((comps / (double)this->gen->getMeasures()["total_components"])*100)/100);
 
@@ -246,11 +252,16 @@ void Measures::measurePhenotype(int argc, char* argv[],std::map<std::string, dou
     this->gen->removeMeasure("connectivity3");
     this->gen->removeMeasure("connectivity4");
     this->gen->removeMeasure("viable_horizontal_joints");
-    this->gen->removeMeasure("coverage");
+    this->gen->removeMeasure("spreadness");
     this->gen->removeMeasure("horizontal_symmetry");
     this->gen->removeMeasure("vertical_symmetry");
 
-
+   // this->gen->removeMeasure("effective_joints");
+  //  this->gen->removeMeasure("symmetry");
+   // this->gen->removeMeasure("length_ratio");
+   // this->gen->removeMeasure("coverage");
+   // this->gen->removeMeasure("joints_per_limb");
+//   / this->gen->removeMeasure("total_components");
 
     // exports measures to file (individual and populational)
 
@@ -267,7 +278,11 @@ void Measures::measurePhenotype(int argc, char* argv[],std::map<std::string, dou
     for( const auto& mea : this->gen->getMeasures() ){
         measures_file << mea.first << " : " << mea.second << std::endl;
         measures_file_general <<"\t"<< mea.second;
+
+        std::cout<<"  "<<mea.first << " : " << mea.second;
     }
+    std::cout<<std::endl;
+
     measures_file_general << std::endl;
 
     measures_file.close();

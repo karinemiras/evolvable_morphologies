@@ -33,8 +33,8 @@ class Evolution{
         void measureIndividuals(int argc, char* argv[],  int generation, std::vector<Genome *>  * individuals);
         void evaluateIndividuals(std::vector<Genome *> * individuals);
         void initPop_measures();
-        void updatePop_measures();
-        void updatePop_measures_minmax();
+        void updatePop_measures_average(std::vector<Genome *>  * individuals);
+        void updatePop_measures_minmax(std::vector<Genome *>  * individuals);
         int  tournament();
         void selection();
         void crossover(LSystem LS, std::vector<Genome *> * offspring);
@@ -43,6 +43,7 @@ class Evolution{
         std::map<std::string, double> getParams();
         void developIndividuals(int argc, char* argv[], LSystem LS, int generation, std::vector<Genome *>  * individuals);
         void noveltySearch(int argc, char* argv[]);
+        void saveResults(int generation);
 
     private:
 
@@ -50,7 +51,6 @@ class Evolution{
         std::map<std::string, double> params =  std::map<std::string, double>(); // contains the list of parameters loaded from parameter file
         std::map< std::string, double >  pop_measures = std::map< std::string, double >(); // average of the measures for the population
         int max_id = 0;
-        std::vector<double> auxiliar_normalization = std::vector<double> (); // saves minimum and maximum values of the measure of spreadness
 
 };
 
