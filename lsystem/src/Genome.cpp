@@ -11,6 +11,7 @@
 #include <math.h>
 
 #include "Genome.h"
+#include "Aux.h"
 
 unsigned int Genome::getTo() {
     return 4;
@@ -180,11 +181,11 @@ GeneticString Genome::build_genetic_string(GeneticString _gs, std::vector<std::s
  *  Decodes the genetic-string into a graph of components.
  *  @param LS - Lsystem structure containing the alphabet.
  */
-void Genome::decodeGeneticString(LSystem LS){
+void Genome::decodeGeneticString(LSystem LS,std::map<std::string, double> params){
 
     try {
         this->dgs = DecodedGeneticString();
-        this->dgs.decode(this->gs,LS);
+        this->dgs.decode(this->gs,LS,  params);
 
     } catch (const std::exception& e) {
         std::cout <<"ERROR decoding genetic-string: " << e.what() << std::endl;
@@ -229,7 +230,10 @@ void Genome::constructor(int argc, char* argv[], std::map<std::string, double> p
         QPainter painter(&image);
         this->scene->render(&painter);
 
-        QString qstr = QString::fromStdString("../../tests/body" + this->id +"_g" + std::to_string(generation) + ".png");
+        Aux aux = Aux();
+        aux.createFolder("generation"+std::to_string(generation));
+
+        QString qstr = QString::fromStdString("../../tests/generation"+std::to_string(generation)+ "/body_" + this->id + "_p1_"+this->id_parent1 + "_p2_" + this->id_parent2+ ".png");
         image.save(qstr);
     }
 
@@ -255,7 +259,7 @@ void Genome::draw_component( std::string reference, std::string direction, QGrap
     int size = params["size_component"];
     int space = params["spacing"];
 
-    if(c2 != NULL and this->list_components.size() < params["max_comps"]){ // condition to stop recursive calls, and also limit the number of components in the phenotype
+    if(c2 != NULL ){ // condition to stop recursive calls
 
         // draws a new component
         items.push_back(new QGraphicsRectItem());
@@ -462,7 +466,7 @@ void Genome::developGenome(int argc, char* argv[], std::map<std::string, double>
 
     // decodes the final genetic-string into a tree of components
     //std::cout << " >> decoding ... " << std::endl;
-    this->decodeGeneticString(LS);
+    this->decodeGeneticString(LS, params);
 
     // generates robot-graphics
    // std::cout << " >> constructing ... " << std::endl;

@@ -1,4 +1,4 @@
-pop_size 100
+pop_size 1000
 add_backtoparent_prob 0.20
 num_initial_comp 3
 show_phenotypes 0
@@ -11,4 +11,4 @@ offspring_size 0.50
 num_generations 2
 mutation_alter_prob 0.10
 max_comps 20
-generations 10
+generations 3

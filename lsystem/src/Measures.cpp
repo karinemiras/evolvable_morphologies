@@ -36,6 +36,8 @@ void Measures::setGenome(Genome * gen){
 
 void Measures::measurePhenotype(int argc, char* argv[],std::map<std::string, double> params, int generation){
 
+
+
     // std::cout<<" --- "<<this->gen->getId()<<" measuring..."<<std::endl;
     int size = params["size_component"] + params["spacing"]; // size of the component plus the spacing between components
 
@@ -53,6 +55,10 @@ void Measures::measurePhenotype(int argc, char* argv[],std::map<std::string, dou
         this->gen->updateMeasure("joints_per_limb", roundf((this->gen->getMeasures()["effective_joints"] /
                                                             (double) this->gen->getMeasures()["connectivity1"]) * 100) /
                                                     100);
+
+        this->gen->updateMeasure("joints_per_limb", roundf((this->gen->getMeasures()["joints_per_limb"] /
+                                                            (double) params["max_comps"]) * 100) /
+                                                    100);  // normalizes
     }
 
     // total of all types of joints
@@ -175,25 +181,33 @@ void Measures::measurePhenotype(int argc, char* argv[],std::map<std::string, dou
 
 
     // calculates the average distance among components
-    int comps = 0;
-    for( const auto& iter1 : this->gen->getList_components() ){
+    int dist_comps = 0;
 
-        int comp = 0;
-        for( const auto& iter2 : this->gen->getList_components() ){
+    if( this->gen->getList_components().size()>1) { // if there are more components than just the core
+
+        for( const auto& iter1 : this->gen->getList_components() ){
+
+            int dist_comp = 0;
+            for( const auto& iter2 : this->gen->getList_components() ){
+
                 // sum of distances from the component to all the other components
-                comp += abs( iter1.first.first - iter2.first.first) + abs( iter1.first.second - iter2.first.second);
+                dist_comp += (abs( iter1.first.first - iter2.first.first) + abs( iter1.first.second - iter2.first.second)) ;
+
+            }
+
+            dist_comp /= this->gen->getList_components().size() - 1; // average of the distances for each component
+
+            dist_comps += dist_comp;
+
         }
 
-        comp /= this->gen->getList_components().size() - 1; // average of the distances for each component
-        comps += comp;
-
+        dist_comps /= this->gen->getList_components().size();  // average of all the averages
     }
 
-    if( this->gen->getList_components().size()>0) {
-        comps /= this->gen->getList_components().size();  // average of all the averages
-    }
-    // normalizes according to the number of components
-    this->gen->updateMeasure("spreadness", roundf((comps / (double)this->gen->getMeasures()["total_components"])*100)/100);
+    dist_comps = (dist_comps /(double) size); // the division by size is for counting only one uni per component
+
+    // normalizes
+    this->gen->updateMeasure("spreadness", roundf(( dist_comps / (double) params["max_comps"]  )*100)/100);
 
 
     // calculates the horizontal symmetry
@@ -240,7 +254,7 @@ void Measures::measurePhenotype(int argc, char* argv[],std::map<std::string, dou
 
 
     // removes temporary measures
-
+//
     this->gen->removeMeasure("total_bricks");
     this->gen->removeMeasure("total_fixed_joints_horizontal");
     this->gen->removeMeasure("total_passive_joints_horizontal");
@@ -252,16 +266,17 @@ void Measures::measurePhenotype(int argc, char* argv[],std::map<std::string, dou
     this->gen->removeMeasure("connectivity3");
     this->gen->removeMeasure("connectivity4");
     this->gen->removeMeasure("viable_horizontal_joints");
-    this->gen->removeMeasure("spreadness");
+  //  this->gen->removeMeasure("spreadness");
     this->gen->removeMeasure("horizontal_symmetry");
     this->gen->removeMeasure("vertical_symmetry");
-
-   // this->gen->removeMeasure("effective_joints");
-  //  this->gen->removeMeasure("symmetry");
-   // this->gen->removeMeasure("length_ratio");
-   // this->gen->removeMeasure("coverage");
-   // this->gen->removeMeasure("joints_per_limb");
-//   / this->gen->removeMeasure("total_components");
+//
+//    this->gen->removeMeasure("connectivity1");
+//    this->gen->removeMeasure("effective_joints");
+//    this->gen->removeMeasure("symmetry");
+//    this->gen->removeMeasure("length_ratio");
+//    this->gen->removeMeasure("coverage");
+//    this->gen->removeMeasure("joints_per_limb");
+//   this->gen->removeMeasure("total_components");
 
     // exports measures to file (individual and populational)
 
@@ -279,7 +294,14 @@ void Measures::measurePhenotype(int argc, char* argv[],std::map<std::string, dou
         measures_file << mea.first << " : " << mea.second << std::endl;
         measures_file_general <<"\t"<< mea.second;
 
-        std::cout<<"  "<<mea.first << " : " << mea.second;
+        if(mea.second < 0 or mea.second > 1) {   // checks if theres any measure ouy of the expected range
+
+            std::cout<< " measure "<<mea.first<<" out of range for "<< this->gen->getId()<<" with value "<<mea.second;
+            exit (EXIT_FAILURE);
+
+        }else{ // otherwise exports normally
+            std::cout << "  " << mea.first << " : " << mea.second<<std::endl;
+        }
     }
     std::cout<<std::endl;
 

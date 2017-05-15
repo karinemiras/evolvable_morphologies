@@ -65,14 +65,15 @@ void Evolution::initPopulation(int argc, char* argv[], LSystem LS){ // default a
 
     for(int i=1; i <= this->params["pop_size"]; i++) { // repeats according to population size
 
-        this->max_id++;
        // std::cout<<" ------ genome "<<i<<std::endl;
-        Genome * gen = new Genome(std::to_string(i));
+        Genome * gen = new Genome(std::to_string(this->next_id), "N", "N");
 
         // std::cout << " >> building grammar ..." << std::endl;
         gen->build_grammar(LS, this->params["num_initial_comp"], this->params["add_backtoparent_prob"]); // creates genetic-strings for the production rules of the letters in the grammar (initial random rules)
 
         this->population.push_back(gen);  // adds genome to the population
+
+        this->next_id++;
     }
 
 }
@@ -94,6 +95,8 @@ void Evolution::developIndividuals(int argc, char* argv[], LSystem LS, int gener
         individuals->at(i)->developGenome(argc, argv, this->params, LS,  generation);  // develops genome
 
     }
+
+
 }
 
 
@@ -120,6 +123,8 @@ void Evolution::developIndividuals(int argc, char* argv[], LSystem LS, int gener
         m->measurePhenotype(argc, argv,this->params, generation);
     }
     measures_file_general.close();
+
+
 
 }
 
@@ -244,6 +249,7 @@ int Evolution::tournament(){
     }else{
         return genome2;
     }
+    //return genome1;
 }
 
 
@@ -307,13 +313,13 @@ void Evolution::testGeneticString(int argc, char* argv[],std::string test_genome
         }
 
         // creates new genome with id equal 1, using the just read genetic-string
-        Genome * gen = new Genome(test_genome);
+        Genome * gen = new Genome(test_genome, test_genome, test_genome);
         gen->setGeneticString(gen->build_genetic_string(gen->getGeneticString(), gs));
         gen->getGeneticString().display_list();
 
         // decodes the final genetic-string into a tree of components
         //std::cout << " >> decoding ... " << std::endl;
-        gen->decodeGeneticString(LS);
+        gen->decodeGeneticString(LS, params);
 
         // generates robot-graphics
         //std::cout << " >> constructing ... " << std::endl;
@@ -347,13 +353,13 @@ void Evolution::selection() {
         std::cout<<"selected"<<genome<<std::endl;
     }
 
-    for(int i=0; i < this->params["pop_size"]; i++) {
-
-        if(!(std::find(index_selected.begin(), index_selected.end(), i) != index_selected.end())){ // if genome is not on the selected list
-            delete this->population[i]; // frees memory for the not selected genomes
-            this->population[i] = NULL;
-        }
-    }
+//    for(int i=0; i < this->params["pop_size"]; i++) {
+//
+//        if(!(std::find(index_selected.begin(), index_selected.end(), i) != index_selected.end())){ // if genome is not on the selected list
+//            delete this->population[i]; // frees memory for the not selected genomes
+//            this->population[i] = NULL;
+//        }
+//    }
 
     this->population = selected; // substitutes current population for the selected subset
 }
@@ -373,22 +379,26 @@ void Evolution::saveResults(int generation){
     double maximum_fitness = 0;
     double average_fitness = 0;
 
-    evolution_file << generation << " ";
+    // evolution_file<< generation <<" ";
+
+    evolution_file<< generation << " --- " << std::endl;
 
     for(int i=0; i < this->getPopulation().size(); i++){
 
 
-         if(this->getPopulation()[i]->getFitness() > maximum_fitness){
+         if(this->getPopulation()[i]->getFitness() > maximum_fitness){  // finds the maximum fitness of the population
 
              maximum_fitness = this->getPopulation()[i]->getFitness();
-             average_fitness += this->getPopulation()[i]->getFitness();
          }
+        average_fitness += this->getPopulation()[i]->getFitness();  //  sums all fitnesses
 
-        average_fitness /= this->getPopulation().size();
+        evolution_file << this->getPopulation()[i]->getId() << " "<< this->getPopulation()[i]->getFitness() << std::endl;
+
     }
 
-    //evolution_file <<  roundf(maximum_fitness*1000)/1000 << " "  << roundf(average_fitness*1000)/1000  << " " << std::endl;
-    evolution_file <<  maximum_fitness << " "  << average_fitness  << " " << std::endl;
+    average_fitness /= this->getPopulation().size();  // finds the average of the fitnesses
+
+    evolution_file  << maximum_fitness << " "  << average_fitness  << " " << std::endl;
 
     evolution_file.close();
 
@@ -412,7 +422,7 @@ void Evolution::noveltySearch(int argc, char* argv[]) {
 
     std::cout<<"---------------- generation 1"<<std::endl;
 
-
+//
     this->initPopulation(argc, argv, LS); // initializes population
     std::vector<Genome *> * ini_pop =  new std::vector<Genome *>();
     for(int i=0; i < this->getPopulation().size(); i++){
@@ -421,46 +431,48 @@ void Evolution::noveltySearch(int argc, char* argv[]) {
 
     this->developIndividuals(argc, argv, LS, 1, ini_pop);  // develops genomes of the initial population
     this->measureIndividuals(argc, argv, 1, ini_pop); // measures phenotypes of the individuals
-    this->updatePop_measures_average(ini_pop);  // updates the average measures for the population
-    this->evaluateIndividuals(ini_pop); // evaluates fitness of the individuals
+   // this->updatePop_measures_average(ini_pop);  // updates the average measures for the population
+   // this->evaluateIndividuals(ini_pop); // evaluates fitness of the individuals
 
-    this->saveResults(1);
+    //this->saveResults(1);
 
-    for(int i=2; i <= params["generations"]; i++) { // evolves population through generations
-
-        std::cout<<" generation "<<i<<std::endl;
-
-        std::vector<Genome *> * offspring =  new std::vector<Genome *>();
-
-        this->crossover(LS, offspring); // creates offspring
-
-        this->developIndividuals(argc, argv, LS, i, offspring);  // develops genomes of the generation
-        this->measureIndividuals(argc, argv, i, offspring); // measures phenotypes of the individuals
-
-
-        std::vector<Genome *> * temp_pop =  new std::vector<Genome *>();
-        for(int i=0; i < this->getPopulation().size(); i++){
-            temp_pop->push_back(this->getPopulation()[i]);
-        }
-        for(int i=0; i < offspring->size(); i++){
-            temp_pop->push_back(offspring->at(i));
-        }
-        this->updatePop_measures_average(temp_pop);  // updates the average measures for the population
-
-
-        this->evaluateIndividuals(offspring); // evaluates fitness of the individuals
-
-
-        for(int i=0; i < offspring->size(); i++){  // adds new individuals to population
-
-            this->population.push_back(offspring->at(i));
-        }
-
-        this->selection(); // selects individuals, keeping the population with a fixed size
-
-        this->saveResults(i);
-
-    }
+//    for(int i=2; i <= params["generations"]; i++) { // evolves population through generations
+//
+//        std::cout<<" generation "<<i<<std::endl;
+//
+//        std::vector<Genome *> * offspring =  new std::vector<Genome *>();
+//
+//        this->crossover(LS, offspring); // creates offspring
+//
+//        this->developIndividuals(argc, argv, LS, i, offspring);  // develops genomes of the generation
+//        this->measureIndividuals(argc, argv, i, offspring); // measures phenotypes of the individuals
+//
+//
+//        std::vector<Genome *> * temp_pop =  new std::vector<Genome *>();
+//        for(int i=0; i < this->getPopulation().size(); i++){
+//            temp_pop->push_back(this->getPopulation()[i]);
+//        }
+//        for(int i=0; i < offspring->size(); i++){
+//            temp_pop->push_back(offspring->at(i));
+//        }
+//
+//
+//        this->updatePop_measures_average(temp_pop);  // updates the average measures for the population
+//
+//
+//        this->evaluateIndividuals(offspring); // evaluates fitness of the individuals
+//
+//
+//        for(int i=0; i < offspring->size(); i++){  // adds new individuals to population
+//
+//            this->population.push_back(offspring->at(i));
+//        }
+//
+//        this->selection(); // selects individuals, keeping the population with a fixed size
+//
+//        this->saveResults(i);
+//
+//    }
 
 
 
@@ -476,13 +488,26 @@ void Evolution::crossover(LSystem LS, std::vector<Genome *>  * offspring){
 
     for(int i = 0; i < ceil(this->params["pop_size"] * this->params["offspring_size"]); i++) { // creates new individuals via crossover (size of offspring is relative to the size of population)
 
-        int parent1 = this->tournament();
-        int parent2 = this->tournament();
+        int parent1 = this->tournament(); // selects two different parents for the crossover, according to INDEX
+        int parent2 = parent1;
 
-        std::cout<<" crossover p1 "<<parent1+1<<" p2 "<<parent2+1<<std::endl;
+        while(parent2 == parent1){
+            parent2 = this->tournament();
+        }
 
-        this->max_id++;
-        Genome * gen = new Genome(std::to_string(this->max_id));
+        std::string id_parent1 = this->population[parent1]->getId(); // fetches the id of the genomes
+        std::string id_parent2 = this->population[parent2]->getId();
+
+        if(parent1 == parent2 ) {
+            std::cout << " crossover with equal parents " <<parent1<<std::endl;
+            exit(EXIT_FAILURE);
+        }
+
+        Genome * gen = new Genome(std::to_string(this->next_id), id_parent1, id_parent2);
+        this->next_id++;
+
+        std::cout<<" crossover for genome " << this->next_id << " p1: "<<id_parent1<<" p2: "<<id_parent2<<std::endl;
+
 
         std::map< std::string, GeneticString >  grammar = std::map< std::string, GeneticString >();
 

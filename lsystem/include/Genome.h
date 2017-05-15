@@ -28,8 +28,10 @@ class Genome{
 
     public:
 
-        Genome(std::string _id){
+        Genome(std::string _id, std::string _id_parent1, std::string _id_parent2){
             id = _id;
+            id_parent1 = _id_parent1;
+            id_parent2 = _id_parent2;
         }
 
         unsigned int getTo();
@@ -39,7 +41,7 @@ class Genome{
         void setGeneticString(GeneticString _gs);
         std::vector<std::string> getAxiom();
         void generate_final_string(int  replacement_iterations, int export_genomes, int generation);
-        void decodeGeneticString(LSystem LS);
+        void decodeGeneticString(LSystem LS,std::map<std::string, double> params);
         void constructor(int argc, char* argv[], std::map<std::string, double> params, int generation);
         void draw_component(std::string reference, std::string direction, QGraphicsScene * scene, std::vector<QGraphicsRectItem *>  items,DecodedGeneticString::Vertex * c1, DecodedGeneticString::Vertex * c2, std::map<std::string, double> params);
         std::string getId();
@@ -59,6 +61,8 @@ class Genome{
     private:
 
         std::string id; // id identifying the genome
+        std::string id_parent1;
+        std::string id_parent2;
         double fitness = 0; // fitness of the genome
         GeneticString gs; // main genetic-string of the genome
         DecodedGeneticString dgs; // graph that logically represents the connections among the components forming the body

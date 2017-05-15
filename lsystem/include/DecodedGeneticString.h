@@ -39,7 +39,7 @@ public:
 
     DecodedGeneticString::Vertex * getRoot();
 
-    void decode(GeneticString gs, LSystem LS);
+    void decode(GeneticString gs, LSystem LS, std::map<std::string, double> params);
 
     DecodedGeneticString(){
         root = NULL;
