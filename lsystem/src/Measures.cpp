@@ -34,7 +34,7 @@ void Measures::setGenome(Genome * gen){
  * @param params - list of params read from configuration file.
  */
 
-void Measures::measurePhenotype(int argc, char* argv[],std::map<std::string, double> params, int generation){
+void Measures::measurePhenotype(int argc, char* argv[],std::map<std::string, double> params, int generation, std::string dirpath){
 
 
 
@@ -266,17 +266,17 @@ void Measures::measurePhenotype(int argc, char* argv[],std::map<std::string, dou
     this->gen->removeMeasure("connectivity3");
     this->gen->removeMeasure("connectivity4");
     this->gen->removeMeasure("viable_horizontal_joints");
-  //  this->gen->removeMeasure("spreadness");
+    this->gen->removeMeasure("coverage");
     this->gen->removeMeasure("horizontal_symmetry");
     this->gen->removeMeasure("vertical_symmetry");
-//
+
 //    this->gen->removeMeasure("connectivity1");
 //    this->gen->removeMeasure("effective_joints");
 //    this->gen->removeMeasure("symmetry");
 //    this->gen->removeMeasure("length_ratio");
-//    this->gen->removeMeasure("coverage");
+//    this->gen->removeMeasure("spreadness");
 //    this->gen->removeMeasure("joints_per_limb");
-//   this->gen->removeMeasure("total_components");
+//    this->gen->removeMeasure("total_components");
 
     // exports measures to file (individual and populational)
 
@@ -285,7 +285,7 @@ void Measures::measurePhenotype(int argc, char* argv[],std::map<std::string, dou
     measures_file_general.open(path, std::ofstream::app);
 
     std::ofstream measures_file;
-    path = "../../tests/measures"+this->gen->getId()+"_g"+ std::to_string(generation)+".txt";
+    path = "../../tests/"+dirpath+std::to_string(generation)+"/measures"+this->gen->getId()+".txt";
     measures_file.open(path);
     measures_file_general << this->gen->getId();
 

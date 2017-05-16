@@ -87,12 +87,23 @@ void Evolution::initPopulation(int argc, char* argv[], LSystem LS){ // default a
 *  @param LS - Lsystem structure containing the alphabet
 *  individuals - array with genomes
 **/
-void Evolution::developIndividuals(int argc, char* argv[], LSystem LS, int generation, std::vector<Genome *> * individuals){
+void Evolution::developIndividuals(int argc, char* argv[], LSystem LS, int generation, std::vector<Genome *> * individuals, std::string path){
 
     for(int i=0; i < individuals->size(); i++) {
 
        // std::cout<<" ------ develops genome "<< individuals->at(i)->getId() <<std::endl;
-        individuals->at(i)->developGenome(argc, argv, this->params, LS,  generation);  // develops genome
+        individuals->at(i)->developGenome(argc, argv, this->params, LS,  generation, path);  // develops genome
+
+    }
+
+
+}
+
+void Evolution::exportPop(int argc, char* argv[], LSystem LS, int generation, std::string path){
+
+    for(int i=0; i < population.size(); i++) {
+
+        population[i]->constructor(argc, argv, this->params,  generation, path);
 
     }
 
@@ -108,7 +119,7 @@ void Evolution::developIndividuals(int argc, char* argv[], LSystem LS, int gener
  *  generation - number of the generation
  *  individuals - array with genomes
  **/
- void Evolution::measureIndividuals(int argc, char* argv[], int generation, std::vector<Genome *>  * individuals){
+ void Evolution::measureIndividuals(int argc, char* argv[], int generation, std::vector<Genome *>  * individuals, std::string dirpath){
 
     std::ofstream measures_file_general;
     std::string path = "../../tests/measures.txt";
@@ -120,7 +131,7 @@ void Evolution::developIndividuals(int argc, char* argv[], LSystem LS, int gener
 
         Measures * m = new Measures();
         m->setGenome(individuals->at(i));
-        m->measurePhenotype(argc, argv,this->params, generation);
+        m->measurePhenotype(argc, argv,this->params, generation, dirpath);
     }
     measures_file_general.close();
 
@@ -249,7 +260,7 @@ int Evolution::tournament(){
     }else{
         return genome2;
     }
-    //return genome1;
+  //  return genome1;
 }
 
 
@@ -323,12 +334,12 @@ void Evolution::testGeneticString(int argc, char* argv[],std::string test_genome
 
         // generates robot-graphics
         //std::cout << " >> constructing ... " << std::endl;
-        gen->constructor(argc, argv, this->params, 1);
+        gen->constructor(argc, argv, this->params, 1, "testpop");
 
         // measures all metrics od the genome
         Measures m;
         m.setGenome(gen);
-        m.measurePhenotype(argc, argv, this->params, 1);
+        m.measurePhenotype(argc, argv, this->params, 1, "testpop");
 
         myfile.close();
     }else{
@@ -347,10 +358,13 @@ void Evolution::selection() {
 
     for(int i=0; i < this->params["pop_size"]; i++) { // selects a subset of fit genomes
 
-        int genome = this->tournament();
+        int genome = this->tournament(); // selects one genome by tournament
+        while(std::find(index_selected.begin(), index_selected.end(), genome) != index_selected.end()) { // makes sure that the same genome wont be selected more than once
+            genome = this->tournament();
+        }
         selected.push_back(this->population[genome]);
         index_selected.push_back(genome);
-        std::cout<<"selected"<<genome<<std::endl;
+        //std::cout<<"selected"<<genome<<std::endl;
     }
 
 //    for(int i=0; i < this->params["pop_size"]; i++) {
@@ -381,7 +395,7 @@ void Evolution::saveResults(int generation){
 
     // evolution_file<< generation <<" ";
 
-    evolution_file<< generation << " --- " << std::endl;
+    evolution_file<< generation << " " ;
 
     for(int i=0; i < this->getPopulation().size(); i++){
 
@@ -392,7 +406,7 @@ void Evolution::saveResults(int generation){
          }
         average_fitness += this->getPopulation()[i]->getFitness();  //  sums all fitnesses
 
-        evolution_file << this->getPopulation()[i]->getId() << " "<< this->getPopulation()[i]->getFitness() << std::endl;
+       // evolution_file << this->getPopulation()[i]->getId() << " "<< this->getPopulation()[i]->getFitness() << std::endl;
 
     }
 
@@ -412,7 +426,6 @@ void Evolution::saveResults(int generation){
 void Evolution::noveltySearch(int argc, char* argv[]) {
 
 
-
     // loads alphabet with letters and commands
     LSystem LS;
     LS.build_commands();
@@ -422,59 +435,57 @@ void Evolution::noveltySearch(int argc, char* argv[]) {
 
     std::cout<<"---------------- generation 1"<<std::endl;
 
-//
     this->initPopulation(argc, argv, LS); // initializes population
     std::vector<Genome *> * ini_pop =  new std::vector<Genome *>();
     for(int i=0; i < this->getPopulation().size(); i++){
         ini_pop->push_back(this->getPopulation()[i]);
     }
 
-    this->developIndividuals(argc, argv, LS, 1, ini_pop);  // develops genomes of the initial population
-    this->measureIndividuals(argc, argv, 1, ini_pop); // measures phenotypes of the individuals
-   // this->updatePop_measures_average(ini_pop);  // updates the average measures for the population
-   // this->evaluateIndividuals(ini_pop); // evaluates fitness of the individuals
+    this->developIndividuals(argc, argv, LS, 1, ini_pop, "totalpop");  // develops genomes of the initial population
+    this->measureIndividuals(argc, argv, 1, ini_pop, "totalpop"); // measures phenotypes of the individuals
+    this->updatePop_measures_average(ini_pop);  // updates the average measures for the population
+    this->evaluateIndividuals(ini_pop); // evaluates fitness of the individuals
 
-    //this->saveResults(1);
+    this->saveResults(1);
 
-//    for(int i=2; i <= params["generations"]; i++) { // evolves population through generations
-//
-//        std::cout<<" generation "<<i<<std::endl;
-//
-//        std::vector<Genome *> * offspring =  new std::vector<Genome *>();
-//
-//        this->crossover(LS, offspring); // creates offspring
-//
-//        this->developIndividuals(argc, argv, LS, i, offspring);  // develops genomes of the generation
-//        this->measureIndividuals(argc, argv, i, offspring); // measures phenotypes of the individuals
-//
-//
-//        std::vector<Genome *> * temp_pop =  new std::vector<Genome *>();
-//        for(int i=0; i < this->getPopulation().size(); i++){
-//            temp_pop->push_back(this->getPopulation()[i]);
-//        }
-//        for(int i=0; i < offspring->size(); i++){
-//            temp_pop->push_back(offspring->at(i));
-//        }
-//
-//
-//        this->updatePop_measures_average(temp_pop);  // updates the average measures for the population
-//
-//
-//        this->evaluateIndividuals(offspring); // evaluates fitness of the individuals
-//
-//
-//        for(int i=0; i < offspring->size(); i++){  // adds new individuals to population
-//
-//            this->population.push_back(offspring->at(i));
-//        }
-//
-//        this->selection(); // selects individuals, keeping the population with a fixed size
-//
-//        this->saveResults(i);
-//
-//    }
+    for(int i=2; i <= params["num_generations"]; i++) { // evolves population through generations
+
+        std::cout<<" generation "<<i<<std::endl;
+
+        std::vector<Genome *> * offspring =  new std::vector<Genome *>();
+
+        this->crossover(LS, offspring); // creates offspring
+
+        this->developIndividuals(argc, argv, LS, i, offspring, "totalpop");  // develops genomes of the generation
+        this->measureIndividuals(argc, argv, i, offspring, "totalpop"); // measures phenotypes of the individuals
 
 
+        std::vector<Genome *> * temp_pop =  new std::vector<Genome *>();
+        for(int i=0; i < this->getPopulation().size(); i++){
+            temp_pop->push_back(this->getPopulation()[i]);
+        }
+        for(int i=0; i < offspring->size(); i++){
+            temp_pop->push_back(offspring->at(i));
+        }
+
+
+        this->updatePop_measures_average(temp_pop);  // updates the average measures for the population
+
+        this->evaluateIndividuals(offspring); // evaluates fitness of the individuals
+
+
+        for(int i=0; i < offspring->size(); i++){  // adds new individuals to population
+
+            this->population.push_back(offspring->at(i));
+        }
+
+        this->selection(); // selects individuals, keeping the population with a fixed size
+
+        this->exportPop(argc, argv, LS, i, "selectedpop");
+
+        this->saveResults(i);
+
+    }
 
 }
 
@@ -488,26 +499,25 @@ void Evolution::crossover(LSystem LS, std::vector<Genome *>  * offspring){
 
     for(int i = 0; i < ceil(this->params["pop_size"] * this->params["offspring_size"]); i++) { // creates new individuals via crossover (size of offspring is relative to the size of population)
 
-        int parent1 = this->tournament(); // selects two different parents for the crossover, according to INDEX
+        int parent1 = this->tournament(); // selects parents for the crossover, according to INDEX
         int parent2 = parent1;
 
-        while(parent2 == parent1){
+        while(parent2 == parent1){ // makes sure that parent2 is different from parent1
             parent2 = this->tournament();
         }
 
         std::string id_parent1 = this->population[parent1]->getId(); // fetches the id of the genomes
         std::string id_parent2 = this->population[parent2]->getId();
 
-        if(parent1 == parent2 ) {
+        if(parent1 == parent2 ) { // #TEST
             std::cout << " crossover with equal parents " <<parent1<<std::endl;
             exit(EXIT_FAILURE);
         }
 
         Genome * gen = new Genome(std::to_string(this->next_id), id_parent1, id_parent2);
-        this->next_id++;
-
         std::cout<<" crossover for genome " << this->next_id << " p1: "<<id_parent1<<" p2: "<<id_parent2<<std::endl;
 
+        this->next_id++;
 
         std::map< std::string, GeneticString >  grammar = std::map< std::string, GeneticString >();
 
@@ -518,11 +528,17 @@ void Evolution::crossover(LSystem LS, std::vector<Genome *>  * offspring){
 
         for ( auto &it : LS.getAlphabet()) { // for each letter in the grammar of the parents
 
-           // std::uniform_int_distribution<int> dist_type_cross(1, 3); //type 3 is disruptive
-            std::uniform_int_distribution<int> dist_type_cross(1, 2);
-            int  type_cross = dist_type_cross(generator);
+           // std::uniform_int_distribution<int> dist_type_cross(1, 3); //type 3 is too disruptive
 
-           // std::cout<<" ----------- typecross "<<it.first<<" "<<type_cross<<" "<<std::endl;
+            int  type_cross = 0;
+
+            if(prob(generator) <= params["prop_parent"]){
+                type_cross = 1;
+            }else{
+                type_cross = 2;
+            }
+
+            //std::cout<<" ----------- typecross "<<it.first<<" "<<type_cross<<" "<<std::endl;
 
             if (type_cross == 1) { // gets the genetic-string from a single parent (parent1)
 
@@ -534,29 +550,29 @@ void Evolution::crossover(LSystem LS, std::vector<Genome *>  * offspring){
                 grammar.emplace(it.first, this->population[parent2]->getGrammar()[it.first]);
             }
 
-            if (type_cross == 3) { // gets a random part of the genetic-string from each parent
-
-                std::uniform_int_distribution<int> dist_pos_parent1_ini(1, this->population[parent1]->getGrammar()[it.first].count()); // distribution for parent1 initial position
-                std::uniform_int_distribution<int> dist_pos_parent2_ini(1, this->population[parent2]->getGrammar()[it.first].count()); // distribution for parent2 initial position
-
-                int pos_parent1_ini = dist_pos_parent1_ini(generator);
-                int pos_parent2_ini = dist_pos_parent2_ini(generator);
-
-                std::uniform_int_distribution<int> dist_pos_parent1_end(pos_parent1_ini, this->population[parent1]->getGrammar()[it.first].count()); // distribution for parent1 final position
-                std::uniform_int_distribution<int> dist_pos_parent2_end(pos_parent2_ini, this->population[parent2]->getGrammar()[it.first].count()); // distribution for parent2 final position
-
-                int pos_parent1_end = dist_pos_parent1_end(generator);
-                int pos_parent2_end = dist_pos_parent2_end(generator);
-
-                GeneticString gs;
-
-               // std::cout<<" ------- pos "<<pos_parent1_ini<<" "<<pos_parent1_end<<" "<<pos_parent2_ini<<" "<<pos_parent2_end <<std::endl;
-
-                gs.create_joined_list(pos_parent1_ini, pos_parent2_ini, pos_parent1_end, pos_parent2_end, this->population[parent1]->getGrammar()[it.first], this->population[parent2]->getGrammar()[it.first]);
-
-
-                grammar.emplace(it.first, gs);
-            }
+//            if (type_cross == 3) { // gets a random part of the genetic-string from each parent
+//
+//                std::uniform_int_distribution<int> dist_pos_parent1_ini(1, this->population[parent1]->getGrammar()[it.first].count()); // distribution for parent1 initial position
+//                std::uniform_int_distribution<int> dist_pos_parent2_ini(1, this->population[parent2]->getGrammar()[it.first].count()); // distribution for parent2 initial position
+//
+//                int pos_parent1_ini = dist_pos_parent1_ini(generator);
+//                int pos_parent2_ini = dist_pos_parent2_ini(generator);
+//
+//                std::uniform_int_distribution<int> dist_pos_parent1_end(pos_parent1_ini, this->population[parent1]->getGrammar()[it.first].count()); // distribution for parent1 final position
+//                std::uniform_int_distribution<int> dist_pos_parent2_end(pos_parent2_ini, this->population[parent2]->getGrammar()[it.first].count()); // distribution for parent2 final position
+//
+//                int pos_parent1_end = dist_pos_parent1_end(generator);
+//                int pos_parent2_end = dist_pos_parent2_end(generator);
+//
+//                GeneticString gs;
+//
+//               // std::cout<<" ------- pos "<<pos_parent1_ini<<" "<<pos_parent1_end<<" "<<pos_parent2_ini<<" "<<pos_parent2_end <<std::endl;
+//
+//                gs.create_joined_list(pos_parent1_ini, pos_parent2_ini, pos_parent1_end, pos_parent2_end, this->population[parent1]->getGrammar()[it.first], this->population[parent2]->getGrammar()[it.first]);
+//
+//
+//                grammar.emplace(it.first, gs);
+//            }
 
             //grammar[it.first].display_list();
         }
@@ -595,15 +611,15 @@ void Evolution::mutation(LSystem LS, std::vector<Genome *> * offspring){
 
         for ( auto &it : offspring->at(i)->getGrammar()) { // for each letter in the grammar
 
-           // std::cout << "letter " << it.first << std::endl;
-           // std::cout << "before " <<std::endl;
-           // it.second.display_list();
+            //std::cout << "letter " << it.first << std::endl;
+            //std::cout << "before " <<std::endl;
+            //it.second.display_list();
 
             //  if there is more than one item, and if the raffled probability is within the constrained probability
-            if (it.second.count() >= 2 and prob(generator) <= this->params["mutation_alter_prob"]) {
+            if (it.second.count() >= 2 and prob(generator) < this->params["mutation_alter_prob"]) {
 
-               // std::cout << " remove " << std::endl;
-                std::uniform_real_distribution<double> pos_d(1, it.second.count()); // distribution for position of deletion in the genetic-string
+                //std::cout << " mutation remove in " << offspring->at(i)->getId() <<  std::endl;
+                std::uniform_int_distribution<int> pos_d(1, it.second.count()); // distribution for position of deletion in the genetic-string
                 int pos_deletion = pos_d(generator);
 
                 if(!(it.first == "CNNN" and pos_deletion == 0)){ // if it is the production rule of the core-component, prevents core-component from being deleted, preserving the root
@@ -612,17 +628,20 @@ void Evolution::mutation(LSystem LS, std::vector<Genome *> * offspring){
             }
 
             std::vector<std::string> genetic_string_items = std::vector<std::string>();
-            std::uniform_real_distribution<double> pos_i(0, it.second.count()); // distribution for position of insertion in the genetic-string
+            std::uniform_int_distribution<int> pos_i(0, it.second.count()); // distribution for position of insertion in the genetic-string
 
-            if (prob(generator) <= this->params["mutation_alter_prob"]) { // if raffled probability is within the constrained probability
+            if (prob(generator) < this->params["mutation_alter_prob"]) { // if raffled probability is within the constrained probability
+                //std::cout << " mutation add command in " << offspring->at(i)->getId() <<  std::endl;
                 genetic_string_items.push_back(LS.getCommands()[dist_command(generator)]); // raffles a command to add
             }
-            if (prob(generator) <= this->params["mutation_alter_prob"]) { // if raffled probability is within the constrained probability
+            if (prob(generator) < this->params["mutation_alter_prob"]) { // if raffled probability is within the constrained probability
+                //std::cout << " mutation add letter in " << offspring->at(i)->getId() <<  std::endl;
                 int test = dist_letter(generator);
 
                 genetic_string_items.push_back(LS.getAlphabetIndex()[test]); // raffles a letter to add
             }
-            if (prob(generator) <= this->params["add_backtoparent_prob"]) { // if raffled probability is within the constrained probability
+            if (prob(generator) < this->params["mutation_alter_prob"]) { // if raffled probability is within the constrained probability
+                //std::cout << " mutation add btp " << offspring->at(i)->getId() <<  std::endl;
                 genetic_string_items.push_back(LS.getCommands()[0]); // adds back-to-parent command (position 0 )
             }
 
