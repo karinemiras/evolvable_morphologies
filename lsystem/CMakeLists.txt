@@ -55,7 +55,7 @@ file(GLOB_RECURSE SOURCES
      src/DecodedGeneticString.cpp
      src/Measures.cpp
         src/Aux.cpp
-
+        src/Tests.cpp
      )
 
 # Generate

@@ -23,8 +23,8 @@ void LSystem::build_commands(){
 void LSystem::build_alphabet(){
 
 
-    alphabet["CNNN"]  = "CNNN";  // core component (no sensors)
-    alphabet_index.push_back("CNNN");
+    alphabet["C"]  = "C";  // core component
+    alphabet_index.push_back("C");
 
     alphabet["J1"] = "J1";       // fixed joint - horizontal
     alphabet_index.push_back("J1");
@@ -44,33 +44,8 @@ void LSystem::build_alphabet(){
     alphabet["PJ2"] = "PJ2";     // passive joint - vertical
     alphabet_index.push_back("PJ2");
 
-    alphabet["BNNN"] = "BNNN";   // brick (no sensors)
-    alphabet_index.push_back("BNNN");
-
- /**
- *  B--- : brick component with possibility of sensors I (infra-red) or L (light) or N (none)
- *         on the sides --- left/front/right.
- *         Ex.: BLIN means brick with light sensor on the left, infra-red on the front, and no sensor on the right
- */
-
-//    std::vector<std::string> sensors;
-//    sensors.push_back("L"); // light sensor
-//    sensors.push_back("I"); // infra-red sensor
-//    sensors.push_back("N"); // no sensor
-
-//    for(int l=0; l<3 ;l++) { // for each type of sensor in the left side
-//
-//        for(int f=0; f<3 ;f++) {  // for each type of sensor in the front side
-//
-//            for(int r=0; r<3 ;r++) {  // for each type of sensor in the right side
-//                std::string letter = "B"+sensors[l]+sensors[f]+sensors[r];
-//                alphabet[letter] = letter;
-//            }
-//        }
-//    }
-
-
-
+    alphabet["B"] = "B";   // brick
+    alphabet_index.push_back("B");
 
 }
 

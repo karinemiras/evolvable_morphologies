@@ -29,25 +29,31 @@ void Evolution::readParams(){
     std::string line;
     std::ifstream myfile ("../../lsystem/configuration.txt");
 
-//    pop_size - size of the population of genomes
-//    add_backtoparent_prob - probability of adding a back-to-parent command to genetic-strings
-//    num_initial_comp - number of initial (random) components in the production rules of the grammar
-//    show_phenotypes - flag to show the phenotype graphic
-//    export_phenotypes - flag to export the phenotypes to  images
-//    export_genomes - flag to export the genomes to files
-//    replacement_iterations - number of replacement iterations for the l-system
-//    size_component - size of each component in pixels
-//    spacing - spacing between components in pixels
-//    offspring_size - proportion of the size of the population to calculate the number of individuals of the offsfpring
-//    num_generations - number of generations of the evolution
-//    mutation_alter_prob - probability of adding items (letters/commands) to the genetic-string in the mutation
+    /*   pop_size - size of the population of genomes
+    *    add_backtoparent_prob - probability of adding a back-to-parent command to genetic-strings
+    *    num_initial_comp - number of initial (random) components in the production rules of the grammar
+    *    show_phenotypes - flag to show the phenotype graphic
+    *    export_phenotypes - flag to export the phenotypes to  images
+    *    export_genomes - flag to export the genomes to files
+    *    replacement_iterations - number of replacement iterations for the l-system
+    *    size_component - size of each component in pixels
+    *    spacing - spacing between components in pixels
+    *    offspring_size - proportion of the size of the population to calculate the number of individuals of the offsfpring
+    *    num_generations - number of generations of the evolution
+    *    mutation_alter_prob - probability of adding/removing items (letters/commands) to the genetic-string in the mutation
+    *    max_comps - maximum number of components allowed per phenotype
+    *    prop_parent - proportion from each parent in the crossover
+    */
 
     if (myfile.is_open()) {
         while ( getline (myfile,line) ) {
             std::vector<std::string> tokens;
-            boost::split( tokens, line, boost::is_any_of(" ") );  // parameters label and value separated by space
 
-            this->params[tokens[0]] = std::stod(tokens[1]);  // first item is the label, second is the value
+            // parameters label and value separated by space
+            boost::split( tokens, line, boost::is_any_of(" ") );
+
+            // first item is the label, second is the value
+            this->params[tokens[0]] = std::stod(tokens[1]);
         }
         myfile.close();
     }
@@ -61,15 +67,15 @@ void Evolution::readParams(){
  * Initializes the population with new genomes.
  * @param LS - Lsystem structure containing the alphabet.
  **/
-void Evolution::initPopulation(int argc, char* argv[], LSystem LS){ // default arguments and Lsystem
+void Evolution::initPopulation(LSystem LS){ // default arguments and Lsystem
 
-    for(int i=1; i <= this->params["pop_size"]; i++) { // repeats according to population size
+    // repeats according to population size
+    for(int i=1; i <= this->params["pop_size"]; i++) {
 
-       // std::cout<<" ------ genome "<<i<<std::endl;
         Genome * gen = new Genome(std::to_string(this->next_id), "N", "N");
 
-        // std::cout << " >> building grammar ..." << std::endl;
-        gen->build_grammar(LS, this->params["num_initial_comp"], this->params["add_backtoparent_prob"]); // creates genetic-strings for the production rules of the letters in the grammar (initial random rules)
+        // creates genetic-strings for the production rules of the letters in the grammar (initial random rules)
+        gen->build_grammar(LS, (int) this->params["num_initial_comp"], this->params["add_backtoparent_prob"]);
 
         this->population.push_back(gen);  // adds genome to the population
 
@@ -82,32 +88,34 @@ void Evolution::initPopulation(int argc, char* argv[], LSystem LS){ // default a
 
 /**
 *  Develops genomes of the population: 1- grows genetic-string of the genome according to grammar, 2- decodes it, 3- constructs the phenotype
-*  argc - default argument
-*  argv[] - default argument
+*  @param argc - default argument
+*  @param argv[] - default argument
 *  @param LS - Lsystem structure containing the alphabet
-*  individuals - array with genomes
+*  @param individuals - array with genomes
 **/
 void Evolution::developIndividuals(int argc, char* argv[], LSystem LS, int generation, std::vector<Genome *> * individuals, std::string path){
 
     for(int i=0; i < individuals->size(); i++) {
 
-       // std::cout<<" ------ develops genome "<< individuals->at(i)->getId() <<std::endl;
         individuals->at(i)->developGenome(argc, argv, this->params, LS,  generation, path);  // develops genome
-
     }
-
-
 }
 
+
+/**
+*  Constructs the phenotype and exports it.
+*  @param argc - default argument
+*  @param argv[] - default argument
+*  @param LS - Lsystem structure containing the alphabet
+*  @param generation - number of generation in evolution
+*  @param path - directory to where export the phenotypes
+**/
 void Evolution::exportPop(int argc, char* argv[], LSystem LS, int generation, std::string path){
 
-    for(int i=0; i < population.size(); i++) {
+    for(int i=0; i < population.size(); i++) { // for each genome
 
-        population[i]->constructor(argc, argv, this->params,  generation, path);
-
+        population[i]->constructor(argc, argv, this->params,  generation, path); // generates
     }
-
-
 }
 
 
@@ -119,59 +127,16 @@ void Evolution::exportPop(int argc, char* argv[], LSystem LS, int generation, st
  *  generation - number of the generation
  *  individuals - array with genomes
  **/
- void Evolution::measureIndividuals(int argc, char* argv[], int generation, std::vector<Genome *>  * individuals, std::string dirpath){
-
-    std::ofstream measures_file_general;
-    std::string path = "../../tests/measures.txt";
-    measures_file_general.open(path);
+ void Evolution::measureIndividuals(int generation, std::vector<Genome *>  * individuals, std::string dirpath){
 
     for(int i=0; i < individuals->size(); i++) {  // for each genome of the population
 
-        std::cout<<" - measures genome "<< individuals->at(i)->getId() <<std::endl;
-
         Measures * m = new Measures();
         m->setGenome(individuals->at(i));
-        m->measurePhenotype(argc, argv,this->params, generation, dirpath);
+        m->measurePhenotype(this->params, generation, dirpath);
     }
-    measures_file_general.close();
-
-
-
 }
 
-
-/**
- * Initializes the averages of the measures of the population with zero.
- */
-
-void Evolution::initPop_measures(){
-
-
-    this->pop_measures.emplace("total_components", 0); //  total amount of components of all types  in the body
-    this->pop_measures.emplace("total_bricks", 0); //  total amount of brick-components
-    this->pop_measures.emplace("total_fixed_joints_horizontal", 0); //  total amount of horizontal fixed-joint-components
-    this->pop_measures.emplace("total_passive_joints_horizontal", 0); // measure: total amount of horizontal passive-joint-components
-    this->pop_measures.emplace("total_active_joints_horizontal", 0); //   total amount of horizontal active-joint-components
-    this->pop_measures.emplace("total_fixed_joints_vertical", 0); //  total amount of vertical fixed-joint-components
-    this->pop_measures.emplace("total_passive_joints_vertical", 0); // measure: total amount of vertical passive-joint-components
-    this->pop_measures.emplace("total_active_joints_vertical", 0); //   total amount of vertical active-joint-components
-    this->pop_measures.emplace("connectivity1", 0); //   total of components with one side connected to another component
-    this->pop_measures.emplace("connectivity2",0); //  total of components with two sides connected to another component
-    this->pop_measures.emplace("connectivity3", 0); // total of components with three sides connected to another component
-    this->pop_measures.emplace("connectivity4", 0); //   total of components with four sides connected to another component
-    this->pop_measures.emplace("effective_joints", 0); //  total of joints connected by both sides to a brick or core component
-    this->pop_measures.emplace("symmetry", 0); //  maximum of horizontal and vertical symmetry
-    this->pop_measures.emplace("viable_horizontal_joints", 0); //  total of effective joints which have no neighboards preventing movement
-    this->pop_measures.emplace("length_ratio", 0); // length of the shortest side dived by the longest
-    this->pop_measures.emplace("coverage", 0); // proportion of the expected area (given the horizontal e vertical lengths) that is covered with components
-    this->pop_measures.emplace("spreadness", 0); // average distance of each component from each other in the axises x/y
-    this->pop_measures.emplace("horizontal_symmetry",  0); // proportion of components in the left side which match with the same type of component in the same relative position on the right side
-    this->pop_measures.emplace("vertical_symmetry", 0); // proportion of components in the top side which match with the same type of component in the same relative position on the bottom side
-    this->pop_measures.emplace("joints_per_limb", 0); //  total amount of effective joints per limb
-
-
-
-}
 
 
 /**
@@ -180,9 +145,11 @@ void Evolution::initPop_measures(){
 
 void Evolution::evaluateIndividuals(std::vector<Genome *> * individuals){
 
-    for(int i=0; i < individuals->size(); i++) {  // for each genome of the population
+    // for each genome of the population
+    for(int i=0; i < individuals->size(); i++) {
 
-        individuals->at(i)->calculateFitness(this->pop_measures); // calculates its fitness
+        // calculates its fitness
+        individuals->at(i)->calculateFitness(this->pop_measures);
         std::cout<<"fitness genome "<<individuals->at(i)->getId()<<" : "<<individuals->at(i)->getFitness()<<std::endl;
     }
 }
@@ -209,35 +176,6 @@ void Evolution::updatePop_measures_average(std::vector<Genome *>  * individuals)
     }
 }
 
-
-/**
- * Calculates the minimum/maximum of some measures among all genomes.
- */
-//
-//void Evolution::updatePop_measures_minmax(std::vector<Genome *>  * individuals){
-//
-//    for(int i=0; i < individuals->size(); i++) {
-//
-//        if(i==0) {
-//            this->min_speadness = individuals->at(i)->getMeasures()["spreadness"];
-//            this->max_speadness = individuals->at(i)->getMeasures()["spreadness"];
-//
-//        }else{
-//            // minimum and maximum for spreadness
-//            if (individuals->at(i)->getMeasures()["spreadness"] < this->min_speadness) { // updates minimum
-//                this->min_speadness = individuals->at(i)->getMeasures()["spreadness"];
-//            }
-//            if (individuals->at(i)->getMeasures()["spreadness"] > this->max_speadness) {  // updates maximum
-//                this->max_speadness = individuals->at(i)->getMeasures()["spreadness"];
-//            }
-//        }
-//    }
-//
-//    for(int i=0; i < individuals->size(); i++) { // normalizes the measure
-//        individuals->at(i)->updateMeasure("spreadness", (individuals->at(i)->getMeasures()["spreadness"] - this->min_speadness ) / (float)(this->max_speadness - this->min_speadness) );
-//    }
-//
-//}
 
 
 
@@ -339,7 +277,7 @@ void Evolution::testGeneticString(int argc, char* argv[],std::string test_genome
         // measures all metrics od the genome
         Measures m;
         m.setGenome(gen);
-        m.measurePhenotype(argc, argv, this->params, 1, "testpop");
+        m.measurePhenotype( this->params, 1, "testpop");
 
         myfile.close();
     }else{
@@ -435,14 +373,14 @@ void Evolution::noveltySearch(int argc, char* argv[]) {
 
     std::cout<<"---------------- generation 1"<<std::endl;
 
-    this->initPopulation(argc, argv, LS); // initializes population
+    this->initPopulation(LS); // initializes population
     std::vector<Genome *> * ini_pop =  new std::vector<Genome *>();
     for(int i=0; i < this->getPopulation().size(); i++){
         ini_pop->push_back(this->getPopulation()[i]);
     }
 
-    this->developIndividuals(argc, argv, LS, 1, ini_pop, "totalpop");  // develops genomes of the initial population
-    this->measureIndividuals(argc, argv, 1, ini_pop, "totalpop"); // measures phenotypes of the individuals
+    this->developIndividuals(argc, argv, LS, 1, ini_pop, "offspringpop");  // develops genomes of the initial population
+    this->measureIndividuals(1, ini_pop, "offspringpop"); // measures phenotypes of the individuals
     this->updatePop_measures_average(ini_pop);  // updates the average measures for the population
     this->evaluateIndividuals(ini_pop); // evaluates fitness of the individuals
 
@@ -456,8 +394,8 @@ void Evolution::noveltySearch(int argc, char* argv[]) {
 
         this->crossover(LS, offspring); // creates offspring
 
-        this->developIndividuals(argc, argv, LS, i, offspring, "totalpop");  // develops genomes of the generation
-        this->measureIndividuals(argc, argv, i, offspring, "totalpop"); // measures phenotypes of the individuals
+        this->developIndividuals(argc, argv, LS, i, offspring, "offspringpop");  // develops genomes of the generation
+        this->measureIndividuals( i, offspring, "offspringpop"); // measures phenotypes of the individuals
 
 
         std::vector<Genome *> * temp_pop =  new std::vector<Genome *>();
@@ -615,14 +553,14 @@ void Evolution::mutation(LSystem LS, std::vector<Genome *> * offspring){
             //std::cout << "before " <<std::endl;
             //it.second.display_list();
 
-            //  if there is more than one item, and if the raffled probability is within the constrained probability
-            if (it.second.count() >= 2 and prob(generator) < this->params["mutation_alter_prob"]) {
+            //  if there is at least more than two components, and if the raffled probability is within the constrained probability
+            if (it.second.count() >= 3 and prob(generator) < this->params["mutation_alter_prob"]) {
 
                 //std::cout << " mutation remove in " << offspring->at(i)->getId() <<  std::endl;
                 std::uniform_int_distribution<int> pos_d(1, it.second.count()); // distribution for position of deletion in the genetic-string
                 int pos_deletion = pos_d(generator);
 
-                if(!(it.first == "CNNN" and pos_deletion == 0)){ // if it is the production rule of the core-component, prevents core-component from being deleted, preserving the root
+                if(!(it.first == "C" and pos_deletion == 0)){ // if it is the production rule of the core-component, prevents core-component from being deleted, preserving the root
                     it.second.remove(pos_deletion); // removes from random position
                 }
             }
@@ -646,7 +584,7 @@ void Evolution::mutation(LSystem LS, std::vector<Genome *> * offspring){
             }
 
             int pos_insertion = pos_i(generator);
-            if(it.first == "CNNN" and pos_insertion == 0){ // if it is the production rule of the core-component, prevents new items from being inserted at the beginning, preserving the root
+            if(it.first == "C" and pos_insertion == 0){ // if it is the production rule of the core-component, prevents new items from being inserted at the beginning, preserving the root
                 pos_insertion++;
             }
 

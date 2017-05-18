@@ -79,41 +79,46 @@ void Genome::build_grammar(LSystem LS, int num_initial_comp, double add_backtopa
     std::default_random_engine generator(rd());
 
     std::uniform_int_distribution<int> dist_1(1, num_initial_comp); // distribution for the number of components
-    std::uniform_int_distribution<int> dist_2(0, alp_i.size()-1); // distribution for letters of the alphabet
-    std::uniform_int_distribution<int> dist_3(1, com.size()-1); // distribution for the mounting commands
+    std::uniform_int_distribution<int> dist_2(0, (int) alp_i.size()-1); // distribution for letters of the alphabet
+    std::uniform_int_distribution<int> dist_3(1, (int) com.size()-1); // distribution for the mounting commands
 
     for (std::map< std::string, std::string >::const_iterator it = alp.begin(); it != alp.end(); ++it) { // for each letter of the alphabet
 
         std::string letter = it->first;
-        //std::cout<<"letter "<<letter<<std::endl;
 
         std::vector<std::string> letter_items;
 
-        if (letter == "CNNN") { // if it is a core component, forces its inclusion in the rule
+        if (letter == "C") { // if it is a core component, forces its inclusion in the rule
             letter_items.push_back(letter);
         }
 
-        while(letter_items.size() < (dist_1(generator)*2) ){  // while a raffled number of components is not achieved (times 2 because it must take the commands into account)
+        // while a raffled number of components is not achieved (times 2 because it must take the commands into account)
+        while(letter_items.size() < (dist_1(generator)*2) ){
 
             std::string item = alp_i[dist_2(generator)]; // raffles a letter to be included
 
-            if (item != "CNNN") { // prevents core component of being (re)included in the rule
-                letter_items.push_back(com[dist_3(generator)]); // raffles a mounting command to be included
+            // prevents core component of being (re)included in the rule
+            if (item != "C") {
+
+                // raffles a mounting command to be included
+                letter_items.push_back(com[dist_3(generator)]);
                 letter_items.push_back(item);
 
                 std::uniform_real_distribution<double> p_btp(0.0, 1.0); // distribution for back-to-parent command
                 double p = p_btp(generator);
-                if (p < add_backtoparent_prob){ // tries to add a back-to-parent command
+                // tries to add a back-to-parent command
+                if (p < add_backtoparent_prob){
                     letter_items.push_back(com[0]);
                 }
             }
         }
 
+        // build a genetic-string with the new production rule
         GeneticString lgs;
-        lgs = this->build_genetic_string(lgs, letter_items); // build a genetic-string with the new production rule
-        //lgs.display_list();
+        lgs = this->build_genetic_string(lgs, letter_items);
 
-        this->grammar.emplace(letter, lgs); // adds letter and its production rule (made a genetic-string) to the grammar of the genome
+        // adds letter and its production rule (made a genetic-string) to the grammar of the genome
+        this->grammar.emplace(letter, lgs);
 
     }
 
@@ -128,11 +133,11 @@ void Genome::build_grammar(LSystem LS, int num_initial_comp, double add_backtopa
  */
 void Genome::generate_final_string(int  replacement_iterations, int export_genomes, int generation, std::string path){
 
-    for(int i=1; i<=replacement_iterations ;i++) { // performs replacements for a number of iterations
+    // performs replacements for a number of iterations
+    for(int i=1; i<=replacement_iterations ;i++) {
 
-        this->gs.replaces(this->grammar); // replacement is made given the grammar
-       // std::cout << "string iteration " << i << std::endl;
-       // this->gs.display_list();
+        // replacement is made given the grammar
+        this->gs.replaces(this->grammar);
     }
     if(export_genomes == 1){
         this->exportGenome(generation, path);
@@ -216,7 +221,8 @@ void Genome::constructor(int argc, char* argv[], std::map<std::string, double> p
     DecodedGeneticString::Vertex * c = NULL;
     c = this->dgs.getRoot();
 
-    this->draw_component("bottom","root",this->scene,items,c,c, params); // from component on the root, draws all the components in the graph
+    // from component on the root, draws all the components in the graph
+    this->draw_component("bottom","root",this->scene,items,c,c, params);
 
     // exports drawn robot into image file
     if (params["export_phenotypes"] == 1) {
@@ -256,24 +262,26 @@ void Genome::constructor(int argc, char* argv[], std::map<std::string, double> p
  */
 void Genome::draw_component( std::string reference, std::string direction, QGraphicsScene * scene, std::vector<QGraphicsRectItem *> items,  DecodedGeneticString::Vertex * c1, DecodedGeneticString::Vertex * c2, std::map<std::string, double> params){
 
-    int size = params["size_component"];
-    int space = params["spacing"];
+    int size = (int) params["size_component"];
+    int space = (int) params["spacing"];
 
     if(c2 != NULL ){ // condition to stop recursive calls
 
         // draws a new component
         items.push_back(new QGraphicsRectItem());
-        items[items.size()-1]->setRect(0,0,size,size); // initial default position of a component, which will be repositioned later
+        // initial default position of a component, which will be repositioned later
+        items[items.size()-1]->setRect(0,0,size,size);
 
-        QGraphicsTextItem * sign = new QGraphicsTextItem; // draws a sign representing the direction (< > ^ v) from the component to its parent
+        // draws a sign representing the direction (< > ^ v) from the component to its parent
+        QGraphicsTextItem * sign = new QGraphicsTextItem;
         scene->addItem(sign);
 
         // defines colors for the components according to type  (light color has angle in axis x / dark color around z)
 
-        if(c2->item == "CNNN"){
+        if(c2->item == "C"){
             items[items.size()-1]->setBrush(Qt::yellow); // yellow
         }
-        if(c2->item == "BNNN"){
+        if(c2->item == "B"){
             items[items.size()-1]->setBrush(Qt::blue); // blue
         }
         if(c2->item == "PJ1"){
@@ -387,8 +395,8 @@ void Genome::draw_component( std::string reference, std::string direction, QGrap
                 items[items.size() - 1]->setPos(0, 0); // core-compoemnt is aligned in the 0-0 position
         }
 
-        c2->x = items[items.size()-1]->x(); // saves x coordinate in the graph for the component
-        c2->y = items[items.size()-1]->y(); // saves y coordinate in the graph for the component
+        c2->x = (int) items[items.size()-1]->x(); // saves x coordinate in the graph for the component
+        c2->y = (int) items[items.size()-1]->y(); // saves y coordinate in the graph for the component
 
         QList < QGraphicsItem * > coll;
         coll =  items[items.size()-1]->collidingItems();
@@ -432,14 +440,11 @@ void Genome::draw_component( std::string reference, std::string direction, QGrap
 void Genome::createEmbryo(){
 
     std::vector<std::string> axiom;
-    axiom.push_back("CNNN");
+    axiom.push_back("C");
 
     // initializes the genetic-string with the axiom
     GeneticString gs;
     this->setGeneticString(this->build_genetic_string(gs, axiom));
-
-    //std::cout << " >> building axiom ..." << std::endl;
-    //this->getGeneticString().display_list();
 
 }
 
@@ -458,18 +463,14 @@ void Genome::developGenome(int argc, char* argv[], std::map<std::string, double>
 
     // creates main genetic-string for axiom (initial developmental state of the genome)
     this->createEmbryo();
-    //std::cout << " ----------------- genome "<<this->getId()<<std::endl;
 
     // enhances the genetic-string according to grammar iteratively
-    //std::cout << " >> iterating replacements ..." << std::endl;
-    this->generate_final_string(params["replacement_iterations"], params["export_genomes"], generation, path);
+    this->generate_final_string((int) params["replacement_iterations"], (int) params["export_genomes"], generation, path);
 
     // decodes the final genetic-string into a tree of components
-    //std::cout << " >> decoding ... " << std::endl;
     this->decodeGeneticString(LS, params);
 
     // generates robot-graphics
-   // std::cout << " >> constructing ... " << std::endl;
     this->constructor(argc, argv, params,  generation, path);
 }
 
@@ -482,7 +483,8 @@ void Genome::calculateFitness(std::map< std::string, double > pop_measures){
 
     for( const auto& it : this->measures ){ // for each measure
 
-        this->fitness += pow((pop_measures[it.first] - it.second), 2); // sum of square differences between individual and population
+        //   sum of square differences between individual and population
+        this->fitness += pow((pop_measures[it.first] - it.second), 2);
     }
     this->fitness = sqrt(this->fitness); // square root of the sum
 }
