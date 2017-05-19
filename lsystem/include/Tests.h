@@ -7,12 +7,16 @@
 
 #include <string>
 
+#include "Genome.h"
+
 
 
 class Tests{
 
      public:
          void testMeasures(std::string id_genome, std::map< std::string, double>);
+         void testParents(int parent1, int parent2);
+         void testPopsize(std::vector<Genome *>  population,  int pop_size);
 
 };
 

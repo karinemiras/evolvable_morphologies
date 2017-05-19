@@ -137,7 +137,7 @@ void GeneticString::remove(int pos) {
     current = start;
     int current_pos = 1;
 
-    while (current_pos < pos) { // looks for chosen position, as items will be inserted after that position
+    while (current_pos < pos) { // looks for chosen position
         current = current->next;
         current_pos++;
     }

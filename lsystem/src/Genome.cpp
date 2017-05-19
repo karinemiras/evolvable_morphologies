@@ -490,8 +490,32 @@ void Genome::calculateFitness(std::map< std::string, double > pop_measures){
 }
 
 
+/**
+ * Saves the value representing the distance from one genome's measure to other genome's measure.
+ * @param distance - distance between the measures
+ */
+void Genome::setGenomeDistance(std::string id_genome, std::pair<int, double> status_distance){
+
+    this->genomes_distance.emplace(id_genome, status_distance);
+}
+
+void Genome::setGenomeDistanceStatus(std::string id_genome){
+
+    // updates status to current, keeping the same value for distance
+    std::pair<int, double> status_distance = std::make_pair(1, this->genomes_distance[id_genome].second);
+    this->genomes_distance[id_genome] = status_distance;
+}
+
+
+std::map< std::string, std::pair<int ,double> > Genome::getGenomeDistance(){
+
+    return genomes_distance;
+}
+
 
 std::map< std::string, GeneticString > Genome::getGrammar(){
 
     return this->grammar;
 }
+
+

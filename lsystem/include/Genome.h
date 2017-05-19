@@ -57,6 +57,9 @@ class Genome{
         std::map< std::string, GeneticString > getGrammar();
         void setGrammar(std::map< std::string, GeneticString > grammar);
         void removeMeasure(std::string key);
+        void setGenomeDistance(std::string id_genome, std::pair<int, double> status_distance);
+        std::map< std::string, std::pair<int ,double> > getGenomeDistance();
+        void setGenomeDistanceStatus(std::string id_genome);
 
     private:
 
@@ -67,10 +70,15 @@ class Genome{
         GeneticString gs; // main genetic-string of the genome
         DecodedGeneticString dgs; // graph that logically represents the connections among the components forming the body
         QGraphicsScene * scene; // scene holding the phenotype
-        std::vector<std::string> axiom = std::vector<std::string>(); // letter(s) of the alphabet to build the initial developmental state of the genetic-string
-        std::map< std::string, GeneticString >  grammar = std::map< std::string, GeneticString >(); // genetic-strings of production rules for each letter of the alphabet
+        // letter(s) of the alphabet to build the initial developmental state of the genetic-string
+        std::vector<std::string> axiom = std::vector<std::string>();
+        // genetic-strings of production rules for each letter of the alphabet
+        std::map< std::string, GeneticString >  grammar = std::map< std::string, GeneticString >();
         std::map< std::string, double >  measures = std::map< std::string, double >(); // list of body metrics about the genome
-        std::map< std::pair<int, int>, std::string >  list_components = std::map< std::pair<int, int>, std::string >(); // list of all components of the body, keys are coordinates, value is a letter
+        // list of all components of the body, keys are coordinates, value is a letter
+        std::map< std::pair<int, int>, std::string >  list_components = std::map< std::pair<int, int>, std::string >();
+        // <id of the genome with which this genome is being compared, <if this comparison is active, value of comparison> >
+        std::map< std::string, std::pair<int ,double> > genomes_distance = std::map< std::string, std::pair<int ,double> >();
 
 };
 
