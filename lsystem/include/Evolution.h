@@ -29,7 +29,7 @@ class Evolution{
         void testGeneticString(int argc, char* argv[],std::string test_genome, LSystem LS);
         void measureIndividuals(int generation, std::vector<Genome *>  * individuals, std::string dirpath);
         void evaluateIndividuals(std::vector<Genome *> * individuals);
-        void compareIndividuals(std::vector<Genome *>  * individuals);;
+        void compareIndividuals(std::vector<Genome *>  * individuals_reference, std::vector<Genome *>  * individuals_compare);
         int  tournament();
         void selection();
         void crossover(LSystem LS, std::vector<Genome *> * offspring);

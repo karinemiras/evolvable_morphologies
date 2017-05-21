@@ -3,6 +3,7 @@
 //
 
 #include <algorithm>
+#include <ctime>
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -172,7 +173,7 @@ void Evolution::evaluateIndividuals(std::vector<Genome *> * individuals){
     for(int i=0; i < individuals->size(); i++) {
 
         // calculates its fitness
-       // individuals->at(i)->calculateFitness(this->pop_measures);
+        individuals->at(i)->calculateFitness((int) this->params["k_neighboards"]);
         std::cout<<"fitness genome "<<individuals->at(i)->getId()<<" : "<<individuals->at(i)->getFitness()<<std::endl;
     }
 }
@@ -180,54 +181,58 @@ void Evolution::evaluateIndividuals(std::vector<Genome *> * individuals){
 
 /**
  * Calculates the average of the measures among all genomes.
+ * @param individuals_reference - individuals of current-population (parents+offspring)
+ * @param individuals_compare - individuals representing current-population+archive
  */
 
-void Evolution::compareIndividuals(std::vector<Genome *>  * individuals){
+void Evolution::compareIndividuals(std::vector<Genome *>  * individuals_reference, std::vector<Genome *>  * individuals_compare){
 
 
-    for(int i=0; i < individuals->size(); i++) {  // for each reference-genome
+    // for each reference-genome
+    for(int i=0; i < individuals_reference->size(); i++) {
 
-        //compare reference-genome with the rest of the genomes in the POPULATION
-        for(int j=0; j < individuals->size(); j++) {
+        //compare reference-genome with the rest of the genomes in the POPULATION/ARCHIVE
+        std::map<std::string,std::string> aux_pop = std::map<std::string,std::string>();
 
-            // if compared-genome is not the reference-genome itself and is also not in the archive
-            if(i != j){
+        for(int j=0; j < individuals_compare->size(); j++) {
 
-                // if comparison with compared-genome has not been calculated in the past
-                if(individuals->at(i)->getGenomeDistance().count(std::to_string(j)) == 0 ) {
+            aux_pop.emplace(individuals_compare->at(j)->getId(),individuals_compare->at(j)->getId() ); // auxiliar pointers
 
-                    double distances = 0;  // cleans the old value of mean
+            // if compared-genome is not the reference-genome itself
+            if(individuals_reference->at(i)->getId() != individuals_compare->at(j)->getId()){
+
+                // if comparison between reference-genome  and compared-genome has not been calculated in the past
+                if(individuals_reference->at(i)->getGenomeDistance().count(individuals_compare->at(j)->getId()) == 0 ) {
+
+                    double distances = 0;
                     // for each measure
-                    for (auto &it : individuals->at(i)->getMeasures()) {
+                    for (auto &it : individuals_reference->at(i)->getMeasures()) {
 
-                        // sums the values of all individuals for the measure
-                        distances += sqrt(pow(individuals->at(i)->getMeasures()[it.first] -
-                                              individuals->at(j)->getMeasures()[it.first], 2));
+                        // acumulate euclidean distance of measures
+                        distances += sqrt(pow(individuals_reference->at(i)->getMeasures()[it.first]
+                                              - individuals_compare->at(j)->getMeasures()[it.first], 2));
                     }
-                    // divides by the total of measures
-                    distances /= (double) individuals->at(i)->getMeasures().size();
+                    // average of the distances
+                    distances /= (double) individuals_reference->at(i)->getMeasures().size();
 
-                    std::cout << " dist g " << individuals->at(j)->getId() << " " << distances << "" << std::endl;
+                    // saves distance from compared-genome inside reference-genome
+                    individuals_reference->at(i)->setGenomeDistance(individuals_compare->at(j)->getId(), distances);
 
-
-                    std::pair<int, double> status_distance = std::make_pair(1, distances);
-                    individuals->at(i)->setGenomeDistance(individuals->at(j)->getId(), status_distance);
-
-                }else{
-
-                    // updates status to current, keeping the same value for distance
-                    individuals->at(i)->setGenomeDistanceStatus(std::to_string(j));
                 }
             }
         }
 
+        // removes from list the comparisons with genomes that no longer exist in the current-population+archive
+        for (auto &it : individuals_reference->at(i)->getGenomeDistance()) {
 
+            if(aux_pop.count(it.first) == 0){
 
+                individuals_reference->at(i)->deleteGenomeDistance(it.first);
+            }
+        }
 
-        std::cout<<" compare genome " << i << "" <<std::endl;
-        for( const auto& it : individuals->at(i)->getGenomeDistance() ){
-
-            std::cout<<" value " << it.first  << " " << it.second.first  << " "<< it.second.second  << " "<<std::endl;
+        for( const auto& it : individuals_reference->at(i)->getGenomeDistance() ){
+            std::cout<<"reference "<<individuals_compare->at(i)->getId()<<" compared to " << it.first  << " is " << it.second  << " "<<std::endl;
         }
     }
 }
@@ -426,6 +431,11 @@ void Evolution::saveResults(int generation){
 void Evolution::noveltySearch(int argc, char* argv[]) {
 
 
+    // logs about time
+    time_t sta = time(0);
+    char* dtsta = ctime(&sta);
+    std::cout<<std::endl<<"experiment start: " <<dtsta<<std::endl;
+
     // loads alphabet with letters and commands
     LSystem LS;
     LS.build_commands();
@@ -437,32 +447,25 @@ void Evolution::noveltySearch(int argc, char* argv[]) {
 
     // initializes population
     this->initPopulation(LS);
-    std::vector<Genome *> * ini_pop =  new std::vector<Genome *>();
-    for(int i=0; i < this->getPopulation().size(); i++){
 
-        ini_pop->push_back(this->getPopulation()[i]);
-    }
+    // auxiliar pointer to population
+        std::vector<Genome *> * aux_ini_pop =  new std::vector<Genome *>();
+        for(int i=0; i < this->getPopulation().size(); i++){ aux_ini_pop->push_back(this->getPopulation()[i]); }
+    //
 
     // develops genomes of the initial population
-    this->developIndividuals(argc, argv, LS, 1, ini_pop, "offspringpop");
+    this->developIndividuals(argc, argv, LS, 1, aux_ini_pop, "offspringpop");
     // measures phenotypes of the individuals
-    this->measureIndividuals(1, ini_pop, "offspringpop");
+    this->measureIndividuals(1, aux_ini_pop, "offspringpop");
     // updates the average measures for the population
-    this->compareIndividuals(ini_pop);
+    this->compareIndividuals(aux_ini_pop, aux_ini_pop);
     // evaluates fitness of the individuals
-    this->evaluateIndividuals(ini_pop);
+    this->evaluateIndividuals(aux_ini_pop);
     // saves metrics of evolution to file
     this->saveResults(1);
     // (possibly) adds genome to archive
-    this->addToArchive(ini_pop, this->params["prob_add_archive"]);
+    this->addToArchive(aux_ini_pop, this->params["prob_add_archive"]);
 
-
-
-    for( const auto& it : this->archive ){
-
-        std::cout<<" archive "<<it.first<<" "<<it.second<<std::endl;
-
-    }
 
     // evolves population through generations
     for(int i=2; i <= params["num_generations"]; i++) {
@@ -479,29 +482,26 @@ void Evolution::noveltySearch(int argc, char* argv[]) {
         // measures phenotypes of the offspring
         this->measureIndividuals( i, offspring, "offspringpop");
 
-        // joins parents with offspring as new population
-        std::vector<Genome *> * temp_pop =  new std::vector<Genome *>();
-        for(int i=0; i < this->getPopulation().size(); i++){
+        // auxiliar pointers
+            std::vector<Genome *> * temp_pop_reference =  new std::vector<Genome *>();
+            std::vector<Genome *> * temp_pop_compare = new std::vector<Genome *>();
 
-            temp_pop->push_back(this->getPopulation()[i]);
-        }
-        for(int i=0; i < offspring->size(); i++){
+            for(int i=0; i < this->getPopulation().size(); i++){
+                temp_pop_reference->push_back(this->getPopulation()[i]);
+                temp_pop_compare->push_back(this->getPopulation()[i]);
+            }
+            for(int i=0; i < offspring->size(); i++){
+                temp_pop_reference->push_back(offspring->at(i));
+                temp_pop_compare->push_back(offspring->at(i));
+            }
+            for ( auto &it : this->archive){ temp_pop_compare->push_back(this->archive[it.first]); }
+        // auxiliar pointers //
 
-            temp_pop->push_back(offspring->at(i));
-        }
-
-        // updates the average measures for the population
-        this->compareIndividuals(temp_pop);
-
-        std::vector<Genome *> * aux_archive =  new std::vector<Genome *>();
-        for ( auto &it : this->archive){
-
-            aux_archive->push_back(this->archive[it.first]);
-        }
-        this->compareIndividuals(aux_archive);
+        std::cout<<" compares population with population+archive "<<std::endl;
+        this->compareIndividuals(temp_pop_reference, temp_pop_compare);
 
         // evaluates fitness of the offspring
-        this->evaluateIndividuals(offspring);
+        this->evaluateIndividuals(temp_pop_reference);
         // (possibly) adds genome to archive
         this->addToArchive(offspring, this->params["prob_add_archive"]);
 
@@ -521,17 +521,16 @@ void Evolution::noveltySearch(int argc, char* argv[]) {
         this->saveResults(i);
 
 
-
         for( const auto& it : this->archive ){
-
             std::cout<<" archive "<<it.first<<" "<<it.second<<std::endl;
-
         }
-
 
     }
 
-
+    // logs about time
+    time_t end = time(0);
+    char* dtend = ctime(&end);
+    std::cout<<std::endl<<"experiment end: " <<dtend<<std::endl;
 
 }
 

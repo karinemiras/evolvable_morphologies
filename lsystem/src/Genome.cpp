@@ -475,18 +475,25 @@ void Genome::developGenome(int argc, char* argv[], std::map<std::string, double>
 }
 
 
+
+
 /**
  * Calculates the fitness of a genome as the euclidean distance from its measures to the population's average measures.
  * @param pop_measures - average for the measures of all the population
  */
-void Genome::calculateFitness(std::map< std::string, double > pop_measures){
+void Genome::calculateFitness(int k_neighboards){
 
-    for( const auto& it : this->measures ){ // for each measure
+    // order distances
+    std::vector<double> ordered_distances = std::vector<double> ();
+    for (const auto& it :this->genomes_distance) ordered_distances.push_back(it.second);
+    std::sort (ordered_distances.begin(), ordered_distances.end());
 
-        //   sum of square differences between individual and population
-        this->fitness += pow((pop_measures[it.first] - it.second), 2);
-    }
-    this->fitness = sqrt(this->fitness); // square root of the sum
+    // average of the closest k_neighboards
+    double avg_distances = 0;
+    for(int i=0; i<k_neighboards; i++) avg_distances += ordered_distances[i];
+    avg_distances /= k_neighboards;
+
+    this->fitness = avg_distances ;
 }
 
 
@@ -494,20 +501,18 @@ void Genome::calculateFitness(std::map< std::string, double > pop_measures){
  * Saves the value representing the distance from one genome's measure to other genome's measure.
  * @param distance - distance between the measures
  */
-void Genome::setGenomeDistance(std::string id_genome, std::pair<int, double> status_distance){
+void Genome::setGenomeDistance(std::string id_genome,   double distance){
 
-    this->genomes_distance.emplace(id_genome, status_distance);
+    this->genomes_distance.emplace(id_genome, distance);
 }
 
-void Genome::setGenomeDistanceStatus(std::string id_genome){
+void Genome::deleteGenomeDistance(std::string id_genome){
 
-    // updates status to current, keeping the same value for distance
-    std::pair<int, double> status_distance = std::make_pair(1, this->genomes_distance[id_genome].second);
-    this->genomes_distance[id_genome] = status_distance;
+    this->genomes_distance.erase(id_genome);
 }
 
 
-std::map< std::string, std::pair<int ,double> > Genome::getGenomeDistance(){
+std::map< std::string,  double  > Genome::getGenomeDistance(){
 
     return genomes_distance;
 }

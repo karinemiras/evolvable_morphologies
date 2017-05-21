@@ -52,14 +52,14 @@ class Genome{
         std::map< std::string, double > getMeasures();
         std::map< std::pair<int, int>, std::string >  getList_components();
         void updateMeasure(std::string key, double value);
-        void calculateFitness(std::map< std::string, double > pop_measures);
+        void calculateFitness(int k_neighboards);
         double getFitness();
         std::map< std::string, GeneticString > getGrammar();
         void setGrammar(std::map< std::string, GeneticString > grammar);
         void removeMeasure(std::string key);
-        void setGenomeDistance(std::string id_genome, std::pair<int, double> status_distance);
-        std::map< std::string, std::pair<int ,double> > getGenomeDistance();
-        void setGenomeDistanceStatus(std::string id_genome);
+        void setGenomeDistance(std::string id_genome, double distance);
+        std::map< std::string  ,double > getGenomeDistance();
+        void deleteGenomeDistance(std::string id_genome);
 
     private:
 
@@ -78,7 +78,7 @@ class Genome{
         // list of all components of the body, keys are coordinates, value is a letter
         std::map< std::pair<int, int>, std::string >  list_components = std::map< std::pair<int, int>, std::string >();
         // <id of the genome with which this genome is being compared, <if this comparison is active, value of comparison> >
-        std::map< std::string, std::pair<int ,double> > genomes_distance = std::map< std::string, std::pair<int ,double> >();
+        std::map< std::string, double>   genomes_distance = std::map< std::string, double>  ();
 
 };
 
