@@ -392,7 +392,7 @@ void Genome::draw_component( std::string reference, std::string direction, QGrap
             sign->setPlainText(QString::fromStdString(tsign)); // draws sign over the component
 
         }else{
-                items[items.size() - 1]->setPos(0, 0); // core-compoemnt is aligned in the 0-0 position
+            items[items.size() - 1]->setPos(0, 0); // core-compoemnt is aligned in the 0-0 position
         }
 
         c2->x = (int) items[items.size()-1]->x(); // saves x coordinate in the graph for the component
@@ -494,6 +494,7 @@ void Genome::calculateFitness(int k_neighboards){
     avg_distances /= k_neighboards;
 
     this->fitness = avg_distances ;
+
 }
 
 

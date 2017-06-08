@@ -9,8 +9,8 @@ size_component 40
 spacing 1
 offspring_size 0.50
 num_generations 10
-mutation_alter_prob 0.2
+mutation_alter_prob 0.1
 max_comps 20
-prop_parent 0.5
+prop_parent 0.05
 prob_add_archive 0.1
 k_neighboards 15

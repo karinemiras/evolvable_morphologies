@@ -21,7 +21,7 @@ int main(int argc, char* argv[]) {
 
 
 
-   // e->testGeneticString(argc, argv,"gecko3", LS);
+    // e->testGeneticString(argc, argv,"gecko3", LS);
 
     return 0;
 

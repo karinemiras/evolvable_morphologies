@@ -266,7 +266,7 @@ void GeneticString::display_list()
 /**
  * Counts the of elements in the genetic-string.
  */
-    int GeneticString::count()
+int GeneticString::count()
 {
     Node *current = start;
     int cnt = 0;

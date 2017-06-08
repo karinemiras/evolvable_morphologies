@@ -30,8 +30,8 @@ endif ()
 # Find the boost lib and headers.
 set(Boost_NO_BOOST_CMAKE ON) #  Don't do a find_package in config mode before searching for a regular boost install.
 find_package(Boost COMPONENTS REQUIRED
-             "unit_test_framework"
-             )
+        "unit_test_framework"
+        )
 include_directories(${Boost_INCLUDE_DIRS})
 
 find_package(Qt5 COMPONENTS
@@ -41,22 +41,22 @@ find_package(Qt5 COMPONENTS
 # Source subdirectories
 # _____________________________________________________________________________
 
-enable_testing()
+#enable_testing()
 include_directories(include)
 add_subdirectory(src)
-add_subdirectory(test)
+#add_subdirectory(test)
 
 file(GLOB_RECURSE SOURCES
-     main.cpp
-     src/GeneticString.cpp
-     src/Genome.cpp
-     src/LSystem.cpp
+        main.cpp
+        src/GeneticString.cpp
+        src/Genome.cpp
+        src/LSystem.cpp
         src/Evolution.cpp
-     src/DecodedGeneticString.cpp
-     src/Measures.cpp
+        src/DecodedGeneticString.cpp
+        src/Measures.cpp
         src/Aux.cpp
         src/Tests.cpp
-     )
+        )
 
 # Generate
 # _____________________________________________________________________________

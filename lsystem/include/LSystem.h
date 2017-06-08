@@ -15,18 +15,18 @@
  */
 class LSystem{
 
-    public:
-        void build_commands();
-        void build_alphabet();
-        std::map< std::string, std::string > getAlphabet();
-        std::vector<std::string> getAlphabetIndex();
-        std::vector<std::string> getCommands();
+public:
+    void build_commands();
+    void build_alphabet();
+    std::map< std::string, std::string > getAlphabet();
+    std::vector<std::string> getAlphabetIndex();
+    std::vector<std::string> getCommands();
 
 
-    private:
-        std::vector<std::string> commands = std::vector<std::string>(); // vector with the commands of the l-system
-        std::map< std::string, std::string > alphabet = std::map< std::string, std::string >();  // alphabet with the letters of the l-system
-        std::vector<std::string> alphabet_index = std::vector<std::string>(); // auxiliar vector for the alphabet letters
+private:
+    std::vector<std::string> commands = std::vector<std::string>(); // vector with the commands of the l-system
+    std::map< std::string, std::string > alphabet = std::map<std::string, std::string>();  // alphabet with the letters of the l-system
+    std::vector<std::string> alphabet_index = std::vector<std::string>(); // auxiliar vector for the alphabet letters
 };
 
 
