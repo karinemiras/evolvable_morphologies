@@ -12,6 +12,7 @@ class Aux{
 
     public:
         void createFolder(std::string dir);
+        void removeFolder(std::string dir);
 
 };
 

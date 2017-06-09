@@ -15,8 +15,8 @@ using namespace std;
 int main(int argc, char* argv[]) {
 
 
-
-    Evolution * e = new Evolution();
+    // experiment: looking for global optimum of innovation
+    Evolution * e = new Evolution("sicco");
     e->noveltySearch(argc, argv);
 
 

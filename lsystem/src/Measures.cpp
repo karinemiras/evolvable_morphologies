@@ -375,7 +375,7 @@ void Measures::measurePhenotype(std::map<std::string, double> params, int genera
     /* BEGINNING: exports measures to files */
 
     std::ofstream measures_file_general;
-    std::string path = "../../tests/"+dirpath+std::to_string(generation)+"/measures.txt";
+    std::string path = "../../experiments/"+dirpath+std::to_string(generation)+"/measures.txt";
     measures_file_general.open(path, std::ofstream::app);
 
     std::ofstream measures_file;

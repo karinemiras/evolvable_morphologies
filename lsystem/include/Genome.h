@@ -45,7 +45,9 @@ public:
     void constructor(int argc, char* argv[], std::map<std::string, double> params, int generation, std::string path);
     void draw_component(std::string reference, std::string direction, QGraphicsScene * scene, std::vector<QGraphicsRectItem *>  items,DecodedGeneticString::Vertex * c1, DecodedGeneticString::Vertex * c2, std::map<std::string, double> params);
     std::string getId();
-    void exportGenome(int generation, std::string path);
+    std::string getId_parent1();
+    std::string getId_parent2();
+    void exportGenome(std::string path);
     void createEmbryo();
     void developGenome(int argc, char* argv[], std::map<std::string, double> params, LSystem LS, int generation, std::string path);
     DecodedGeneticString getDgs();

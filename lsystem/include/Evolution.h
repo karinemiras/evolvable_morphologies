@@ -21,6 +21,10 @@ class Evolution{
 
 public:
 
+    Evolution(std::string experiment_name_){
+        this->experiment_name = experiment_name_;
+    }
+
 
     void initPopulation( LSystem LS);
     void readParams();
@@ -40,7 +44,9 @@ public:
     void noveltySearch(int argc, char* argv[]);
     void saveResults(int generation);
     void exportPop(int argc, char* argv[], LSystem LS, int generation, std::string path);
-    void addToArchive( std::vector<Genome *>  * individuals, double prob_add_archive);
+    void addToArchive( std::vector<Genome *>  * individuals, double prob_add_archive, std::string path);
+    void saveParameters();
+    void logsTime(std::string moment);
 
 private:
 
@@ -49,6 +55,7 @@ private:
     std::map< std::string, Genome * >  * archive = new std::map< std::string , Genome * > ();
     int next_id = 0; // id that will be given for the next genome to be created
     Tests tests = Tests();
+    std::string experiment_name = "";
 
 };
 

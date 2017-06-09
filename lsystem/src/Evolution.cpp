@@ -15,6 +15,7 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
 
+#include "Aux.h"
 #include "Evolution.h"
 #include "Genome.h"
 #include "LSystem.h"
@@ -108,7 +109,7 @@ void Evolution::developIndividuals(int argc, char* argv[], LSystem LS, int gener
 }
 
 
-void Evolution::addToArchive( std::vector<Genome *>  * individuals, double prob_add_archive){
+void Evolution::addToArchive( std::vector<Genome *>  * individuals, double prob_add_archive, std::string path){
 
     std::random_device rd;
      std::default_random_engine generator(rd());
@@ -120,7 +121,14 @@ void Evolution::addToArchive( std::vector<Genome *>  * individuals, double prob_
         // if raffled probability is within the constrained probability
         if (prob(generator) < prob_add_archive) {
 
-            this->archive->emplace(individuals->at(i)->getId(), individuals->at(i));
+            Genome * gen_arc = nullptr;
+            gen_arc = new Genome(*individuals->at(i)); // copies object of the genome to archive
+
+            this->archive->emplace(individuals->at(i)->getId(),gen_arc);
+
+            if(this->params["export_genomes"] == 1){
+                individuals->at(i)->exportGenome(path+"/archive");
+            }
         }
     }
 }
@@ -283,7 +291,7 @@ void Evolution::loadPopulation(int argc, char* argv[],int size_pop, std::string 
 //    for (int i=1; i<=size_pop; i++) { // for each genome file in the specified folder, reads its contents
 //
 //        convert << i; // if of genome
-//        std::ifstream myfile("../../tests/" + test_folder + "/genome_" + convert.str() + ".txt");
+//        std::ifstream myfile("../../experiments/" + test_folder + "/genome_" + convert.str() + ".txt");
 //        if (myfile.is_open()) {
 //            getline(myfile, line);
 //            std::vector<std::string> tokens;
@@ -370,13 +378,14 @@ void Evolution::selection() {
         index_selected.push_back(genome);
     }
 
-//    for(int i=0; i < this->params["pop_size"]; i++) {
-//
-//        if(!(std::find(index_selected.begin(), index_selected.end(), i) != index_selected.end())){ // if genome is not on the selected list
-//            delete this->population->at(i); // frees memory for the not selected genomes
-//            this->population->at(i) = NULL;
-//        }
-//    }
+    for(int i=0; i < this->params["pop_size"]; i++) {
+
+        // if genome is not on the selected list
+        if(!(std::find(index_selected.begin(), index_selected.end(), i) != index_selected.end())){
+            delete this->population->at(i); // frees memory for the not selected genomes
+            this->population->at(i) = NULL;
+        }
+    }
 
     this->population = selected; // substitutes current population for the selected subset
 
@@ -393,13 +402,11 @@ void Evolution::saveResults(int generation){
 
 
     std::ofstream evolution_file;
-    std::string path = "../../tests/evolution.txt";
+    std::string path = "../../experiments/"+this->experiment_name+"/evolution.txt";
     evolution_file.open(path, std::ofstream::app);
 
     double maximum_fitness = 0;
     double average_fitness = 0;
-
-    // evolution_file<< generation <<" ";
 
     evolution_file<< generation << " " ;
 
@@ -411,8 +418,6 @@ void Evolution::saveResults(int generation){
             maximum_fitness = this->getPopulation()->at(i)->getFitness();
         }
         average_fitness += this->getPopulation()->at(i)->getFitness();  //  sums all fitnesses
-
-        // evolution_file << this->getPopulation()[i]->getId() << " "<< this->getPopulation()[i]->getFitness() << std::endl;
 
     }
 
@@ -431,28 +436,38 @@ void Evolution::saveResults(int generation){
 
 void Evolution::noveltySearch(int argc, char* argv[]) {
 
-
-    // logs about time
-    time_t sta = time(0);
-    char* dtsta = ctime(&sta);
-    std::cout<<std::endl<<"experiment start: " <<dtsta<<std::endl;
+    this->logsTime("start");
 
     // loads alphabet with letters and commands
     LSystem LS;
     LS.build_commands();
     LS.build_alphabet();
 
-    this->readParams(); // read parameters for the experiment
+    // read parameters for the experiment
+    this->readParams();
 
     std::cout<<"---------------- generation 1"<<std::endl;
+
+    // cleans old files and creates folders for the experiment
+    Aux aux = Aux();
+    aux.removeFolder(this->experiment_name);
+    aux.createFolder(this->experiment_name);
+
+
+    aux.createFolder(this->experiment_name+"/archive");
+
+    aux.createFolder(this->experiment_name+"/offspringpop1");
+
+    // saves parameters configuration for experiment
+    this->saveParameters();
 
     // initializes population
     this->initPopulation(LS);
 
     // develops genomes of the initial population
-    this->developIndividuals(argc, argv, LS, 1, this->population, "offspringpop");
+    this->developIndividuals(argc, argv, LS, 1, this->population, this->experiment_name+"/offspringpop");
     // measures phenotypes of the individuals
-    this->measureIndividuals(1, this->population, "offspringpop");
+    this->measureIndividuals(1, this->population,  this->experiment_name+"/offspringpop");
     // updates the average measures for the population
     this->compareIndividuals(this->population, this->population);
     // evaluates fitness of the individuals
@@ -460,7 +475,7 @@ void Evolution::noveltySearch(int argc, char* argv[]) {
     // saves metrics of evolution to file
     this->saveResults(1);
     // (possibly) adds genome to archive
-    this->addToArchive(this->population, this->params["prob_add_archive"]);
+    this->addToArchive(this->population, this->params["prob_add_archive"], this->experiment_name);
 
 
     // evolves population through generations
@@ -473,12 +488,15 @@ void Evolution::noveltySearch(int argc, char* argv[]) {
         // creates offspring
         this->crossover(LS, offspring);
 
-        // develops genomes of the offspring
-        this->developIndividuals(argc, argv, LS, i, offspring, "offspringpop");
-        // measures phenotypes of the offspring
-        this->measureIndividuals( i, offspring, "offspringpop");
+        aux.createFolder(this->experiment_name+"/offspringpop"+std::to_string(i));
+        aux.createFolder(this->experiment_name+"/selectedpop"+std::to_string(i));
 
-        // auxiliar pointers
+        // develops genomes of the offspring
+        this->developIndividuals(argc, argv, LS, i, offspring, this->experiment_name+"/offspringpop");
+        // measures phenotypes of the offspring
+        this->measureIndividuals( i, offspring, this->experiment_name+"/offspringpop");
+
+        // auxiliar pointers //
         std::vector<Genome *> * temp_pop_reference =  new std::vector<Genome *>();
         std::vector<Genome *> * temp_pop_compare = new std::vector<Genome *>();
 
@@ -493,13 +511,14 @@ void Evolution::noveltySearch(int argc, char* argv[]) {
         for ( auto &it : *this->archive){ temp_pop_compare->push_back(this->archive->at(it.first));  }
         // auxiliar pointers //
 
+
         std::cout<<" compares population with population+archive "<<std::endl;
         this->compareIndividuals(temp_pop_reference, temp_pop_compare);
 
         // evaluates fitness of the offspring
         this->evaluateIndividuals(temp_pop_reference);
         // (possibly) adds genome to archive
-        this->addToArchive(offspring, this->params["prob_add_archive"]);
+        this->addToArchive(offspring, this->params["prob_add_archive"], this->experiment_name);
 
         // adds new individuals to population
         for(int i=0; i < offspring->size(); i++){
@@ -510,7 +529,7 @@ void Evolution::noveltySearch(int argc, char* argv[]) {
         this->selection();
 
         // saves phenotypes of the selected population to a separated folder
-        this->exportPop(argc, argv, LS, i, "selectedpop");
+        this->exportPop(argc, argv, LS, i, this->experiment_name+"/selectedpop");
 
         // saves metrics of evolution to file
         this->saveResults(i);
@@ -522,10 +541,7 @@ void Evolution::noveltySearch(int argc, char* argv[]) {
 
     }
 
-    // logs about time
-    time_t end = time(0);
-    char* dtend = ctime(&end);
-    std::cout<<std::endl<<"experiment end: " <<dtend<<std::endl;
+    this->logsTime("end");
 
 }
 
@@ -722,4 +738,35 @@ std::vector<Genome *> * Evolution::getPopulation(){
 
 std::map<std::string, double> Evolution::getParams(){
     return params;
+}
+
+
+/*
+ * Exports the parameters of the experiment.
+ */
+void Evolution::saveParameters() {
+
+    std::ofstream param_file;
+    std::string path = "../../experiments/"+this->experiment_name+ "/configuration.txt";
+    param_file.open(path);
+
+    // writes each parameter to a different line in a the file
+    for (auto &it : this->getParams()) {
+
+        param_file << it.first << " " << it.second;
+        param_file << std::endl;
+    }
+    param_file.close();
+}
+
+
+/*
+ * Logs time.
+ */
+void Evolution::logsTime(std::string moment){
+
+    time_t sta = time(0);
+    char* dtsta = ctime(&sta);
+    std::cout<<std::endl<<"experiment " <<moment << ": " <<dtsta<<std::endl;
+
 }

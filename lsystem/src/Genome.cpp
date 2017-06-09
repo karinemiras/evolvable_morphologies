@@ -10,8 +10,9 @@
 
 #include <math.h>
 
-#include "Genome.h"
 #include "Aux.h"
+#include "Genome.h"
+
 
 unsigned int Genome::getTo() {
     return 4;
@@ -27,6 +28,14 @@ GeneticString Genome::getGeneticString(){
 
 std::string Genome::getId(){
     return this->id;
+}
+
+std::string Genome::getId_parent1(){
+    return this->id_parent1;
+}
+
+std::string Genome::getId_parent2(){
+    return this->id_parent2;
 }
 
 DecodedGeneticString Genome::getDgs(){
@@ -139,26 +148,34 @@ void Genome::generate_final_string(int  replacement_iterations, int export_genom
         // replacement is made given the grammar
         this->gs.replaces(this->grammar);
     }
+
     if(export_genomes == 1){
-        this->exportGenome(generation, path);
+        this->exportGenome(path+std::to_string(generation));
     }
 }
 
 /**
  * Exports the main-genetic string of a genome to a file.
  */
-void Genome::exportGenome(int generation, std::string dirpath) {
+void Genome::exportGenome(std::string dirpath) {
 
     std::ofstream genome_file;
-    std::string path = "../../tests/"+dirpath+std::to_string(generation)+"/genome" + this->id +".txt";
+    std::string path = "../../experiments/"+dirpath+"/genome" + this->id +".txt";
     genome_file.open(path);
 
-    GeneticString::Node *current;
-    current = this->gs.getStart(); // recovers pointer to the beginning of the genetic-string
-    while (current != NULL) {
+    std::map< std::string, GeneticString >  grammar = std::map< std::string, GeneticString >();
 
-        genome_file << current->item << " ";
-        current = current->next;
+    // writes each production rule of the grammar to a different line in a the file
+    for ( auto &it : this->getGrammar()) {
+
+        GeneticString::Node *current;
+        current = this->getGrammar()[it.first].getStart();
+        while (current != NULL) {
+
+            genome_file << current->item << " ";
+            current = current->next;
+        }
+        genome_file << std::endl;
     }
     genome_file.close();
 }
@@ -236,10 +253,7 @@ void Genome::constructor(int argc, char* argv[], std::map<std::string, double> p
         QPainter painter(&image);
         this->scene->render(&painter);
 
-        Aux aux = Aux();
-        aux.createFolder(path+std::to_string(generation));
-
-        QString qstr = QString::fromStdString("../../tests/"+path+std::to_string(generation)+ "/body_" + this->id + "_p1_"+this->id_parent1 + "_p2_" + this->id_parent2+ ".png");
+        QString qstr = QString::fromStdString("../../experiments/"+path+std::to_string(generation)+ "/body_" + this->id + "_p1_"+this->id_parent1 + "_p2_" + this->id_parent2+ ".png");
         image.save(qstr);
     }
 
