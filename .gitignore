@@ -406,4 +406,4 @@ nbdist/
 .nb-gradle/
 cmake-build-debug/
 fixed_morph/
-tests/
+experiments/
