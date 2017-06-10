@@ -499,13 +499,32 @@ void Genome::calculateFitness(int k_neighboards){
 
     // order distances
     std::vector<double> ordered_distances = std::vector<double> ();
-    for (const auto& it :this->genomes_distance) ordered_distances.push_back(it.second);
+
+    for (const auto& it :this->genomes_distance) {
+
+        std::cout<<"d"<<it.second<<std::endl;
+        ordered_distances.push_back(it.second);
+    }
     std::sort (ordered_distances.begin(), ordered_distances.end());
+
 
     // average of the closest k_neighboards
     double avg_distances = 0;
-    for(int i=0; i<k_neighboards; i++) avg_distances += ordered_distances[i];
-    avg_distances /= k_neighboards;
+    for(int i=0; i<ordered_distances.size(); i++) {
+
+        if(i<k_neighboards) {
+            std::cout << "dist" << std::to_string(i) << " " << ordered_distances[i] << std::endl;
+            avg_distances += ordered_distances[i];
+        }
+    }
+
+    if( ordered_distances.size() >= k_neighboards ) {
+
+        avg_distances /= k_neighboards;
+    }else{
+
+        avg_distances /= ordered_distances.size();
+    }
 
     this->fitness = avg_distances ;
 

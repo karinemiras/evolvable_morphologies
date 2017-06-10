@@ -14,3 +14,5 @@ max_comps 20
 prop_parent 0.5
 prob_add_archive 0.1
 k_neighboards 15
+logs_to_screen 1
+logs_to_file 1

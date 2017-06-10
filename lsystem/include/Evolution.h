@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 
+#include "Aux.h"
 #include "Genome.h"
 #include "Tests.h"
 
@@ -47,6 +48,7 @@ public:
     void addToArchive( std::vector<Genome *>  * individuals, double prob_add_archive, std::string path);
     void saveParameters();
     void logsTime(std::string moment);
+    void setupEvolution();
 
 private:
 
@@ -56,6 +58,7 @@ private:
     int next_id = 0; // id that will be given for the next genome to be created
     Tests tests = Tests();
     std::string experiment_name = "";
+    Aux aux = Aux(this->experiment_name, this->getParams());;
 
 };
 
