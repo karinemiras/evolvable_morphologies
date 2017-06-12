@@ -22,8 +22,9 @@ class Evolution{
 
 public:
 
-    Evolution(std::string experiment_name_){
+    Evolution(std::string experiment_name_, int new_experiment_){
         this->experiment_name = experiment_name_;
+        this->new_experiment = new_experiment_;
     }
 
 
@@ -49,6 +50,10 @@ public:
     void saveParameters();
     void logsTime(std::string moment);
     void setupEvolution();
+    void writesGeneration(int generation);
+    int readsGeneration();
+    void loadsParams();
+    void loadPopulation();
 
 private:
 
@@ -56,10 +61,10 @@ private:
     std::map<std::string, double> params =  std::map<std::string, double>(); // contains the list of parameters loaded from parameter file
     std::map< std::string, Genome * >  * archive = new std::map< std::string , Genome * > ();
     int next_id = 0; // id that will be given for the next genome to be created
-    Tests tests = Tests();
-    std::string experiment_name = "";
-    Aux aux = Aux(this->experiment_name, this->getParams());;
-
+    std::string experiment_name = ""; // name for the experiment
+    int new_experiment; // if state of previous a experiment is being restored (1) or not (0)
+    Aux aux = Aux(this->experiment_name, this->getParams()); // contains general auxiliar methos for the experiments
+    Tests tests = Tests(); // contains methods with tests for the system
 };
 
 
