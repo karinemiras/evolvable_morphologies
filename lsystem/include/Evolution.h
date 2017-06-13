@@ -54,6 +54,7 @@ public:
     int readsGeneration();
     void loadsParams();
     void loadPopulation();
+    void calculateNicheCoverage();
 
 private:
 

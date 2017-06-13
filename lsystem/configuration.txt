@@ -8,7 +8,7 @@ replacement_iterations 3
 size_component 40
 spacing 1
 offspring_size 0.50
-num_generations 3
+num_generations 1
 mutation_alter_prob 0.05
 max_comps 20
 prop_parent 0.1

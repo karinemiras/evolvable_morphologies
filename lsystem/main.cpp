@@ -16,7 +16,7 @@ int main(int argc, char* argv[]) {
 
 
     // experiment: looking for global optimum of innovation
-    Evolution * e = new Evolution("sicco", 1);
+    Evolution * e = new Evolution("test", 1);
     e->noveltySearch(argc, argv);
 
 

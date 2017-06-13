@@ -220,13 +220,20 @@ void Evolution::measureIndividuals(int generation, std::vector<Genome *>  * indi
 
 void Evolution::evaluateIndividuals(std::vector<Genome *> * individuals){
 
+    std::ofstream fitness_file;
+    std::string path = "../../experiments/"+this->experiment_name+"/fitness.txt";
+    fitness_file.open(path, std::ofstream::app);
+
     // for each genome of the population
     for(int i=0; i < individuals->size(); i++) {
 
         // calculates its fitness
         individuals->at(i)->calculateFitness((int) this->params["k_neighbors"]);
         this->aux.logs("fitness genome " + individuals->at(i)->getId()+ " : "+ std::to_string(individuals->at(i)->getFitness()));
+        fitness_file<<individuals->at(i)->getId()+ " "+ std::to_string(individuals->at(i)->getFitness())<<std::endl;
     }
+
+    fitness_file.close();
 }
 
 
@@ -497,7 +504,7 @@ void Evolution::setupEvolution(){
 *  Evolution in the search for novelty.
 **/
 
-void Evolution::    noveltySearch(int argc, char* argv[]) {
+void Evolution::noveltySearch(int argc, char* argv[]) {
 
 
     this->logsTime("start");
@@ -884,3 +891,10 @@ int Evolution::readsGeneration() {
     myfile.close();
 
 }
+
+
+void Evolution::calculateNicheCoverage(){
+
+
+}
+
