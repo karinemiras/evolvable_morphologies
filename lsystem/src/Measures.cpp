@@ -41,33 +41,30 @@ void Measures::initalizeMeasures(){
     this->gen->updateMeasure("total_fixed_joints_vertical", 0); //    vertical fixed-joint-components
     this->gen->updateMeasure("total_passive_joints_vertical", 0); //  vertical passive-joint-components
     this->gen->updateMeasure("total_active_joints_vertical", 0); //    vertical active-joint-components
-    this->gen->updateMeasure("connectivity1", 0); //    components with one side connected to another component
+    this->gen->updateMeasure("coverage", 0); // proportion of the expected area (given the horizontal e vertical lengths) that is covered with components
+    this->gen->updateMeasure("horizontal_symmetry",  0); // proportion of components in the left side which match with the same type of component in the same relative position on the right side
+    this->gen->updateMeasure("vertical_symmetry", 0); // proportion of components in the top side which match with the same type of component in the same relative position on the bottom side
+    this->gen->updateMeasure("viable_horizontal_joints", 0); //  total of effective joints which have no neighboards preventing movement
     this->gen->updateMeasure("connectivity2",0); //    components with two sides connected to another component
     this->gen->updateMeasure("connectivity3", 0); //   components with three sides connected to another component
     this->gen->updateMeasure("connectivity4", 0); //   components with four sides connected to another component
     this->gen->updateMeasure("effective_joints", 0); //   joints connected by both sides to a brick or core component
-
-    this->gen->updateMeasure("viable_horizontal_joints", 0); //  total of effective joints which have no neighboards preventing movement
-
+    this->gen->updateMeasure("connectivity1", 0); //    components with one side connected to another component
     this->gen->updateMeasure("symmetry", 0); //   maximum of horizontal and vertical symmetry
     this->gen->updateMeasure("total_components", 0); //  proportion of components of all types  in the body given the maximum possible size
     this->gen->updateMeasure("length_ratio", 0); // length of the shortest side dived by the longest
-    this->gen->updateMeasure("coverage", 0); // proportion of the expected area (given the horizontal e vertical lengths) that is covered with components
-    this->gen->updateMeasure("sparseness", 0); // average distance of each component from each other in the axises x/y
-    this->gen->updateMeasure("horizontal_symmetry",  0); // proportion of components in the left side which match with the same type of component in the same relative position on the right side
-    this->gen->updateMeasure("vertical_symmetry", 0); // proportion of components in the top side which match with the same type of component in the same relative position on the bottom side
-    this->gen->updateMeasure("joints_per_limb", 0); //  total amount of effective joints per limb
-    this->gen->updateMeasure("branching",0); //
+    this->gen->updateMeasure("sparseness", 0); // average distance of each component from each other in the axises x/y, divided by the total of components
+    this->gen->updateMeasure("joints_per_limb", 0); //  proportion of effective joints per limb
+    this->gen->updateMeasure("branching",0); // sum of 1*connectivty3 and 2*connectivity4,  divided by the total of components
 }
 
 
 /**
  * Calculates several measures for a morphology.
  * @param params - list of params read from configuration file.
- * @param generation - generation of the evolution
  * @param dirpath - directory where file with measures will be saved.
  */
-void Measures::measurePhenotype(std::map<std::string, double> params, int generation, std::string dirpath){
+void Measures::measurePhenotype(std::map<std::string, double> params, std::string dirpath){
 
 
     // size of the component plus the spacing between components
@@ -134,6 +131,14 @@ void Measures::measurePhenotype(std::map<std::string, double> params, int genera
     this->gen->updateMeasure("connectivity1",
                              roundf (
                                      ( (float) this->gen->getMeasures()["connectivity1"]
+                                       / (float) this->gen->getMeasures()["total_components"])
+                                     * 100) / 100);
+
+
+    // accounts for conenctivity in levels 3 (weight 1) and 4 (weight 2)
+    this->gen->updateMeasure("branching",
+                             roundf (
+                                     (   (float) ( this->gen->getMeasures()["connectivity3"] + 2*this->gen->getMeasures()["connectivity4"])
                                        / (float) this->gen->getMeasures()["total_components"])
                                      * 100) / 100);
 
@@ -379,11 +384,11 @@ void Measures::measurePhenotype(std::map<std::string, double> params, int genera
     /* BEGINNING: exports measures to files */
 
     std::ofstream measures_file_general;
-    std::string path = "../../experiments/"+dirpath+std::to_string(generation)+"/measures.txt";
+    std::string path = "../../experiments/"+dirpath+"/measures.txt";
     measures_file_general.open(path, std::ofstream::app);
 
     std::ofstream measures_file;
-    path = "../../experiments/"+dirpath+std::to_string(generation)+"/measures"+this->gen->getId()+".txt";
+    path = "../../experiments/"+dirpath+"/measures"+this->gen->getId()+".txt";
     measures_file.open(path);
     measures_file_general << this->gen->getId();
 

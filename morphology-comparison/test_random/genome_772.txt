@@ -1,1 +1,0 @@
-CNNN addf AJ2 addr J1 addl AJ2 addf addf AJ2 addf J2 addf BNNN < addr addl PJ2 addl addf AJ2 addf J2 addf BNNN < addf addf addf AJ2 addf J2 addf BNNN < addf addl J2 addr PJ2 addf J2 addf addf BNNN < addf J1 addf PJ1 < addr addl addf AJ1 addl BNNN addl addf addf AJ2 addf J2 addf BNNN < addf addl J2 addr PJ2 addf J2 addf addf BNNN < addf J1 addf PJ1 < 

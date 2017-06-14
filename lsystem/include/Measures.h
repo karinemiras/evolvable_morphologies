@@ -22,7 +22,7 @@ class Measures{
 public:
 
     void initalizeMeasures();
-    void measurePhenotype(std::map<std::string, double> params, int generation, std::string dirpath);
+    void measurePhenotype(std::map<std::string, double> params, std::string dirpath);
     void measureComponent(std::string reference, std::string direction, DecodedGeneticString::Vertex * c1, DecodedGeneticString::Vertex * c2, std::map<std::string, double> params);
     std::map< std::string, double> getMeasures();
     void setGenome(Genome * gen);

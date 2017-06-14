@@ -188,7 +188,7 @@ void Evolution::exportPop(int argc, char* argv[], LSystem LS, int generation, st
 
     for(int i=0; i < this->population->size(); i++) { // for each genome in the population
 
-        this->population->at(i)->constructor(argc, argv, this->params,  generation, path); // generates phenotype
+        this->population->at(i)->constructor(argc, argv, this->params, path+std::to_string(generation)); // generates phenotype
     }
 }
 
@@ -198,8 +198,8 @@ void Evolution::exportPop(int argc, char* argv[], LSystem LS, int generation, st
  * Measures all the individuals of the population for several metrics.
  *  @param argc - command line parameter
  *  @param argv[] - command line parameter
- *  generation - number of the generation
- *  individuals - array with genomes
+ *  @param individuals - array with genomes
+ *  @param dirpath - name of the output directory
  **/
 void Evolution::measureIndividuals(int generation, std::vector<Genome *>  * individuals, std::string dirpath){
 
@@ -207,7 +207,7 @@ void Evolution::measureIndividuals(int generation, std::vector<Genome *>  * indi
 
         Measures * m = new Measures();
         m->setGenome(individuals->at(i));
-        m->measurePhenotype(this->params, generation, dirpath); // measures phenotype
+        m->measurePhenotype(this->params, dirpath+std::to_string(generation)); // measures phenotype
         delete m;
     }
 }
@@ -242,7 +242,7 @@ void Evolution::evaluateIndividuals(std::vector<Genome *> * individuals){
  * @param individuals_reference - individuals of current-population (parents+offspring)
  * @param individuals_compare - individuals representing current-population+archive
  */
-
+// ## FIX: change it for a k-d-tree !!!!!
 void Evolution::compareIndividuals(std::vector<Genome *>  * individuals_reference, std::vector<Genome *>  * individuals_compare){
 
 
@@ -367,17 +367,25 @@ void Evolution::loadPopulation(int argc, char* argv[],int size_pop, std::string 
  * @param LS - Lsystem structure containing the alphabet.
  */
 
-void Evolution::testGeneticString(int argc, char* argv[],std::string test_genome, LSystem LS) {
+void Evolution::testGeneticString(int argc, char* argv[],std::string test_genome) {
+
+    this->readParams();
+
+    LSystem LS;
+    LS.build_commands();
+    LS.build_alphabet();
 
     std::string line;
-    std::ifstream myfile("../../fixed_morph/" + test_genome+ ".txt");
+    std::ifstream myfile("../../experiments/fixed/" + test_genome+ ".txt");
     if (myfile.is_open()) {
         getline(myfile, line);
         std::vector<std::string> tokens;
-        boost::split(tokens, line, boost::is_any_of(" ")); // items of the genetic-string separated by space
+        // items of the genetic-string separated by space
+        boost::split(tokens, line, boost::is_any_of(" "));
         std::vector<std::string> gs;
 
-        for(int j=0; j<tokens.size(); j++){ // adds each item in the genetic-string in the array of items
+        // adds each item in the genetic-string in the array of items
+        for(int j=0; j<tokens.size(); j++){
             if(tokens[j] != "") { gs.push_back(tokens[j]); }
         }
 
@@ -392,12 +400,12 @@ void Evolution::testGeneticString(int argc, char* argv[],std::string test_genome
 
         // generates robot-graphics
         //std::cout << " >> constructing ... " << std::endl;
-        gen->constructor(argc, argv, this->params, 1, "testpop");
+        gen->constructor(argc, argv, this->params, "fixed");
 
         // measures all metrics od the genome
         Measures m;
         m.setGenome(gen);
-        m.measurePhenotype( this->params, 1, "testpop");
+        m.measurePhenotype( this->params, "fixed");
 
         myfile.close();
     }else{
@@ -547,7 +555,7 @@ void Evolution::noveltySearch(int argc, char* argv[]) {
         this->aux.logs("---------------- generation "+std::to_string(gi)+" ----------------");
 
         // loads population and archive
-        this->loadPopulation(); // #finish it !!!!!!!
+        this->loadPopulation(); // #FIX: finish it, loading pop/archive/state etc !!!!!!!
 
     }
 
@@ -895,6 +903,24 @@ int Evolution::readsGeneration() {
 
 void Evolution::calculateNicheCoverage(){
 
+    std::string line;
+    std::ifstream myfile ("../../lsystem/configuration.txt");
+
+
+    if (myfile.is_open()) {
+        while ( getline (myfile,line) ) {
+            std::vector<std::string> tokens;
+
+            // parameters label and value separated by space
+            boost::split( tokens, line, boost::is_any_of(" ") );
+
+            // first item is the label, second is the value
+            this->params[tokens[0]] = std::stod(tokens[1]);
+        }
+        myfile.close();
+    } else {
+        this->aux.logs("Unable to open parameters file.");
+    }
 
 }
 

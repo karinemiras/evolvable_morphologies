@@ -15,7 +15,7 @@
 
 
 unsigned int Genome::getTo() {
-    return 4;
+    //return 4; //test of testing
 }
 
 void Genome::setGeneticString(GeneticString _gs){
@@ -222,8 +222,9 @@ void Genome::decodeGeneticString(LSystem LS,std::map<std::string, double> params
  * @param argc - command line parameter
  * @param argv[] - command line parameter
  * @param params - list of params read from configuration file.
+ * @param path - name of the output directory
  */
-void Genome::constructor(int argc, char* argv[], std::map<std::string, double> params, int generation, std::string path ) {
+void Genome::constructor(int argc, char* argv[], std::map<std::string, double> params, std::string path ) {
 
 
     QApplication app(argc, argv);
@@ -253,7 +254,7 @@ void Genome::constructor(int argc, char* argv[], std::map<std::string, double> p
         QPainter painter(&image);
         this->scene->render(&painter);
 
-        QString qstr = QString::fromStdString("../../experiments/"+path+std::to_string(generation)+ "/body_" + this->id + "_p1_"+this->id_parent1 + "_p2_" + this->id_parent2+ ".png");
+        QString qstr = QString::fromStdString("../../experiments/"+path+ "/body_" + this->id + "_p1_"+this->id_parent1 + "_p2_" + this->id_parent2+ ".png");
         image.save(qstr);
     }
 
@@ -469,7 +470,7 @@ void Genome::createEmbryo(){
 *  Develops the initial genetic-string according to the grammar and creates phenotype.
 * @param argc - command line parameter
 * @param argv[] - command line parameter
- * * @param params - list of params read from configuration file.
+* @param params - list of params read from configuration file.
 * @param LS - Lsystem structure containing the alphabet.
 **/
 
@@ -485,7 +486,7 @@ void Genome::developGenome(int argc, char* argv[], std::map<std::string, double>
     this->decodeGeneticString(LS, params);
 
     // generates robot-graphics
-    this->constructor(argc, argv, params,  generation, path);
+    this->constructor(argc, argv, params, path+std::to_string(generation));
 }
 
 

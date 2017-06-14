@@ -42,7 +42,7 @@ public:
     std::vector<std::string> getAxiom();
     void generate_final_string(int  replacement_iterations, int export_genomes, int generation, std::string path);
     void decodeGeneticString(LSystem LS,std::map<std::string, double> params);
-    void constructor(int argc, char* argv[], std::map<std::string, double> params, int generation, std::string path);
+    void constructor(int argc, char* argv[], std::map<std::string, double> params, std::string path);
     void draw_component(std::string reference, std::string direction, QGraphicsScene * scene, std::vector<QGraphicsRectItem *>  items,DecodedGeneticString::Vertex * c1, DecodedGeneticString::Vertex * c2, std::map<std::string, double> params);
     std::string getId();
     std::string getId_parent1();

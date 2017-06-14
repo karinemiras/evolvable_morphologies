@@ -32,7 +32,7 @@ public:
     void readParams();
     void developGenome(int argc, char* argv[], Genome * gen, LSystem LS);
     void loadPopulation(int argc, char* argv[],int size_pop, std::string test_folder, LSystem LS);
-    void testGeneticString(int argc, char* argv[],std::string test_genome, LSystem LS);
+    void testGeneticString(int argc, char* argv[],std::string test_genome);
     void measureIndividuals(int generation, std::vector<Genome *>  * individuals, std::string dirpath);
     void evaluateIndividuals(std::vector<Genome *> * individuals);
     void compareIndividuals(std::vector<Genome *>  * individuals_reference, std::vector<Genome *>  * individuals_compare);
