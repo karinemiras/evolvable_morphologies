@@ -44,7 +44,7 @@ void Evolution::readParams(){
     *    num_generations - number of generations of the evolution
     *    mutation_alter_prob - probability of adding/removing items (letters/commands) to the genetic-string in the mutation
     *    max_comps - maximum number of components allowed per phenotype
-    *    prop_parent - proportion from each parent in the crossover
+    *    prop_parent - proportion from each parent in the crossover (1 leads to no crossover)
     *    prob_add_archive - probability of adding any genome to the archive
     *    k_neighbors - number of neighbords to compare for fitness
     *    logs_to_screen - if exports the logs to the screen (1) or not (0)
@@ -234,16 +234,37 @@ void Evolution::evaluateIndividuals(std::vector<Genome *> * individuals, int gen
 
         history_file << std::to_string(generation)<<" "     // generation
                      << individuals->at(i)->getId()<<" "   // idgenome
-                     << std::to_string(individuals->at(i)->getFitness())<<" "  // gitness genome
+                     << std::to_string(individuals->at(i)->getFitness())<<" "  // fitness genome
                      << individuals->at(i)->getId_parent1()<<" "  // id of parent1
                      << individuals->at(i)->getFit_parent1()<<" "  // fitness of parent1
                      << individuals->at(i)->getId_parent2()<<" " // id of parent2
-                     << individuals->at(i)->getFit_parent2()<<" " // fitness of parent2
+                     << individuals->at(i)->getFit_parent2() // fitness of parent2
                      << std::endl;
     }
 
     history_file.close();
 }
+
+/**
+ * Creates files of results containing headers.
+ */
+
+void Evolution::createHeader(){
+
+    std::ofstream file;
+
+    std::string path = "../../experiments/"+this->experiment_name+"/history.txt";
+    file.open(path, std::ofstream::app);
+    file << "generation" << " idgenome" << " fitgenome" << " idparent1" << " fitparent1" << " idparent2" << " fitparent2" << std::endl;
+    file.close();
+
+    path = "../../experiments/"+this->experiment_name+"/evolution.txt";
+    file.open(path, std::ofstream::app);
+    file << "generation" << " maxfitness" << " meanfitness" << " nichecoverage" << std::endl;
+    file.close();
+
+}
+
 
 
 /**
@@ -540,6 +561,7 @@ void Evolution::noveltySearch(int argc, char* argv[]) {
         this->setupEvolution();
 
         this->logsTime("start");
+        this->createHeader();
 
         gi = 1; // start evolution from first generation
 
@@ -557,6 +579,7 @@ void Evolution::noveltySearch(int argc, char* argv[]) {
 
 
         this->logsTime("start");
+        this->createHeader();
 
         // loads state of parameters from previous experiment
         this->loadsParams();
@@ -709,53 +732,69 @@ void Evolution::crossover(LSystem LS, std::vector<Genome *>  * offspring){
 
         for ( auto &it : LS.getAlphabet()) { // for each letter in the grammar
 
-            // std::uniform_int_distribution<int> dist_type_cross(1, 3); //type 3 is too disruptive
-
-            int  type_cross = 0;
-
-            if(prob(generator) <= params["prop_parent"]){
-                type_cross = 1;
-            }else{
-                type_cross = 2;
-            }
+             std::uniform_int_distribution<int> dist_type_cross(1, 2); // distribution for the type of crossover
+            int  type_cross = dist_type_cross(generator);
 
             //std::cout<<" ----------- typecross "<<it.first<<" "<<type_cross<<" "<<std::endl;
 
-            if (type_cross == 1) { // gets the genetic-string from a single parent (parent1)
+            if (type_cross == 1) { // gets the genetic-string from a single parent for that letter
 
-                grammar.emplace(it.first, this->population->at(parent1)->getGrammar()[it.first]);
+                if(prob(generator) <= params["prop_parent"]) {
+
+                    grammar.emplace(it.first, this->population->at(parent1)->getGrammar()[it.first]); // gets is from parent1
+                } else{
+
+                    grammar.emplace(it.first, this->population->at(parent2)->getGrammar()[it.first]); // gets is from parent2
+                }
             }
 
-            if (type_cross == 2) { // gets the genetic-string from a single parent (parent2)
+            if (type_cross == 2) { // gets a random part of the genetic-string from each parent
 
-                grammar.emplace(it.first, this->population->at(parent2)->getGrammar()[it.first]);
+                std::uniform_int_distribution<int> dist_pos_parent1_ini(1,
+                                                                        this->population->at(parent1)->getGrammar()[it.first].count()); // distribution for parent1 initial position
+                std::uniform_int_distribution<int> dist_pos_parent2_ini(1,
+                                                                        this->population->at(parent2)->getGrammar()[it.first].count()); // distribution for parent2 initial position
+
+                // raffles random positions for the start point (of the genetic string) for both parents
+                int pos_parent1_ini =  dist_pos_parent1_ini(generator);
+                int pos_parent2_ini = dist_pos_parent2_ini(generator);
+
+                // however, if it is the production rule of the core-component
+                if(it.first == "C") {
+
+                    // forces parent1 to start from first position, preserving the core-component at the beginning
+                    pos_parent1_ini = 1;
+
+                    // makes sure that parent2 will start from a position which is not the first
+                    while(pos_parent2_ini == 1){
+                        pos_parent2_ini = dist_pos_parent2_ini(generator);
+                    }
+                }
+
+                std::uniform_int_distribution<int> dist_pos_parent1_end(pos_parent1_ini,
+                                                                        this->population->at(parent1)->getGrammar()[it.first].count()); // distribution for parent1 final position
+                std::uniform_int_distribution<int> dist_pos_parent2_end(pos_parent2_ini,
+                                                                        this->population->at(parent2)->getGrammar()[it.first].count()); // distribution for parent2 final position
+
+                int pos_parent1_end = dist_pos_parent1_end(generator);
+                int pos_parent2_end = dist_pos_parent2_end(generator);
+
+                GeneticString gs;
+
+               // std::cout<<" ------- pos "<<pos_parent1_ini<<" "<<pos_parent1_end<<" "<<pos_parent2_ini<<" "<<pos_parent2_end <<std::endl;
+
+                gs.create_joined_list(pos_parent1_ini, pos_parent2_ini,
+                                      pos_parent1_end, pos_parent2_end,
+                                      this->population->at(parent1)->getGrammar()[it.first],
+                                      this->population->at(parent2)->getGrammar()[it.first]);
+
+
+                grammar.emplace(it.first, gs);
             }
-
-//            if (type_cross == 3) { // gets a random part of the genetic-string from each parent
-//
-//                std::uniform_int_distribution<int> dist_pos_parent1_ini(1, this->population[parent1]->getGrammar()[it.first].count()); // distribution for parent1 initial position
-//                std::uniform_int_distribution<int> dist_pos_parent2_ini(1, this->population[parent2]->getGrammar()[it.first].count()); // distribution for parent2 initial position
-//
-//                int pos_parent1_ini = dist_pos_parent1_ini(generator);
-//                int pos_parent2_ini = dist_pos_parent2_ini(generator);
-//
-//                std::uniform_int_distribution<int> dist_pos_parent1_end(pos_parent1_ini, this->population[parent1]->getGrammar()[it.first].count()); // distribution for parent1 final position
-//                std::uniform_int_distribution<int> dist_pos_parent2_end(pos_parent2_ini, this->population[parent2]->getGrammar()[it.first].count()); // distribution for parent2 final position
-//
-//                int pos_parent1_end = dist_pos_parent1_end(generator);
-//                int pos_parent2_end = dist_pos_parent2_end(generator);
-//
-//                GeneticString gs;
-//
-//               // std::cout<<" ------- pos "<<pos_parent1_ini<<" "<<pos_parent1_end<<" "<<pos_parent2_ini<<" "<<pos_parent2_end <<std::endl;
-//
-//                gs.create_joined_list(pos_parent1_ini, pos_parent2_ini, pos_parent1_end, pos_parent2_end, this->population[parent1]->getGrammar()[it.first], this->population[parent2]->getGrammar()[it.first]);
-//
-//
-//                grammar.emplace(it.first, gs);
-//            }
-
-            //grammar[it.first].display_list();
+            if(it.first == "C") {
+                std::cout << it.first << std::endl;
+                grammar[it.first].display_list();
+            }
         }
 
         gen->setGrammar(grammar); // sets grammar for the new genome
@@ -932,6 +971,8 @@ int Evolution::calculateNicheCoverage() {
     // total number of points in the grid given the dimentions and spacing
     //int total_points = std::pow(this->population->at(0)->getMeasures().size(),this->params["grid_bins"]);
 
+    this->morphological_grid =  std::map<std::string, std::vector<double>>();
+
     for(int i = 0; i < this->population->size(); i++ ) {
 
         std::string key_point = "";
@@ -965,9 +1006,6 @@ int Evolution::calculateNicheCoverage() {
     }
 
 
-    return this->morphological_grid.size();
-
-
 //    for(const auto& it : this->morphological_grid) {
 //
 //        std::cout<<" point "<<it.first<<std::endl;
@@ -977,43 +1015,8 @@ int Evolution::calculateNicheCoverage() {
 //        }
 //
 //    }
-}
+    return this->morphological_grid.size();
 
-//// build bins for the morphology space
-//void Evolution::buildMorphologyBins(){
-//
-//
-//    int bins = 10;
-//
-//    // for the 8 measures
-//    for(int i1 = 1; i1 <= bins; i1++) {
-//        for(int i2 = 1; i2 <= bins; i2++) {
-//            for(int i3 = 1; i3 <= bins; i3++) {
-//                for(int i4 = 1; i4 <= bins; i4++) {
-//                    for(int i5 = 1; i5 <= bins; i5++) {
-//                        for(int i6 = 1; i6 <= bins; i6++) {
-//                            for(int i7 = 1; i7 <= bins; i7++) {
-//                                for(int i8 = 1; i8 <= bins; i8++) {
-//
-//                                    std::vector<int> gens; gens.push_back(0);
-//                                    this->morphological_grid[std::to_string(i1)+"-"+std::to_string(i2)+"-"+
-//                                                             std::to_string(i3)+"-"+std::to_string(i4)+"-"+
-//                                                             std::to_string(i5)+"-"+std::to_string(i6)+"-"+
-//                                                             std::to_string(i7)+"-"+std::to_string(i8)] = gens;
-//
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
-//
-//    for ( auto &it : this->morphological_grid){
-//       std::cout<<it.first<<"   "<<it.second.size()<<std::endl;
-//    }
-//
-//
-//}
+
+}
 

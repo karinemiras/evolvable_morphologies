@@ -55,6 +55,7 @@ public:
     void loadsParams();
     void loadPopulation();
     int calculateNicheCoverage();
+    void createHeader();
 
 
 private:
