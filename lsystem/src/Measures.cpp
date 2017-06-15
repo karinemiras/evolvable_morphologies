@@ -377,18 +377,18 @@ void Measures::measurePhenotype(std::map<std::string, double> params, std::strin
 
 
     // #TEST: checks if there is any measure ouy of the expected range
-    Tests tests = Tests();
+    Tests tests = Tests(this->experiment_name, this->params);
     tests.testMeasures(this->gen->getId(), this->gen->getMeasures());
 
 
     /* BEGINNING: exports measures to files */
 
     std::ofstream measures_file_general;
-    std::string path = "../../experiments/"+dirpath+"/measures.txt";
+    std::string path = "../../experiments/"+this->experiment_name+dirpath+"/measures.txt";
     measures_file_general.open(path, std::ofstream::app);
 
     std::ofstream measures_file;
-    path = "../../experiments/"+dirpath+"/measures"+this->gen->getId()+".txt";
+    path = "../../experiments/"+this->experiment_name+dirpath+"/measures"+this->gen->getId()+".txt";
     measures_file.open(path);
     measures_file_general << this->gen->getId();
 
@@ -398,7 +398,6 @@ void Measures::measurePhenotype(std::map<std::string, double> params, std::strin
         measures_file_general <<"\t"<< mea.second;
 
     }
-    std::cout<<std::endl;
 
     measures_file_general << std::endl;
 

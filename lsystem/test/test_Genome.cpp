@@ -11,6 +11,6 @@
 BOOST_AUTO_TEST_CASE(testgenomeget)
 {
 
-
+// test aboiut test
   BOOST_CHECK(gen.getTo() == 3);
 }

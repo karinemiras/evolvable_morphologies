@@ -28,10 +28,12 @@ class Genome{
 
 public:
 
-    Genome(std::string _id, std::string _id_parent1, std::string _id_parent2){
+    Genome(std::string _id, std::string _id_parent1, std::string _id_parent2, double _fit_parent1, double _fit_parent2){
         id = _id;
         id_parent1 = _id_parent1;
         id_parent2 = _id_parent2;
+        fit_parent1 = _fit_parent1;
+        fit_parent2 = _fit_parent2;
     }
 
     unsigned int getTo();
@@ -47,6 +49,8 @@ public:
     std::string getId();
     std::string getId_parent1();
     std::string getId_parent2();
+    double getFit_parent1();
+    double getFit_parent2();
     void exportGenome(std::string path);
     void createEmbryo();
     void developGenome(int argc, char* argv[], std::map<std::string, double> params, LSystem LS, int generation, std::string path);
@@ -66,8 +70,10 @@ public:
 private:
 
     std::string id; // id identifying the genome
-    std::string id_parent1;
-    std::string id_parent2;
+    std::string id_parent1; // id of parent1 of genome
+    std::string id_parent2; // id of parent2 of genome
+    double fit_parent1;  // fit of parent1 of genome
+    double fit_parent2;  // fit of parent2 of genome
     double fitness = 0; // fitness of the genome
     GeneticString gs; // main genetic-string of the genome
     DecodedGeneticString dgs; // graph that logically represents the connections among the components forming the body

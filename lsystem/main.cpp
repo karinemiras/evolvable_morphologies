@@ -16,12 +16,12 @@ int main(int argc, char* argv[]) {
 
 
     // experiment: looking for global optimum of innovation
-    Evolution * e = new Evolution("2000", 1);
-    //e->noveltySearch(argc, argv);
+    Evolution * e = new Evolution("test", 1);
+    e->noveltySearch(argc, argv);
 
 
 
-     e->testGeneticString(argc, argv,"snake3");
+    // e->testGeneticString(argc, argv,"spider3");
 
     return 0;
 

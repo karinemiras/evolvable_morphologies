@@ -5,6 +5,7 @@
 #include <iostream>
 #include <map>
 
+#include "Aux.h"
 #include "Tests.h"
 
 /**
@@ -22,8 +23,12 @@ void Tests::testMeasures(std::string id_genome, std::map< std::string, double> m
             std::cout<< "#TEST ERROR: measure "<<mea.first<<" out of range for genome "<< id_genome <<", with value "<<mea.second<<std::endl;
             exit (EXIT_FAILURE);
 
-        }else{
-            std::cout<< " measure "<<mea.first<<" for genome "<< id_genome <<" has value "<<mea.second<<std::endl;
+        }else{ //+ " for genome " + id_genome + " has value " + std::to_string(mea.second)+std::endl
+
+            this->aux = Aux(this->experiment_name, this->params);
+            this->aux.logs("measure " + mea.first + " for genome " + id_genome+ " has value "+ std::to_string(mea.second));
+
+
         }
     }
 }
@@ -51,6 +56,13 @@ void Tests::testPopsize(std::vector<Genome *> * population, int pop_size){
         std::cout << " population size is unappropriate with value " <<population->size()<<std::endl;
         exit(EXIT_FAILURE);
     }
+}
+
+
+void Tests::setParams(std::map<std::string, double> params){
+
+    this->params = params;
+
 }
 
 

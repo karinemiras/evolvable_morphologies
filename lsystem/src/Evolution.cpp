@@ -107,7 +107,7 @@ void Evolution::initPopulation(LSystem LS){ // default arguments and Lsystem
     for(int i=1; i <= this->params["pop_size"]; i++) {
 
         // initial genomes receive personal ids, but the ids of the parents are none
-        Genome * gen = new Genome(std::to_string(this->next_id), "N", "N");
+        Genome * gen = new Genome(std::to_string(this->next_id), "N", "N", -1, -1);
 
         // creates genetic-strings for the production rules of the letters in the grammar (initial random rules)
         gen->build_grammar(LS, (int) this->params["num_initial_comp"], this->params["add_backtoparent_prob"]);
@@ -127,7 +127,7 @@ void Evolution::initPopulation(LSystem LS){ // default arguments and Lsystem
  **/
 void Evolution::loadPopulation(){ // default arguments and Lsystem
 
-
+  //##implement !!!
 }
 
 
@@ -205,7 +205,7 @@ void Evolution::measureIndividuals(int generation, std::vector<Genome *>  * indi
 
     for(int i=0; i < individuals->size(); i++) {  // for each genome of the population
 
-        Measures * m = new Measures();
+        Measures * m = new Measures(this->experiment_name, this->params);
         m->setGenome(individuals->at(i));
         m->measurePhenotype(this->params, dirpath+std::to_string(generation)); // measures phenotype
         delete m;
@@ -218,22 +218,31 @@ void Evolution::measureIndividuals(int generation, std::vector<Genome *>  * indi
  * Calculates the fitness of the population of genomes.
  */
 
-void Evolution::evaluateIndividuals(std::vector<Genome *> * individuals){
+void Evolution::evaluateIndividuals(std::vector<Genome *> * individuals, int generation){
 
-    std::ofstream fitness_file;
-    std::string path = "../../experiments/"+this->experiment_name+"/fitness.txt";
-    fitness_file.open(path, std::ofstream::app);
+    std::ofstream history_file;
+    std::string path = "../../experiments/"+this->experiment_name+"/history.txt";
+    history_file.open(path, std::ofstream::app);
 
     // for each genome of the population
     for(int i=0; i < individuals->size(); i++) {
 
         // calculates its fitness
         individuals->at(i)->calculateFitness((int) this->params["k_neighbors"]);
+
         this->aux.logs("fitness genome " + individuals->at(i)->getId()+ " : "+ std::to_string(individuals->at(i)->getFitness()));
-        fitness_file<<individuals->at(i)->getId()+ " "+ std::to_string(individuals->at(i)->getFitness())<<std::endl;
+
+        history_file << std::to_string(generation)<<" "     // generation
+                     << individuals->at(i)->getId()<<" "   // idgenome
+                     << std::to_string(individuals->at(i)->getFitness())<<" "  // gitness genome
+                     << individuals->at(i)->getId_parent1()<<" "  // id of parent1
+                     << individuals->at(i)->getFit_parent1()<<" "  // fitness of parent1
+                     << individuals->at(i)->getId_parent2()<<" " // id of parent2
+                     << individuals->at(i)->getFit_parent2()<<" " // fitness of parent2
+                     << std::endl;
     }
 
-    fitness_file.close();
+    history_file.close();
 }
 
 
@@ -390,7 +399,7 @@ void Evolution::testGeneticString(int argc, char* argv[],std::string test_genome
         }
 
         // creates new genome with id equal 1, using the just read genetic-string
-        Genome * gen = new Genome(test_genome, test_genome, test_genome);
+        Genome * gen = new Genome(test_genome, test_genome, test_genome, -1, -1);
         gen->setGeneticString(gen->build_genetic_string(gen->getGeneticString(), gs));
         gen->getGeneticString().display_list();
 
@@ -403,7 +412,7 @@ void Evolution::testGeneticString(int argc, char* argv[],std::string test_genome
         gen->constructor(argc, argv, this->params, "fixed");
 
         // measures all metrics od the genome
-        Measures m;
+        Measures m(this->experiment_name, this->params);
         m.setGenome(gen);
         m.measurePhenotype( this->params, "fixed");
 
@@ -455,7 +464,7 @@ void Evolution::selection() {
  *  Saves state of the generations to file.
  */
 
-void Evolution::saveResults(int generation){
+void Evolution::exportGenerationMetrics(int generation, int niche_coverage){
 
 
     std::ofstream evolution_file;
@@ -480,7 +489,7 @@ void Evolution::saveResults(int generation){
 
     average_fitness /= this->getPopulation()->size();  // finds the average of the fitnesses
 
-    evolution_file  << maximum_fitness << " "  << average_fitness  << " " << std::endl;
+    evolution_file  << maximum_fitness << " "  << average_fitness  << " " << niche_coverage << " " << std::endl;
 
     evolution_file.close();
 
@@ -514,13 +523,13 @@ void Evolution::setupEvolution(){
 
 void Evolution::noveltySearch(int argc, char* argv[]) {
 
-
-    this->logsTime("start");
+    int niche_coverage = 0;
 
     // loads alphabet with letters and commands
     LSystem LS;
     LS.build_commands();
     LS.build_alphabet();
+
 
     int gi = NULL; // initial generation
 
@@ -529,6 +538,8 @@ void Evolution::noveltySearch(int argc, char* argv[]) {
 
         // reads parameters for new experiment and creates directories
         this->setupEvolution();
+
+        this->logsTime("start");
 
         gi = 1; // start evolution from first generation
 
@@ -545,9 +556,10 @@ void Evolution::noveltySearch(int argc, char* argv[]) {
     }else{
 
 
+        this->logsTime("start");
+
         // loads state of parameters from previous experiment
         this->loadsParams();
-        Aux aux = Aux(this->experiment_name, this->getParams());
         this->aux = Aux(this->experiment_name, this->getParams());
 
         gi = this->readsGeneration(); // generation from which to start evolution
@@ -561,16 +573,24 @@ void Evolution::noveltySearch(int argc, char* argv[]) {
 
     // develops genomes of the initial population
     this->developIndividuals(argc, argv, LS, gi, this->population, this->experiment_name+"/offspringpop");
+
     // measures phenotypes of the individuals
-    this->measureIndividuals(gi, this->population,  this->experiment_name+"/offspringpop");
+    this->measureIndividuals(gi, this->population, "/offspringpop");
+
     // updates the average measures for the population
     this->compareIndividuals(this->population, this->population);
+
     // evaluates fitness of the individuals
-    this->evaluateIndividuals(this->population);
-    // saves metrics of evolution to file
-    this->saveResults(gi);
+    this->evaluateIndividuals(this->population, gi);
+
     // (possibly) adds genome to archive
     this->addToArchive(this->population, this->params["prob_add_archive"], this->experiment_name);
+
+    // calculates quality state of the search for the generation
+    niche_coverage = this->calculateNicheCoverage();
+
+    // saves metrics of evolution to file
+    this->exportGenerationMetrics(gi, niche_coverage);
 
 
 
@@ -590,31 +610,36 @@ void Evolution::noveltySearch(int argc, char* argv[]) {
         // develops genomes of the offspring
         this->developIndividuals(argc, argv, LS, g, offspring, this->experiment_name+"/offspringpop");
         // measures phenotypes of the offspring
-        this->measureIndividuals( g, offspring, this->experiment_name+"/offspringpop");
+        this->measureIndividuals( g, offspring, "/offspringpop");
 
         // auxiliar pointers //
-        std::vector<Genome *> * temp_pop_reference =  new std::vector<Genome *>();
-        std::vector<Genome *> * temp_pop_compare = new std::vector<Genome *>();
+            std::vector<Genome *> * temp_pop_reference =  new std::vector<Genome *>();
+            std::vector<Genome *> * temp_pop_compare = new std::vector<Genome *>();
 
-        for(int j=0; j < this->getPopulation()->size(); j++){
-            temp_pop_reference->push_back(this->getPopulation()->at(j));
-            temp_pop_compare->push_back(this->getPopulation()->at(j));
-        }
-        for(int j=0; j < offspring->size(); j++){
-            temp_pop_reference->push_back(offspring->at(j));
-            temp_pop_compare->push_back(offspring->at(j));
-        }
-        for ( auto &it : *this->archive){ temp_pop_compare->push_back(this->archive->at(it.first));  }
+            for(int j=0; j < this->getPopulation()->size(); j++){
+                temp_pop_reference->push_back(this->getPopulation()->at(j));
+                temp_pop_compare->push_back(this->getPopulation()->at(j));
+            }
+            for(int j=0; j < offspring->size(); j++){
+                temp_pop_reference->push_back(offspring->at(j));
+                temp_pop_compare->push_back(offspring->at(j));
+            }
+            for ( auto &it : *this->archive){ temp_pop_compare->push_back(this->archive->at(it.first));  }
         // auxiliar pointers //
 
 
-        this->aux.logs(" compares population with population+archive ");
+        // compares population with population+archive
         this->compareIndividuals(temp_pop_reference, temp_pop_compare);
 
         // evaluates fitness of the offspring
-        this->evaluateIndividuals(temp_pop_reference);
-        // (possibly) adds genome to archive
+        this->evaluateIndividuals(temp_pop_reference, g);
+
+        // (possibly) adds genomes to archive
         this->addToArchive(offspring, this->params["prob_add_archive"], this->experiment_name);
+        // logs arquive
+        for( const auto& it : *this->archive ){
+            this->aux.logs(" archive " + it.first);
+        }
 
         // adds new individuals to population
         for(int j=0; j < offspring->size(); j++){
@@ -624,16 +649,14 @@ void Evolution::noveltySearch(int argc, char* argv[]) {
         // selects individuals, keeping the population with a fixed size
         this->selection();
 
-        // saves phenotypes of the selected population to a separated folder
-        this->exportPop(argc, argv, LS, g, this->experiment_name+"/selectedpop");
+        // calculates quality state of the search for the generation
+        niche_coverage = this->calculateNicheCoverage();
 
         // saves metrics of evolution to file
-        this->saveResults(g);
+        this->exportGenerationMetrics(g, niche_coverage);
 
-
-        for( const auto& it : *this->archive ){
-            this->aux.logs(" archive " + it.first);
-        }
+        // saves phenotypes of the selected population to a separated folder (only for visualization issues)
+        this->exportPop(argc, argv, LS, g, this->experiment_name+"/selectedpop");
 
         // saves the number of the last generation created/evaluated
         this->writesGeneration(g);
@@ -663,16 +686,17 @@ void Evolution::crossover(LSystem LS, std::vector<Genome *>  * offspring){
             parent2 = this->tournament();
         }
 
-        // fetches the id of the genomes
-        std::string id_parent1 = this->population->at(parent1)->getId();
-        std::string id_parent2 = this->population->at(parent2)->getId();
-
         // #TEST: Tests if selected parents are different.
         this->tests.testParents(parent1, parent2);
 
         // creates new offspring genome
-        Genome * gen = new Genome(std::to_string(this->next_id), id_parent1, id_parent2);
-        this->aux.logs(" crossover for genome " + std::to_string(this->next_id) + " - p1: " + id_parent1 + " p2: " + id_parent2);
+        Genome * gen = new Genome(std::to_string(this->next_id),
+                                  this->population->at(parent1)->getId(),
+                                  this->population->at(parent2)->getId(),
+                                  this->population->at(parent1)->getFitness(),
+                                  this->population->at(parent2)->getFitness());
+
+        this->aux.logs(" crossover for genome " + std::to_string(this->next_id) + " - p1: " + this->population->at(parent1)->getId() + " p2: " + this->population->at(parent2)->getId());
 
         this->next_id++;
 
@@ -842,7 +866,7 @@ std::map<std::string, double> Evolution::getParams(){
 
 /*
  * Exports the parameters of the experiment.
- */
+ **/
 void Evolution::saveParameters() {
 
     std::ofstream param_file;
@@ -861,7 +885,7 @@ void Evolution::saveParameters() {
 
 /*
  * Logs time.
- */
+ **/
 void Evolution::logsTime(std::string moment){
 
     time_t sta = time(0);
@@ -885,7 +909,6 @@ void Evolution::writesGeneration(int generation) {
 /*
  * Reads number of the generation from which the recovered evolution should start from.
  * */
-
 int Evolution::readsGeneration() {
 
     std::string line;
@@ -901,26 +924,96 @@ int Evolution::readsGeneration() {
 }
 
 
-void Evolution::calculateNicheCoverage(){
+/*
+ * Calculates the quality metric for the novelty search: niche coverage
+ * */
+int Evolution::calculateNicheCoverage() {
 
-    std::string line;
-    std::ifstream myfile ("../../lsystem/configuration.txt");
+    // total number of points in the grid given the dimentions and spacing
+    //int total_points = std::pow(this->population->at(0)->getMeasures().size(),this->params["grid_bins"]);
 
+    for(int i = 0; i < this->population->size(); i++ ) {
 
-    if (myfile.is_open()) {
-        while ( getline (myfile,line) ) {
-            std::vector<std::string> tokens;
+        std::string key_point = "";
+        double distance = 0;
 
-            // parameters label and value separated by space
-            boost::split( tokens, line, boost::is_any_of(" ") );
+        for(const auto& it : this->population->at(i)->getMeasures()){
 
-            // first item is the label, second is the value
-            this->params[tokens[0]] = std::stod(tokens[1]);
+            if(it.second <= 0.1){                     key_point += "1|"; distance += -1*(it.second-0.1); }
+            if(it.second > 0.1 and it.second <= 0.2){ key_point += "2|"; distance += -1*(it.second-0.2); }
+            if(it.second > 0.2 and it.second <= 0.3){ key_point += "3|"; distance += -1*(it.second-0.3); }
+            if(it.second > 0.3 and it.second <= 0.4){ key_point += "4|";  distance += -1*(it.second-0.4); }
+            if(it.second > 0.4 and it.second <= 0.5){ key_point += "5|"; distance += -1*(it.second-0.5); }
+            if(it.second > 0.5 and it.second <= 0.6){ key_point += "6|"; distance += -1*(it.second-0.6); }
+            if(it.second > 0.6 and it.second <= 0.7){ key_point += "7|"; distance += -1*(it.second-0.7); }
+            if(it.second > 0.7 and it.second <= 0.8){ key_point += "8|"; distance += -1*(it.second-0.8); }
+            if(it.second > 0.8 and it.second <= 0.9){ key_point += "9|"; distance += -1*(it.second-0.9); }
+            if(it.second > 0.9 and it.second <=  1){  key_point += "10|"; distance += -1*(it.second-1);   }
+
         }
-        myfile.close();
-    } else {
-        this->aux.logs("Unable to open parameters file.");
+
+        // if point already exists in the array, adds an individual and the difference between them
+        if(this->morphological_grid.count(key_point)>0) {
+
+            this->morphological_grid[key_point].push_back(distance);
+
+        // if point does not exist in the array yet, , adds new point with its first individual and the difference between them
+        }else {
+            std::vector<double> individual; individual.push_back(distance);
+            this->morphological_grid[key_point] = individual;
+        }
     }
 
+
+    return this->morphological_grid.size();
+
+
+//    for(const auto& it : this->morphological_grid) {
+//
+//        std::cout<<" point "<<it.first<<std::endl;
+//        for(int i =0; i<it.second.size(); i++){
+//
+//            std::cout<<"    dist "<<it.second[i]<<std::endl;
+//        }
+//
+//    }
 }
+
+//// build bins for the morphology space
+//void Evolution::buildMorphologyBins(){
+//
+//
+//    int bins = 10;
+//
+//    // for the 8 measures
+//    for(int i1 = 1; i1 <= bins; i1++) {
+//        for(int i2 = 1; i2 <= bins; i2++) {
+//            for(int i3 = 1; i3 <= bins; i3++) {
+//                for(int i4 = 1; i4 <= bins; i4++) {
+//                    for(int i5 = 1; i5 <= bins; i5++) {
+//                        for(int i6 = 1; i6 <= bins; i6++) {
+//                            for(int i7 = 1; i7 <= bins; i7++) {
+//                                for(int i8 = 1; i8 <= bins; i8++) {
+//
+//                                    std::vector<int> gens; gens.push_back(0);
+//                                    this->morphological_grid[std::to_string(i1)+"-"+std::to_string(i2)+"-"+
+//                                                             std::to_string(i3)+"-"+std::to_string(i4)+"-"+
+//                                                             std::to_string(i5)+"-"+std::to_string(i6)+"-"+
+//                                                             std::to_string(i7)+"-"+std::to_string(i8)] = gens;
+//
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
+//
+//    for ( auto &it : this->morphological_grid){
+//       std::cout<<it.first<<"   "<<it.second.size()<<std::endl;
+//    }
+//
+//
+//}
 

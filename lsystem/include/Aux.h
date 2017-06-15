@@ -13,9 +13,9 @@ class Aux{
 
     public:
 
-    Aux(std::string experiment_name_, std::map<std::string, double> params_){
-        params = params_;
-        experiment_name = experiment_name_;
+    Aux(std::string experiment_name, std::map<std::string, double> params){
+        this->params = params;
+        this->experiment_name = experiment_name;
     }
 
         void createFolder(std::string dir);

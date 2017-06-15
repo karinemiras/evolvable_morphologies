@@ -38,6 +38,14 @@ std::string Genome::getId_parent2(){
     return this->id_parent2;
 }
 
+double Genome::getFit_parent1(){
+    return this->fit_parent1;
+}
+
+double Genome::getFit_parent2(){
+    return this->fit_parent2;
+}
+
 DecodedGeneticString Genome::getDgs(){
     return this->dgs;
 }
@@ -503,7 +511,7 @@ void Genome::calculateFitness(int k_neighbors){
 
     for (const auto& it :this->genomes_distance) {
 
-        std::cout<<"d"<<it.second<<std::endl;
+       // std::cout<<"d"<<it.second<<std::endl;
         ordered_distances.push_back(it.second);
     }
     std::sort (ordered_distances.begin(), ordered_distances.end());
@@ -514,7 +522,7 @@ void Genome::calculateFitness(int k_neighbors){
     for(int i=0; i<ordered_distances.size(); i++) {
 
         if(i<k_neighbors) {
-            std::cout << "dist" << std::to_string(i) << " " << ordered_distances[i] << std::endl;
+           // std::cout << "dist" << std::to_string(i) << " " << ordered_distances[i] << std::endl;
             avg_distances += ordered_distances[i];
         }
     }
