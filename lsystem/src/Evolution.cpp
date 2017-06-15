@@ -733,7 +733,7 @@ void Evolution::crossover(LSystem LS, std::vector<Genome *>  * offspring){
         // for each letter in the grammar
         for ( auto &it : LS.getAlphabet()) {
 
-            std::uniform_int_distribution<int> dist_type_cross(1, 1);//2); // distribution for the type of crossover
+            std::uniform_int_distribution<int> dist_type_cross(1, 2); // distribution for the type of crossover
             int  type_cross = dist_type_cross(generator);
 
             this->aux.logs("typecross "+it.first+" "+std::to_string(type_cross));
