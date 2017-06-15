@@ -110,7 +110,7 @@ void Evolution::initPopulation(LSystem LS){ // default arguments and Lsystem
         Genome * gen = new Genome(std::to_string(this->next_id), "N", "N", -1, -1);
 
         // creates genetic-strings for the production rules of the letters in the grammar (initial random rules)
-        gen->build_grammar(LS, (int) this->params["num_initial_comp"], this->params["add_backtoparent_prob"]);
+        gen->build_grammar(LS, (int) this->params["num_initial_comp"], this->params["add_backtoparent_prob_ini"]);
 
         this->population->push_back(gen);  // adds genome to the population
 
@@ -730,14 +730,16 @@ void Evolution::crossover(LSystem LS, std::vector<Genome *>  * offspring){
 
         std::uniform_real_distribution<double> prob(0.0, 1.0); // distribution for probabilities
 
-        for ( auto &it : LS.getAlphabet()) { // for each letter in the grammar
+        // for each letter in the grammar
+        for ( auto &it : LS.getAlphabet()) {
 
-             std::uniform_int_distribution<int> dist_type_cross(1, 2); // distribution for the type of crossover
+            std::uniform_int_distribution<int> dist_type_cross(1, 1);//2); // distribution for the type of crossover
             int  type_cross = dist_type_cross(generator);
 
-            //std::cout<<" ----------- typecross "<<it.first<<" "<<type_cross<<" "<<std::endl;
+            this->aux.logs("typecross "+it.first+" "+std::to_string(type_cross));
 
-            if (type_cross == 1) { // gets the genetic-string from a single parent for that letter
+            // gets a genetic-string from a single parent for each letter
+            if (type_cross == 1) {
 
                 if(prob(generator) <= params["prop_parent"]) {
 
@@ -748,7 +750,8 @@ void Evolution::crossover(LSystem LS, std::vector<Genome *>  * offspring){
                 }
             }
 
-            if (type_cross == 2) { // gets a random part of the genetic-string from each parent
+            // gets a random part of the genetic-string from each parent for each letter
+            if (type_cross == 2) {
 
                 std::uniform_int_distribution<int> dist_pos_parent1_ini(1,
                                                                         this->population->at(parent1)->getGrammar()[it.first].count()); // distribution for parent1 initial position
@@ -791,10 +794,9 @@ void Evolution::crossover(LSystem LS, std::vector<Genome *>  * offspring){
 
                 grammar.emplace(it.first, gs);
             }
-            if(it.first == "C") {
-                std::cout << it.first << std::endl;
-                grammar[it.first].display_list();
-            }
+
+             // grammar[it.first].display_list();
+
         }
 
         gen->setGrammar(grammar); // sets grammar for the new genome
@@ -871,7 +873,7 @@ void Evolution::mutation(LSystem LS, std::vector<Genome *> * offspring){
             }
 
             // if raffled probability is within the constrained probability
-            if (prob(generator) < this->params["mutation_alter_prob"]) {
+            if (prob(generator) < this->params["add_backtoparent_prob"]) {
 
                 //std::cout << "----- mut g " << offspring->at(i)->getId() << "add btp " << offspring->at(i)->getId() <<  std::endl;
                 // adds back-to-parent command
