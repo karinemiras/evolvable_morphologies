@@ -97,9 +97,10 @@ void Genome::build_grammar(LSystem LS, int num_initial_comp, double add_backtopa
 
     std::uniform_int_distribution<int> dist_1(1, num_initial_comp); // distribution for the number of components
     std::uniform_int_distribution<int> dist_2(0, (int) alp_i.size()-1); // distribution for letters of the alphabet
-    std::uniform_int_distribution<int> dist_3(1, (int) com.size()-1); // distribution for the mounting commands
+    std::uniform_int_distribution<int> dist_3(1, (int) com.size()-1); // distribution for the mounting commands (not considering 1-backtoparent)
 
-    for (std::map< std::string, std::string >::const_iterator it = alp.begin(); it != alp.end(); ++it) { // for each letter of the alphabet
+    // for each letter of the alphabet
+    for (std::map< std::string, std::string >::const_iterator it = alp.begin(); it != alp.end(); ++it) {
 
         std::string letter = it->first;
 
@@ -112,7 +113,8 @@ void Genome::build_grammar(LSystem LS, int num_initial_comp, double add_backtopa
         // while a raffled number of components is not achieved (times 2 because it must take the commands into account)
         while(letter_items.size() < (dist_1(generator)*2) ){
 
-            std::string item = alp_i[dist_2(generator)]; // raffles a letter to be included
+            // raffles a letter to be included
+            std::string item = alp_i[dist_2(generator)];
 
             // prevents core component of being (re)included in the rule
             if (item != "C") {
@@ -121,7 +123,8 @@ void Genome::build_grammar(LSystem LS, int num_initial_comp, double add_backtopa
                 letter_items.push_back(com[dist_3(generator)]);
                 letter_items.push_back(item);
 
-                std::uniform_real_distribution<double> p_btp(0.0, 1.0); // distribution for back-to-parent command
+                // distribution for back-to-parent command
+                std::uniform_real_distribution<double> p_btp(0.0, 1.0);
                 double p = p_btp(generator);
                 // tries to add a back-to-parent command
                 if (p < add_backtoparent_prob){
