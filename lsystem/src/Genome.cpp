@@ -83,21 +83,22 @@ double Genome::getFitness(){
 /**
 * Generates initial production rules for the alphabet.
  * @param LS - Lsystem structure containing the alphabet.
- * @param num_initial_comp - number of components to be included in the initial random production rules.
- * @param add_backtoparent_prob - probability of adding a back-to-parent command to the genetic-string each time a letter is added.
+ * @param params - parameters of the system
 */
-void Genome::build_grammar(LSystem LS, int num_initial_comp, double add_backtoparent_prob) {
+void Genome::build_grammar(LSystem LS, std::map<std::string, double> params) {
 
     std::map< std::string, std::string > alp = LS.getAlphabet();
     std::vector<std::string> alp_i = LS.getAlphabetIndex();
-    std::vector<std::string> com = LS.getCommands();
+    std::vector<std::string> mountingcom = LS.getMountingCommands();
+    std::vector<std::string> movingcom = LS.getMovingCommands();
 
     std::random_device rd;
     std::default_random_engine generator(rd());
 
-    std::uniform_int_distribution<int> dist_1(1, num_initial_comp); // distribution for the number of components
+    std::uniform_int_distribution<int> dist_1(1, (int) params["num_initial_comp"]); // distribution for the number of components
     std::uniform_int_distribution<int> dist_2(0, (int) alp_i.size()-1); // distribution for letters of the alphabet
-    std::uniform_int_distribution<int> dist_3(1, (int) com.size()-1); // distribution for the mounting commands (not considering 1-backtoparent)
+    std::uniform_int_distribution<int> dist_3(0, (int) mountingcom.size()-1); // distribution for the mounting commands
+    std::uniform_int_distribution<int> dist_4(0, (int) movingcom.size()-1); // distribution for the moving commands
 
     // for each letter of the alphabet
     for (std::map< std::string, std::string >::const_iterator it = alp.begin(); it != alp.end(); ++it) {
@@ -110,8 +111,9 @@ void Genome::build_grammar(LSystem LS, int num_initial_comp, double add_backtopa
             letter_items.push_back(letter);
         }
 
-        // while a raffled number of components is not achieved (times 2 because it must take the commands into account)
-        while(letter_items.size() < (dist_1(generator)*2) ){
+        // while a raffled number of components is not achieved
+        // (times 3 because it must take the commands of type 'mounting' and 'moving' into account)
+        while(letter_items.size() < (dist_1(generator)*3) ){
 
             // raffles a letter to be included
             std::string item = alp_i[dist_2(generator)];
@@ -120,16 +122,13 @@ void Genome::build_grammar(LSystem LS, int num_initial_comp, double add_backtopa
             if (item != "C") {
 
                 // raffles a mounting command to be included
-                letter_items.push_back(com[dist_3(generator)]);
+                letter_items.push_back(mountingcom[dist_3(generator)]);
+                // adds letter
                 letter_items.push_back(item);
 
-                // distribution for back-to-parent command
-                std::uniform_real_distribution<double> p_btp(0.0, 1.0);
-                double p = p_btp(generator);
-                // tries to add a back-to-parent command
-                if (p < add_backtoparent_prob){
-                    letter_items.push_back(com[0]);
-                }
+                // a raffles a moving command to be included
+                letter_items.push_back(movingcom[dist_4(generator)]);
+
             }
         }
 
@@ -159,6 +158,8 @@ void Genome::generate_final_string(int  replacement_iterations, int export_genom
         // replacement is made given the grammar
         this->gs.replaces(this->grammar);
     }
+
+    //this->gs.display_list();
 
     if(export_genomes == 1){
         this->exportGenome(path+std::to_string(generation));

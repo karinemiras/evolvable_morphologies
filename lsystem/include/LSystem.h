@@ -16,17 +16,23 @@
 class LSystem{
 
 public:
-    void build_commands();
+    void build_moving_commands();
+    void build_mounting_commands();
     void build_alphabet();
     std::map< std::string, std::string > getAlphabet();
     std::vector<std::string> getAlphabetIndex();
-    std::vector<std::string> getCommands();
-
+    std::vector<std::string> getMovingCommands();
+    std::vector<std::string> getMountingCommands();
 
 private:
-    std::vector<std::string> commands = std::vector<std::string>(); // vector with the commands of the l-system
-    std::map< std::string, std::string > alphabet = std::map<std::string, std::string>();  // alphabet with the letters of the l-system
-    std::vector<std::string> alphabet_index = std::vector<std::string>(); // auxiliar vector for the alphabet letters
+    // vector with the commands to move in the turtle
+    std::vector<std::string> moving_commands = std::vector<std::string>();
+    // vector with the commands to mount components in the turtle
+    std::vector<std::string> mounting_commands = std::vector<std::string>();
+    // alphabet with the letters
+    std::map< std::string, std::string > alphabet = std::map<std::string, std::string>();
+    // auxiliar vector for the alphabet letters
+    std::vector<std::string> alphabet_index = std::vector<std::string>();
 };
 
 

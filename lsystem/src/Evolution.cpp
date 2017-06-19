@@ -14,6 +14,7 @@
 
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
+#include <mlpack/methods/neighbor_search/neighbor_search.hpp>
 
 #include "Aux.h"
 #include "Evolution.h"
@@ -110,7 +111,7 @@ void Evolution::initPopulation(LSystem LS){ // default arguments and Lsystem
         Genome * gen = new Genome(std::to_string(this->next_id), "N", "N", -1, -1);
 
         // creates genetic-strings for the production rules of the letters in the grammar (initial random rules)
-        gen->build_grammar(LS, (int) this->params["num_initial_comp"], this->params["add_backtoparent_prob_ini"]);
+        gen->build_grammar(LS, this->params);
 
         this->population->push_back(gen);  // adds genome to the population
 
@@ -319,9 +320,9 @@ void Evolution::compareIndividuals(std::vector<Genome *>  * individuals_referenc
             }
         }
 
-        for( const auto& it : individuals_reference->at(i)->getGenomeDistance() ){
-            this->aux.logs("reference " + individuals_compare->at(i)->getId() + " compared to " + it.first + " is " + std::to_string(it.second) + " ");
-        }
+//        for( const auto& it : individuals_reference->at(i)->getGenomeDistance() ){
+//            this->aux.logs("reference " + individuals_compare->at(i)->getId() + " compared to " + it.first + " is " + std::to_string(it.second) + " ");
+//        }
     }
 }
 
@@ -402,7 +403,8 @@ void Evolution::testGeneticString(int argc, char* argv[],std::string test_genome
     this->readParams();
 
     LSystem LS;
-    LS.build_commands();
+    LS.build_mounting_commands();
+    LS.build_moving_commands();
     LS.build_alphabet();
 
     std::string line;
@@ -548,7 +550,8 @@ void Evolution::noveltySearch(int argc, char* argv[]) {
 
     // loads alphabet with letters and commands
     LSystem LS;
-    LS.build_commands();
+    LS.build_mounting_commands();
+    LS.build_moving_commands();
     LS.build_alphabet();
 
 
@@ -819,126 +822,129 @@ void Evolution::crossover(LSystem LS, std::vector<Genome *>  * offspring){
 
 void Evolution::mutation(LSystem LS, std::vector<Genome *> * offspring) {
 
-//    std::random_device rd;
-//    std::default_random_engine generator(rd());
-//
-//    // distribution for letters of the alphabet (does not include position 0, which is core-component, as it should be present only once)
-//    std::uniform_int_distribution<int> dist_letter(1, (int) LS.getAlphabetIndex().size()-1);
-//
-//    // distribution for the mounting commands (positions 1-3, does not include position 0, which is back-to-parent command)
-//    std::uniform_int_distribution<int> dist_command(1, (int) LS.getCommands().size()-1);
-//
-//    // distribution for 0-1 probabilities
-//    std::uniform_real_distribution<double> prob(0.0, 1.0);
-//
-//
-//    for(int i=0; i < offspring->size(); i++) {  // for each genome of the offspring
-//
-//
-//        for ( auto &it : offspring->at(i)->getGrammar()) { // for each letter in the grammar
-//
-//            //  if there is at least more than two components, and if the raffled probability is within the constrained probability
-//            if (it.second.count() >= 3 and prob(generator) < this->params["mutation_alter_prob"]) {
-//
-//                //std::cout << "----- mut g " << offspring->at(i)->getId() << " remove in " << offspring->at(i)->getId() <<  std::endl;
-//
-//                // distribution for position of deletion in the genetic-string
-//                std::uniform_int_distribution<int> pos_d(1, it.second.count());
-//                int pos_deletion = pos_d(generator);
-//
-//                // if it is the production rule of the core-component, prevents core-component from being deleted, preserving the root
-//                if(!(it.first == "C" and pos_deletion == 0)){
-//                    it.second.remove(pos_deletion); // removes item from chosen position
-//                }
-//            }
-//
-//            std::vector<std::string> genetic_string_items = std::vector<std::string>();
-//            // distribution for position of insertion in the genetic-string
-//            std::uniform_int_distribution<int> pos_i(0, it.second.count());
-//
-//            // if raffled probability is within the constrained probability
-//            if (prob(generator) < this->params["mutation_alter_prob"]) {
-//
-//                //std::cout << "----- mut g " << offspring->at(i)->getId() << " add command in " << offspring->at(i)->getId() <<  std::endl;
-//                // raffles a command to add
-//                genetic_string_items.push_back(LS.getCommands()[dist_command(generator)]);
-//            }
-//
-//            // if raffled probability is within the constrained probability
-//            if (prob(generator) < this->params["mutation_alter_prob"]) {
-//
-//                //std::cout << "----- mut g " << offspring->at(i)->getId() << " add letter in " << offspring->at(i)->getId() <<  std::endl;
-//                // raffles a letter to add
-//                genetic_string_items.push_back(LS.getAlphabetIndex()[dist_letter(generator)]);
-//            }
-//
-//            // if raffled probability is within the constrained probability
-//            if (prob(generator) < this->params["add_backtoparent_prob"]) {
-//
-//                //std::cout << "----- mut g " << offspring->at(i)->getId() << "add btp " << offspring->at(i)->getId() <<  std::endl;
-//                // adds back-to-parent command
-//                genetic_string_items.push_back(LS.getCommands()[0]);
-//            }
-//
-//            // if it is the production rule of the core-component, prevents new items from being inserted at the beginning, preserving the root
-//            int pos_insertion = pos_i(generator);
-//            if(it.first == "C" and pos_insertion == 0){
-//                pos_insertion++;
-//            }
-//
-//            //  (possibly) alters genetic-string (production rule) adding items (moving command, letter or back-to-parent command).
-//            it.second.add(pos_insertion, genetic_string_items);
-//
-//        }
-//
-//    }
-//
-//}
-
-
     std::random_device rd;
     std::default_random_engine generator(rd());
 
-    std::uniform_int_distribution<int> dist_1(1, this->params["num_initial_comp"]); // distribution for the number of components
-    std::uniform_int_distribution<int> dist_2(0, (int) LS.getAlphabetIndex().size() - 1); // distribution for letters of the alphabet
-    std::uniform_int_distribution<int> dist_3(1, (int) LS.getCommands().size() - 1); // distribution for the mounting commands (not considering 1-backtoparent)
+    // distribution for letters of the alphabet (does not include position 0, which is core-component, as it should be present only once)
+    std::uniform_int_distribution<int> dist_letter(1, (int) LS.getAlphabetIndex().size()-1);
 
-    // for each genome of the offspring
-    for(int i=0; i < offspring->size(); i++) {
+    // distribution for the mounting commands
+    std::uniform_int_distribution<int> dist_mountingcommand(0, (int) LS.getMountingCommands().size()-1);
 
-        // for each letter in the grammar
-        for (auto &it : offspring->at(i)->getGrammar()) {
+    // distribution for the moving commands
+    std::uniform_int_distribution<int> dist_movingcommand(0, (int) LS.getMovingCommands().size()-1);
 
-            std::vector<std::string> letter_items;
+    // distribution for 0-1 probabilities
+    std::uniform_real_distribution<double> prob(0.0, 1.0);
 
-            // while a raffled number of components is not achieved (times 2 because it must take the commands into account)
-            while (letter_items.size() < (dist_1(generator) * 2)) {
 
-                // raffles a letter to be included
-                std::string item = LS.getAlphabetIndex()[dist_2(generator)];
+    for(int i=0; i < offspring->size(); i++) {  // for each genome of the offspring
 
-                // prevents core component of being (re)included in the rule
-                if (item != "C") {
 
-                    // raffles a mounting command to be included
-                    letter_items.push_back(LS.getCommands()[dist_3(generator)]);
-                    letter_items.push_back(item);
+        for ( auto &it : offspring->at(i)->getGrammar()) { // for each letter in the grammar
 
-                    // distribution for back-to-parent command
-                    std::uniform_real_distribution<double> p_btp(0.0, 1.0);
-                    double p = p_btp(generator);
-                    // tries to add a back-to-parent command
-                    if (p < this->params["add_backtoparent_prob"]) {
-                        letter_items.push_back(LS.getCommands()[0]);
-                    }
+            //  if there is at least more than two components, and if the raffled probability is within the constrained probability
+            if (it.second.count() >= 3 and prob(generator) < this->params["mutation_delete_prob"]) {
+
+                //std::cout << "----- mut g " << offspring->at(i)->getId() << " remove in " << offspring->at(i)->getId() <<  std::endl;
+
+                // distribution for position of deletion in the genetic-string
+                std::uniform_int_distribution<int> pos_d(1, it.second.count());
+                int pos_deletion = pos_d(generator);
+
+                // if it is the production rule of the core-component, prevents core-component from being deleted, preserving the root
+                if(!(it.first == "C" and pos_deletion == 0)){
+                    it.second.remove(pos_deletion); // removes item from chosen position
                 }
             }
 
-            it.second.add(it.second.count(), letter_items);
+            std::vector<std::string> genetic_string_items = std::vector<std::string>();
+            // distribution for position of insertion in the genetic-string
+            std::uniform_int_distribution<int> pos_i(0, it.second.count());
+
+            // if raffled probability is within the constrained probability
+            if (prob(generator) < this->params["mutation_add_prob"]) {
+
+                //std::cout << "----- mut g " << offspring->at(i)->getId() << " add mounting command in " << offspring->at(i)->getId() <<  std::endl;
+                // raffles a command to add
+                genetic_string_items.push_back(LS.getMountingCommands()[dist_mountingcommand(generator)]);
+            }
+
+            // if raffled probability is within the constrained probability
+            if (prob(generator) < this->params["mutation_add_prob"]) {
+
+                //std::cout << "----- mut g " << offspring->at(i)->getId() << " add letter in " << offspring->at(i)->getId() <<  std::endl;
+                // raffles a letter to add
+                genetic_string_items.push_back(LS.getAlphabetIndex()[dist_letter(generator)]);
+            }
+
+            // if raffled probability is within the constrained probability
+            if (prob(generator) < this->params["mutation_move_prob"]) {
+
+                //std::cout << "----- mut g " << offspring->at(i)->getId() << "add moving command " << offspring->at(i)->getId() <<  std::endl;
+                // adds moving command
+                genetic_string_items.push_back(LS.getMovingCommands()[dist_movingcommand(generator)]);
+            }
+
+            // if it is the production rule of the core-component, prevents new items from being inserted at the beginning, preserving the root
+            int pos_insertion = pos_i(generator);
+            if(it.first == "C" and pos_insertion == 0){
+                pos_insertion++;
+            }
+
+            //  (possibly) alters genetic-string (production rule) adding items (moving command, letter or back-to-parent command).
+            it.second.add(pos_insertion, genetic_string_items);
+
         }
+
     }
 
 }
+
+//
+//    std::random_device rd;
+//    std::default_random_engine generator(rd());
+//
+//    std::uniform_int_distribution<int> dist_1(1, this->params["num_initial_comp"]); // distribution for the number of components
+//    std::uniform_int_distribution<int> dist_2(0, (int) LS.getAlphabetIndex().size() - 1); // distribution for letters of the alphabet
+//    std::uniform_int_distribution<int> dist_3(1, (int) LS.getCommands().size() - 1); // distribution for the mounting commands (not considering 1-backtoparent)
+//
+//    // for each genome of the offspring
+//    for(int i=0; i < offspring->size(); i++) {
+//
+//        // for each letter in the grammar
+//        for (auto &it : offspring->at(i)->getGrammar()) {
+//
+//            std::vector<std::string> letter_items;
+//
+//            // while a raffled number of components is not achieved (times 2 because it must take the commands into account)
+//            while (letter_items.size() < (dist_1(generator) * 2)) {
+//
+//                // raffles a letter to be included
+//                std::string item = LS.getAlphabetIndex()[dist_2(generator)];
+//
+//                // prevents core component of being (re)included in the rule
+//                if (item != "C") {
+//
+//                    // raffles a mounting command to be included
+//                    letter_items.push_back(LS.getCommands()[dist_3(generator)]);
+//                    letter_items.push_back(item);
+//
+//                    // distribution for back-to-parent command
+//                    std::uniform_real_distribution<double> p_btp(0.0, 1.0);
+//                    double p = p_btp(generator);
+//                    // tries to add a back-to-parent command
+//                    if (p < this->params["add_backtoparent_prob"]) {
+//                        letter_items.push_back(LS.getCommands()[0]);
+//                    }
+//                }
+//            }
+//
+//            it.second.add(it.second.count(), letter_items);
+//        }
+//    }
+//
+//}
 
 
 std::vector<Genome *> * Evolution::getPopulation(){
@@ -1064,15 +1070,12 @@ int Evolution::calculateNicheCoverage() {
     }
 
 
-//    for(const auto& it : this->morphological_grid) {
-//
-//        std::cout<<" point "<<it.first<<std::endl;
-//        for(int i =0; i<it.second.size(); i++){
-//
-//            std::cout<<"    dist "<<it.second[i]<<std::endl;
-//        }
-//
-//    }
+    for(const auto& it : this->morphological_grid) {
+
+        this->aux.logs("morphological_grid point "+it.first+" contains "+std::to_string(it.second.size())+" individuals");
+
+    }
+
     return this->morphological_grid.size();
 
 

@@ -25,8 +25,8 @@ void Tests::testMeasures(std::string id_genome, std::map< std::string, double> m
 
         }else{ //+ " for genome " + id_genome + " has value " + std::to_string(mea.second)+std::endl
 
-            this->aux = Aux(this->experiment_name, this->params);
-            this->aux.logs("measure " + mea.first + " for genome " + id_genome+ " has value "+ std::to_string(mea.second));
+            //this->aux = Aux(this->experiment_name, this->params);
+           // this->aux.logs("measure " + mea.first + " for genome " + id_genome+ " has value "+ std::to_string(mea.second));
 
 
         }

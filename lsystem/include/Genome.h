@@ -38,7 +38,7 @@ public:
 
     unsigned int getTo();
     GeneticString build_genetic_string(GeneticString gs, std::vector<std::string> genetic_string_items);
-    void build_grammar(LSystem LS, int num_initial_comp, double add_backtoparent_prob);
+    void build_grammar(LSystem LS, std::map<std::string, double> params);
     GeneticString getGeneticString();
     void setGeneticString(GeneticString _gs);
     std::vector<std::string> getAxiom();

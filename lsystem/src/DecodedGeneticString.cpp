@@ -20,7 +20,7 @@ void DecodedGeneticString::decode(GeneticString gs, LSystem LS, std::map<std::st
 
     int id = 0; // id of the component
     int num_components = 0;
-    std::string command = "";
+    std::string mountingcommand = "";
     DecodedGeneticString::Vertex  *current_component = NULL;
     GeneticString::Node *current_gs_item;
     current_gs_item = gs.getStart();
@@ -28,6 +28,7 @@ void DecodedGeneticString::decode(GeneticString gs, LSystem LS, std::map<std::st
 
 
     for (int i = 0; i < gs.count(); i++) { // for each item of the main genetic-string
+
 
         // if limit number of components has not been reached
         if(num_components < params["max_comps"]-1) {
@@ -53,12 +54,13 @@ void DecodedGeneticString::decode(GeneticString gs, LSystem LS, std::map<std::st
                     new_component->back = NULL;
                     current_component = new_component;
                     root = new_component;
-                    command = "";
+                    mountingcommand = "";
 
                 } else { // if the graph has been started already
 
                     // if a command has been set for mounting the component
-                    if (!command.empty()) {
+                    // commands of previous vaiolations remain to pair with a possible new letter, unless a new command be added
+                    if (!mountingcommand.empty()) {
 
                         std::string component = current_component->item.substr(0, 1);
 
@@ -81,7 +83,7 @@ void DecodedGeneticString::decode(GeneticString gs, LSystem LS, std::map<std::st
 
                             } else { // mounts component in the sue side if theres no violation
 
-                                if (command == "l") {  // mounts component on the left
+                                if (mountingcommand == "l") {  // mounts component on the left
                                     if (current_component->left != NULL) { // if position is occupied
 
                                         goto violation;
@@ -91,7 +93,7 @@ void DecodedGeneticString::decode(GeneticString gs, LSystem LS, std::map<std::st
                                     }
                                 }
 
-                                if (command == "f") {  // mounts component on the front
+                                if (mountingcommand == "f") {  // mounts component on the front
                                     if (current_component->front != NULL) { // if  position is occupied
 
                                         goto violation;
@@ -101,7 +103,7 @@ void DecodedGeneticString::decode(GeneticString gs, LSystem LS, std::map<std::st
                                     }
                                 }
 
-                                if (command == "r") {  // mounts component on the right
+                                if (mountingcommand == "r") {  // mounts component on the right
                                     if (current_component->right != NULL) { // if  position is occupied
 
                                         goto violation;
@@ -127,36 +129,65 @@ void DecodedGeneticString::decode(GeneticString gs, LSystem LS, std::map<std::st
 
                         new_component->back = current_component;
                         current_component = new_component;
-
-                        violation: // when the genetic-string leads to trying to hatch a component into a position where theres already another component or a sensor, the command is ignored
-                        command = "";
-
                         num_components++;
 
+                        violation: int vio=1;// when the genetic-string leads to trying to hatch a component into a position where theres already another component or a sensor, the command is ignored
+
+
                     } else {
-                        // std::cout<< "-- no-command violation!" << std::endl;
+                        // std::cout<< "-- no mounting-command violation!" << std::endl;
                     }
                 }
 
             // the item is a command
             } else {
 
-                if (current_gs_item->item.substr(current_gs_item->item.size() - 1, 1) == "<") { // if it is a move-command
+                std::string typecommand = current_gs_item->item.substr(0, 4);
 
-                    // if it is not root, moves back to parent component in the graph
-                    if (current_component != root) {
+                // if it is a moving command
+                if (typecommand == "move") {
 
-                        current_component = current_component->back;
 
-                    } else {
-                        // std::cout<< "-- back-to-parent violation!" << std::endl;
+                    std::string movingcommand = current_gs_item->item.substr(4, 1);
+
+                    if(movingcommand == "b"){
+                        // if it is not root, moves back to parent component in the graph
+                        if (current_component != root) {
+
+                            current_component = current_component->back;
+                        } //else {  std::cout<< "-- back-to-parent violation!" << std::endl;}
                     }
+
+                    if(movingcommand == "l"){
+                        // if there is a component to the left, moves to it in the graph
+                        if (current_component->left != NULL) {
+
+                            current_component = current_component->left;
+                        } //else {  std::cout<< "-- move-to-left violation!" << std::endl;}
+                    }
+
+                    if(movingcommand == "f"){
+                        // if there is a component to the front, moves to it in the graph
+                        if (current_component->front != NULL) {
+
+                            current_component = current_component->front;
+                        } //else  { std::cout<< "-- move-to-front violation!" << std::endl;}
+                    }
+
+                    if(movingcommand == "r"){
+                        // if there is a component to the left, moves to it in the graph
+                        if (current_component->right != NULL) {
+
+                            current_component = current_component->right;
+                        } //else { std::cout<< "-- move-to-right violation!" << std::endl;}
+                    }
+
 
                 // if it is a mounting command
                 } else {
 
-                    // discovers the type of command, to be used with the next component to be mounted later on
-                    command = current_gs_item->item.substr(current_gs_item->item.size() - 1, 1);
+                    // discovers the type of mounting command, to be used with the next component to be mounted later on
+                    mountingcommand = current_gs_item->item.substr(3, 1);
                 }
 
 
