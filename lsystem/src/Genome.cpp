@@ -503,6 +503,11 @@ void Genome::developGenome(int argc, char* argv[], std::map<std::string, double>
 
 
 
+void Genome::updateFitness(double fitness){
+
+    this->fitness = fitness;
+}
+
 
 /**
  * Saves the value representing the distance from one genome's measure to other genome's measure.

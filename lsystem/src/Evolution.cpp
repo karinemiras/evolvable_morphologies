@@ -129,14 +129,6 @@ void Evolution::initPopulation(LSystem LS){ // default arguments and Lsystem
 
 
 
-/**
- * Initializes population with genomes of a previous experiment.
- **/
-void Evolution::loadPopulation(){ // default arguments and Lsystem
-
-  //##implement !!!
-}
-
 
 
 /**
@@ -221,36 +213,6 @@ void Evolution::measureIndividuals(int generation, std::vector<Genome *>  * indi
 
 
 
-/**
- * Calculates the fitness of the population of genomes.
- */
-
-void Evolution::evaluateIndividuals(std::vector<Genome *> * individuals, int generation){
-
-    std::ofstream history_file;
-    std::string path = "../../experiments/"+this->experiment_name+"/history.txt";
-    history_file.open(path, std::ofstream::app);
-
-    // for each genome of the population
-    for(int i=0; i < individuals->size(); i++) {
-
-        // calculates its fitness
-        individuals->at(i)->calculateFitness((int) this->params["k_neighbors"]);
-
-        this->aux.logs("fitness genome " + individuals->at(i)->getId()+ " : "+ std::to_string(individuals->at(i)->getFitness()));
-
-        history_file << std::to_string(generation)<<" "     // generation
-                     << individuals->at(i)->getId()<<" "   // idgenome
-                     << std::to_string(individuals->at(i)->getFitness())<<" "  // fitness genome
-                     << individuals->at(i)->getId_parent1()<<" "  // id of parent1
-                     << individuals->at(i)->getFit_parent1()<<" "  // fitness of parent1
-                     << individuals->at(i)->getId_parent2()<<" " // id of parent2
-                     << individuals->at(i)->getFit_parent2() // fitness of parent2
-                     << std::endl;
-    }
-
-    history_file.close();
-}
 
 /**
  * Creates files of results containing headers.
@@ -281,7 +243,7 @@ void Evolution::createHeader(){
  * @param individuals_compare - individuals representing current-population+archive
  */
 
-void Evolution::compareIndividuals(int generation, std::vector<Genome *>  * individuals_reference, std::vector<Genome *>  * individuals_compare){
+void Evolution::evaluateIndividuals(int generation, std::vector<Genome *>  * individuals_reference, std::vector<Genome *>  * individuals_compare){
 
 
     std::ofstream history_file;
@@ -308,7 +270,7 @@ void Evolution::compareIndividuals(int generation, std::vector<Genome *>  * indi
     for(int i=0; i < individuals_reference->size(); i++) {
 
         // matrix with individuals which will be compared to the others
-        // columns: number of metrics / line: genome
+        // columns: number of metrics / single line: genome
         arma::mat reference(individuals_reference->at(0)->getMeasures().size(), 1);
 
         int m = 0;
@@ -378,13 +340,13 @@ int Evolution::tournament(){
     }else{
         return genome2;
     }
-    //  return genome1;
+
 }
 
 
 
 /**
- * Loads population of genomes from files.
+ * Loads population of genomes from files, from previous experiment.
  * @param argc - command line parameter
  * @param argv[] - command line parameter
  * @param size_pop - size of the population to be loaded.
@@ -392,7 +354,7 @@ int Evolution::tournament(){
  * @param LS - Lsystem structure containing the alphabet.
  **/
 
-void Evolution::loadPopulation(int argc, char* argv[],int size_pop, std::string test_folder, LSystem LS){
+//void Evolution::loadPopulation(int argc, char* argv[],int size_pop, std::string test_folder, LSystem LS){
 //
 //    std::string line;
 //    std::stringstream convert;
@@ -416,7 +378,7 @@ void Evolution::loadPopulation(int argc, char* argv[],int size_pop, std::string 
 //        }
 //    }
 
-};
+//};
 
 
 /**
@@ -622,7 +584,7 @@ void Evolution::noveltySearch(int argc, char* argv[]) {
         this->aux.logs("---------------- generation "+std::to_string(gi)+" ----------------");
 
         // loads population and archive
-        this->loadPopulation(); // #FIX: finish it, loading pop/archive/state etc !!!!!!!
+       // this->loadPopulation(); // #FIX: finish it, loading pop/archive/state etc !!!!!!!
 
     }
 

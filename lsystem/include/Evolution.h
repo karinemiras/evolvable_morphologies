@@ -52,7 +52,7 @@ public:
     void writesGeneration(int generation);
     int readsGeneration();
     void loadsParams();
-    void loadPopulation();
+    //void loadPopulation(int argc, char* argv[],int size_pop, std::string test_folder, LSystem LS);
     int calculateNicheCoverage();
     void createHeader();
 
