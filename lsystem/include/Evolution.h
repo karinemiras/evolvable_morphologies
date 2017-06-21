@@ -34,8 +34,7 @@ public:
     void loadPopulation(int argc, char* argv[],int size_pop, std::string test_folder, LSystem LS);
     void testGeneticString(int argc, char* argv[],std::string test_genome);
     void measureIndividuals(int generation, std::vector<Genome *>  * individuals, std::string dirpath);
-    void evaluateIndividuals(std::vector<Genome *> * individuals, int generation);
-    void compareIndividuals(std::vector<Genome *>  * individuals_reference, std::vector<Genome *>  * individuals_compare);
+    void evaluateIndividuals(int generation, std::vector<Genome *>  * individuals_reference, std::vector<Genome *>  * individuals_compare);
     int  tournament();
     void selection();
     void crossover(LSystem LS, std::vector<Genome *> * offspring);
@@ -72,6 +71,7 @@ private:
     std::map<std::string, std::vector<double>> morphological_grid =  std::map<std::string, std::vector<double>>();
     Aux aux = Aux(this->experiment_name, this->getParams()); // contains general auxiliar methos for the experiments
     Tests tests = Tests(this->experiment_name, this->getParams()); // contains methods with tests for the system
+
 };
 
 

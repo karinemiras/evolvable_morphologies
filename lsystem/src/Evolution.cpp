@@ -14,7 +14,13 @@
 
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
+
+#include <mlpack/core.hpp>
 #include <mlpack/methods/neighbor_search/neighbor_search.hpp>
+
+using namespace mlpack;
+using namespace mlpack::neighbor; // NeighborSearch and NearestNeighborSort
+using namespace mlpack::metric; // EuclideanDistance
 
 #include "Aux.h"
 #include "Evolution.h"
@@ -269,61 +275,84 @@ void Evolution::createHeader(){
 
 
 /**
- * Calculates the average of the measures among all genomes.
+ * Calculates the fitness for the individuals: average euclidean distance from the nearest neighbors
+ * @param generation - number of the generation for the evolution
  * @param individuals_reference - individuals of current-population (parents+offspring)
  * @param individuals_compare - individuals representing current-population+archive
  */
-// ## FIX: change it for a k-d-tree !!!!!
-void Evolution::compareIndividuals(std::vector<Genome *>  * individuals_reference, std::vector<Genome *>  * individuals_compare){
+
+void Evolution::compareIndividuals(int generation, std::vector<Genome *>  * individuals_reference, std::vector<Genome *>  * individuals_compare){
 
 
-    // for each reference-genome
+    std::ofstream history_file;
+    std::string path = "../../experiments/"+this->experiment_name+"/history.txt";
+    history_file.open(path, std::ofstream::app);
+
+
+    // matrix with all individuals
+    // columns: number of metrics / lines: number of genomes
+    arma::mat compare(individuals_compare->at(0)->getMeasures().size() , individuals_compare->size());
+
+    for(int i=0; i < individuals_compare->size(); i++) {
+
+        int m = 0;
+        for( const auto& it : individuals_compare->at(i)->getMeasures()){
+
+            compare(m, i) = it.second;
+            m ++;
+        }
+
+    }
+
+
     for(int i=0; i < individuals_reference->size(); i++) {
 
-        //compare reference-genome with the rest of the genomes in the POPULATION/ARCHIVE
-        std::map<std::string,std::string> aux_pop = std::map<std::string,std::string>();
+        // matrix with individuals which will be compared to the others
+        // columns: number of metrics / line: genome
+        arma::mat reference(individuals_reference->at(0)->getMeasures().size(), 1);
 
-        for(int j=0; j < individuals_compare->size(); j++) {
+        int m = 0;
+        for( const auto& it : individuals_reference->at(i)->getMeasures()){
 
-            aux_pop.emplace(individuals_compare->at(j)->getId(),individuals_compare->at(j)->getId() ); // auxiliar pointers
-
-            // if compared-genome is not the reference-genome itself
-            if(individuals_reference->at(i)->getId() != individuals_compare->at(j)->getId()){
-
-                // if comparison between reference-genome  and compared-genome has not been calculated in the past
-                if(individuals_reference->at(i)->getGenomeDistance().count(individuals_compare->at(j)->getId()) == 0 ) {
-
-                    double distances = 0;
-                    // for each measure
-                    for (auto &it : individuals_reference->at(i)->getMeasures()) {
-
-                        // acumulate euclidean distance of measures
-                        distances += pow((  individuals_reference->at(i)->getMeasures()[it.first]
-                                            - individuals_compare->at(j)->getMeasures()[it.first]), 2);
-                    }
-                    // average of the distances
-                    distances = sqrt(distances);
-
-                    // saves distance from compared-genome inside reference-genome
-                    individuals_reference->at(i)->setGenomeDistance(individuals_compare->at(j)->getId(), distances);
-
-                }
-            }
+            reference(m, 0) = it.second;
+            m ++;
         }
 
-        // removes from list the comparisons with genomes that no longer exist in the current-population+archive
-        for (auto &it : individuals_reference->at(i)->getGenomeDistance()) {
+        NeighborSearch<NearestNeighborSort, EuclideanDistance> nn(compare);
+        arma::Mat<size_t> neighbors;
+        arma::mat distances;
 
-            if(aux_pop.count(it.first) == 0){
+        // search for each individual, the nearest neighbors (+1 because it includes itself)
+        nn.Search(reference, this->params["k_neighbors"]+1, neighbors, distances);
 
-                individuals_reference->at(i)->deleteGenomeDistance(it.first);
-            }
-        }
+        double fitness = 0;
+        for (size_t j = 0; j < neighbors.n_elem; ++j) {
 
-//        for( const auto& it : individuals_reference->at(i)->getGenomeDistance() ){
-//            this->aux.logs("reference " + individuals_compare->at(i)->getId() + " compared to " + it.first + " is " + std::to_string(it.second) + " ");
-//        }
+             fitness +=  distances[j];
+             this->aux.logs("nearest neighbor  "+std::to_string(j)+" for genome " +individuals_reference->at(i)->getId()+ " has distance " + std::to_string(distances[j]));
+         }
+
+        // averages the nearest neighboards
+        fitness = fitness/this->params["k_neighbors"];
+        individuals_reference->at(i)->updateFitness(fitness);
+
+
+        this->aux.logs("fitness genome " + individuals_reference->at(i)->getId()+ " : "+ std::to_string(individuals_reference->at(i)->getFitness()));
+
+        history_file << std::to_string(generation)<<" "     // generation
+                     << individuals_reference->at(i)->getId()<<" "   // idgenome
+                     << std::to_string(individuals_reference->at(i)->getFitness())<<" "  // fitness genome
+                     << individuals_reference->at(i)->getId_parent1()<<" "  // id of parent1
+                     << individuals_reference->at(i)->getFit_parent1()<<" "  // fitness of parent1
+                     << individuals_reference->at(i)->getId_parent2()<<" " // id of parent2
+                     << individuals_reference->at(i)->getFit_parent2() // fitness of parent2
+                     << std::endl;
+
     }
+
+
+    history_file.close();
+
 }
 
 
@@ -604,10 +633,7 @@ void Evolution::noveltySearch(int argc, char* argv[]) {
     this->measureIndividuals(gi, this->population, "/offspringpop");
 
     // updates the average measures for the population
-    this->compareIndividuals(this->population, this->population);
-
-    // evaluates fitness of the individuals
-    this->evaluateIndividuals(this->population, gi);
+    this->evaluateIndividuals(gi, this->population, this->population);
 
     // (possibly) adds genome to archive
     this->addToArchive(this->population, this->params["prob_add_archive"], this->experiment_name);
@@ -638,27 +664,36 @@ void Evolution::noveltySearch(int argc, char* argv[]) {
         // measures phenotypes of the offspring
         this->measureIndividuals( g, offspring, "/offspringpop");
 
+
         // auxiliar pointers //
+
             std::vector<Genome *> * temp_pop_reference =  new std::vector<Genome *>();
             std::vector<Genome *> * temp_pop_compare = new std::vector<Genome *>();
 
             for(int j=0; j < this->getPopulation()->size(); j++){
+
                 temp_pop_reference->push_back(this->getPopulation()->at(j));
                 temp_pop_compare->push_back(this->getPopulation()->at(j));
+
             }
+
             for(int j=0; j < offspring->size(); j++){
+
                 temp_pop_reference->push_back(offspring->at(j));
                 temp_pop_compare->push_back(offspring->at(j));
             }
-            for ( auto &it : *this->archive){ temp_pop_compare->push_back(this->archive->at(it.first));  }
+
+            for ( auto &it : *this->archive){
+
+                temp_pop_compare->push_back(this->archive->at(it.first));
+            }
+
+
         // auxiliar pointers //
 
 
-        // compares population with population+archive
-        this->compareIndividuals(temp_pop_reference, temp_pop_compare);
-
-        // evaluates fitness of the offspring
-        this->evaluateIndividuals(temp_pop_reference, g);
+        // evaluates population (parents+offspring)
+        this->evaluateIndividuals(g, temp_pop_reference, temp_pop_compare);
 
         // (possibly) adds genomes to archive
         this->addToArchive(offspring, this->params["prob_add_archive"], this->experiment_name);
@@ -846,15 +881,15 @@ void Evolution::mutation(LSystem LS, std::vector<Genome *> * offspring) {
             //  if there is at least more than two components, and if the raffled probability is within the constrained probability
             if (it.second.count() >= 3 and prob(generator) < this->params["mutation_delete_prob"]) {
 
-                //std::cout << "----- mut g " << offspring->at(i)->getId() << " remove in " << offspring->at(i)->getId() <<  std::endl;
-
                 // distribution for position of deletion in the genetic-string
                 std::uniform_int_distribution<int> pos_d(1, it.second.count());
                 int pos_deletion = pos_d(generator);
 
                 // if it is the production rule of the core-component, prevents core-component from being deleted, preserving the root
                 if(!(it.first == "C" and pos_deletion == 0)){
+
                     it.second.remove(pos_deletion); // removes item from chosen position
+                    this->aux.logs("mutation: remove in "+ offspring->at(i)->getId());
                 }
             }
 
@@ -865,25 +900,25 @@ void Evolution::mutation(LSystem LS, std::vector<Genome *> * offspring) {
             // if raffled probability is within the constrained probability
             if (prob(generator) < this->params["mutation_add_prob"]) {
 
-                //std::cout << "----- mut g " << offspring->at(i)->getId() << " add mounting command in " << offspring->at(i)->getId() <<  std::endl;
                 // raffles a command to add
                 genetic_string_items.push_back(LS.getMountingCommands()[dist_mountingcommand(generator)]);
+                this->aux.logs("mutation: add mounting command in " + offspring->at(i)->getId());
             }
 
             // if raffled probability is within the constrained probability
             if (prob(generator) < this->params["mutation_add_prob"]) {
 
-                //std::cout << "----- mut g " << offspring->at(i)->getId() << " add letter in " << offspring->at(i)->getId() <<  std::endl;
                 // raffles a letter to add
                 genetic_string_items.push_back(LS.getAlphabetIndex()[dist_letter(generator)]);
+                this->aux.logs("mutation: add letter in " + offspring->at(i)->getId());
             }
 
             // if raffled probability is within the constrained probability
             if (prob(generator) < this->params["mutation_move_prob"]) {
 
-                //std::cout << "----- mut g " << offspring->at(i)->getId() << "add moving command " << offspring->at(i)->getId() <<  std::endl;
                 // adds moving command
                 genetic_string_items.push_back(LS.getMovingCommands()[dist_movingcommand(generator)]);
+                this->aux.logs("mutation: add moving command in " + offspring->at(i)->getId());
             }
 
             // if it is the production rule of the core-component, prevents new items from being inserted at the beginning, preserving the root
@@ -900,51 +935,6 @@ void Evolution::mutation(LSystem LS, std::vector<Genome *> * offspring) {
     }
 
 }
-
-//
-//    std::random_device rd;
-//    std::default_random_engine generator(rd());
-//
-//    std::uniform_int_distribution<int> dist_1(1, this->params["num_initial_comp"]); // distribution for the number of components
-//    std::uniform_int_distribution<int> dist_2(0, (int) LS.getAlphabetIndex().size() - 1); // distribution for letters of the alphabet
-//    std::uniform_int_distribution<int> dist_3(1, (int) LS.getCommands().size() - 1); // distribution for the mounting commands (not considering 1-backtoparent)
-//
-//    // for each genome of the offspring
-//    for(int i=0; i < offspring->size(); i++) {
-//
-//        // for each letter in the grammar
-//        for (auto &it : offspring->at(i)->getGrammar()) {
-//
-//            std::vector<std::string> letter_items;
-//
-//            // while a raffled number of components is not achieved (times 2 because it must take the commands into account)
-//            while (letter_items.size() < (dist_1(generator) * 2)) {
-//
-//                // raffles a letter to be included
-//                std::string item = LS.getAlphabetIndex()[dist_2(generator)];
-//
-//                // prevents core component of being (re)included in the rule
-//                if (item != "C") {
-//
-//                    // raffles a mounting command to be included
-//                    letter_items.push_back(LS.getCommands()[dist_3(generator)]);
-//                    letter_items.push_back(item);
-//
-//                    // distribution for back-to-parent command
-//                    std::uniform_real_distribution<double> p_btp(0.0, 1.0);
-//                    double p = p_btp(generator);
-//                    // tries to add a back-to-parent command
-//                    if (p < this->params["add_backtoparent_prob"]) {
-//                        letter_items.push_back(LS.getCommands()[0]);
-//                    }
-//                }
-//            }
-//
-//            it.second.add(it.second.count(), letter_items);
-//        }
-//    }
-//
-//}
 
 
 std::vector<Genome *> * Evolution::getPopulation(){
@@ -1076,7 +1066,7 @@ int Evolution::calculateNicheCoverage() {
 
     }
 
-    return this->morphological_grid.size();
+    return (int)this->morphological_grid.size();
 
 
 }

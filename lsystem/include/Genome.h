@@ -66,6 +66,7 @@ public:
     void setGenomeDistance(std::string id_genome, double distance);
     std::map< std::string  ,double > getGenomeDistance();
     void deleteGenomeDistance(std::string id_genome);
+    void updateFitness(double fitness);
 
 private:
 

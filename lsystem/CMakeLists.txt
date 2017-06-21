@@ -36,7 +36,12 @@ include_directories(${Boost_INCLUDE_DIRS})
 
 find_package(Qt5 COMPONENTS
         Core
-        Widgets)
+        Widgets
+        )
+
+find_package(mlpack)
+
+find_package(armadillo)
 
 # Source subdirectories
 # _____________________________________________________________________________
@@ -62,5 +67,8 @@ file(GLOB_RECURSE SOURCES
 # _____________________________________________________________________________
 
 add_executable(lsystem_proto ${SOURCES})
+
 target_link_libraries(lsystem_proto
-        Qt5::Widgets)
+        Qt5::Widgets
+        mlpack
+        armadillo)

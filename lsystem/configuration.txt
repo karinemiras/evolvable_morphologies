@@ -1,5 +1,5 @@
-pop_size 300
-num_generations 20
+pop_size 1000
+num_generations 30
 offspring_size 0.50
 num_initial_comp 3
 replacement_iterations 3
