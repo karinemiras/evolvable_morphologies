@@ -42,7 +42,7 @@ public:
     std::vector<Genome *>  * getPopulation();
     std::map<std::string, double> getParams();
     void developIndividuals(int argc, char* argv[], LSystem LS, int generation, std::vector<Genome *>  * individuals, std::string path);
-    void noveltySearch(int argc, char* argv[]);
+    int noveltySearch(int argc, char* argv[]);
     void exportGenerationMetrics(int generation, int niche_coverage);
     void exportPop(int argc, char* argv[], LSystem LS, int generation, std::string path);
     void addToArchive( std::vector<Genome *>  * individuals, double prob_add_archive, std::string path);
@@ -55,6 +55,7 @@ public:
     //void loadPopulation(int argc, char* argv[],int size_pop, std::string test_folder, LSystem LS);
     int calculateNicheCoverage();
     void createHeader();
+    void updateParameter(std::string key, double value);
 
 
 private:

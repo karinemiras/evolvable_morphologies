@@ -1,11 +1,11 @@
-pop_size 1000
-num_generations 30
+pop_size 30
+num_generations 3
 offspring_size 0.50
 num_initial_comp 3
 replacement_iterations 3
-mutation_add_prob 0
-mutation_delete_prob 0
-mutation_move_prob 0
+mutation_add_prob 0.2
+mutation_delete_prob 0.2
+mutation_move_prob 0.2
 prop_parent 0.5
 prob_add_archive 0.1
 k_neighbors 15
@@ -18,3 +18,4 @@ spacing 1
 show_phenotypes 0
 export_phenotypes 1
 export_genomes 1
+tuning 1

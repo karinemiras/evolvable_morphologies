@@ -78,6 +78,12 @@ void Evolution::readParams(){
 }
 
 
+void Evolution::updateParameter(std::string key, double value){
+
+    this->params[key] = value;
+}
+
+
 /**
  * Loads parameters from saved state.
  **/
@@ -512,8 +518,10 @@ void Evolution::exportGenerationMetrics(int generation, int niche_coverage){
 
 void Evolution::setupEvolution(){
 
-    // read parameters for the experiment
-    this->readParams();
+    // read default parameters for the experiment, if it is not running in tuning mode
+    if(this->params["tuning"] == 0) {
+        this->readParams();
+    }
 
     Aux aux = Aux(this->experiment_name, this->getParams());
     this->aux = Aux(this->experiment_name, this->getParams());
@@ -535,9 +543,10 @@ void Evolution::setupEvolution(){
 *  Evolution in the search for novelty.
 **/
 
-void Evolution::noveltySearch(int argc, char* argv[]) {
+int Evolution::noveltySearch(int argc, char* argv[]) {
 
-    int niche_coverage = 0;
+    int niche_coverage = 0, max_niche_coverage = 0;
+
 
     // loads alphabet with letters and commands
     LSystem LS;
@@ -627,7 +636,7 @@ void Evolution::noveltySearch(int argc, char* argv[]) {
         this->measureIndividuals( g, offspring, "/offspringpop");
 
 
-        // auxiliar pointers //
+        // BEGINNING: auxiliar pointers //
 
             std::vector<Genome *> * temp_pop_reference =  new std::vector<Genome *>();
             std::vector<Genome *> * temp_pop_compare = new std::vector<Genome *>();
@@ -651,7 +660,7 @@ void Evolution::noveltySearch(int argc, char* argv[]) {
             }
 
 
-        // auxiliar pointers //
+        // END: auxiliar pointers //
 
 
         // evaluates population (parents+offspring)
@@ -687,6 +696,12 @@ void Evolution::noveltySearch(int argc, char* argv[]) {
     }
 
     this->logsTime("end");
+
+    // updates the maximum niche coverage found so far
+    if(niche_coverage > max_niche_coverage) max_niche_coverage = niche_coverage;
+
+
+    return max_niche_coverage;
 
 }
 
@@ -841,7 +856,7 @@ void Evolution::mutation(LSystem LS, std::vector<Genome *> * offspring) {
         for ( auto &it : offspring->at(i)->getGrammar()) { // for each letter in the grammar
 
             //  if there is at least more than two components, and if the raffled probability is within the constrained probability
-            if (it.second.count() >= 3 and prob(generator) < this->params["mutation_delete_prob"]) {
+            if (it.second.count() >= 2 and prob(generator) < this->params["mutation_delete_prob"]) {
 
                 // distribution for position of deletion in the genetic-string
                 std::uniform_int_distribution<int> pos_d(1, it.second.count());
@@ -856,8 +871,6 @@ void Evolution::mutation(LSystem LS, std::vector<Genome *> * offspring) {
             }
 
             std::vector<std::string> genetic_string_items = std::vector<std::string>();
-            // distribution for position of insertion in the genetic-string
-            std::uniform_int_distribution<int> pos_i(0, it.second.count());
 
             // if raffled probability is within the constrained probability
             if (prob(generator) < this->params["mutation_add_prob"]) {
@@ -883,6 +896,8 @@ void Evolution::mutation(LSystem LS, std::vector<Genome *> * offspring) {
                 this->aux.logs("mutation: add moving command in " + offspring->at(i)->getId());
             }
 
+            // distribution for position of insertion in the genetic-string
+            std::uniform_int_distribution<int> pos_i(0, it.second.count());
             // if it is the production rule of the core-component, prevents new items from being inserted at the beginning, preserving the root
             int pos_insertion = pos_i(generator);
             if(it.first == "C" and pos_insertion == 0){
