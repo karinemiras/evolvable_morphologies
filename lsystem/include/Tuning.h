@@ -16,10 +16,10 @@ class Tuning{
         int tournament();
 
     private:
-        int pop_size = 5;
-        int num_generations = 2;
-        int offspring_size = 1;
-        double prob_mu = 1;
+        int pop_size = 100;
+        int num_generations = 100;
+        int offspring_size = 50;
+        double prob_mu = 0.3;
         double prop_parent = 0.5;
         std::vector<std::vector<double>> population;
 
