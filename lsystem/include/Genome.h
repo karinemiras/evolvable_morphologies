@@ -38,7 +38,6 @@ public:
 
     unsigned int getTo();
     GeneticString build_genetic_string(GeneticString gs, std::vector<std::string> genetic_string_items);
-    void build_grammar(LSystem LS, std::map<std::string, double> params);
     GeneticString getGeneticString();
     void setGeneticString(GeneticString _gs);
     std::vector<std::string> getAxiom();
@@ -53,7 +52,8 @@ public:
     double getFit_parent2();
     void exportGenome(std::string path);
     void createEmbryo();
-    void developGenome(int argc, char* argv[], std::map<std::string, double> params, LSystem LS, int generation, std::string path);
+    void developGenomeIndirect(int argc, char* argv[], std::map<std::string, double> params, LSystem LS, int generation, std::string path);
+    void developGenomeDirect(int argc, char* argv[], std::map<std::string, double> params, LSystem LS, int generation, std::string path);
     DecodedGeneticString getDgs();
     std::map< std::string, double > getMeasures();
     std::map< std::pair<int, int>, std::string >  getList_components();
@@ -67,6 +67,9 @@ public:
     std::map< std::string  ,double > getGenomeDistance();
     void deleteGenomeDistance(std::string id_genome);
     void updateFitness(double fitness);
+
+    void build_grammar(LSystem LS, std::map<std::string, double> params);
+    void build_genome_direct(LSystem LS, std::map<std::string, double> params);
 
 private:
 

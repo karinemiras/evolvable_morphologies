@@ -7,25 +7,33 @@
 
 #include<iostream>
 
-#include "Evolution.h"
+#include "EvolutionIndirect.h"
+#include "EvolutionDirect.h"
 #include "Tuning.h"
 
 
 int main(int argc, char* argv[]) {
 
 
-    Tuning t = Tuning();
-    t.optimize(argc, argv);
-
+     //  Tuning t = Tuning();
+     //  t.optimize(argc, argv);
 
 
     // experiment: looking for global optimum of innovation
-    // int max_niche_coverage = 0;
-    // Evolution * e = new Evolution("test", 1);
-    // max_niche_coverage = e->noveltySearch(argc, argv);
-    // std::cout<<">>> maximum niche coverage found "<<max_niche_coverage;
+     int max_niche_coverage = 0;
+     EvolutionIndirect * e = new EvolutionIndirect("test_comps", 1);
+     max_niche_coverage = e->noveltySearch(argc, argv, 1); // 1-indirect TYPE is temporary, it will be replaced by genome parent class scheme
+     std::cout<<">>> maximum niche coverage found "<<max_niche_coverage;
 
     // e->testGeneticString(argc, argv,"spider3");
+
+
+    // experiment: looking for global optimum of innovation
+  //   int max_niche_coverage = 0;
+  //   EvolutionDirect * e = new EvolutionDirect("test", 1);
+   //  max_niche_coverage = e->noveltySearch(argc, argv);
+  //   std::cout<<">>> maximum niche coverage found "<<max_niche_coverage;
+
 
     return 0;
 

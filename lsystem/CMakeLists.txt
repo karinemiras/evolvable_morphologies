@@ -55,8 +55,12 @@ file(GLOB_RECURSE SOURCES
         main.cpp
         src/GeneticString.cpp
         src/Genome.cpp
+        src/GenomeIndirect.cpp
+        src/GenomeDirect.cpp
         src/LSystem.cpp
         src/Evolution.cpp
+        src/EvolutionIndirect.cpp
+        src/EvolutionDirect.cpp
         src/DecodedGeneticString.cpp
         src/Measures.cpp
         src/Aux.cpp
@@ -67,7 +71,7 @@ file(GLOB_RECURSE SOURCES
 # Generate
 # _____________________________________________________________________________
 
-add_executable(lsystem_proto ${SOURCES} )
+add_executable(lsystem_proto ${SOURCES})
 
 target_link_libraries(lsystem_proto
         Qt5::Widgets

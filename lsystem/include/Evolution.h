@@ -17,18 +17,17 @@
  * Evolutionary algorithm.
  */
 
-class Evolution{
+class  Evolution{
 
 
 public:
     // name of the experiment / if the experiment should be started from scratch (1) or not (0)
-    Evolution(std::string experiment_name, int new_experiment){
+    explicit Evolution(std::string experiment_name, int new_experiment){
         this->experiment_name = experiment_name;
         this->new_experiment = new_experiment;
     }
 
 
-    void initPopulation( LSystem LS);
     void readParams();
     void developGenome(int argc, char* argv[], Genome * gen, LSystem LS);
     void loadPopulation(int argc, char* argv[],int size_pop, std::string test_folder, LSystem LS);
@@ -37,12 +36,9 @@ public:
     void evaluateIndividuals(int generation, std::vector<Genome *>  * individuals_reference, std::vector<Genome *>  * individuals_compare);
     int  tournament();
     void selection();
-    void crossover(LSystem LS, std::vector<Genome *> * offspring);
-    void mutation(LSystem LS, std::vector<Genome *> * offspring);
     std::vector<Genome *>  * getPopulation();
     std::map<std::string, double> getParams();
-    void developIndividuals(int argc, char* argv[], LSystem LS, int generation, std::vector<Genome *>  * individuals, std::string path);
-    int noveltySearch(int argc, char* argv[]);
+    int noveltySearch(int argc, char* argv[], int encodingtype);
     void exportGenerationMetrics(int generation, int niche_coverage);
     void exportPop(int argc, char* argv[], LSystem LS, int generation, std::string path);
     void addToArchive( std::vector<Genome *>  * individuals, double prob_add_archive, std::string path);
@@ -56,11 +52,17 @@ public:
     int calculateNicheCoverage();
     void createHeader();
     void updateParameter(std::string key, double value);
+    void developIndividuals(int argc, char* argv[], LSystem LS, int generation, std::vector<Genome *>  * individuals, std::string path, int encodingtype);
+
+    virtual void initPopulation( LSystem LS){};
+    virtual void crossover(LSystem LS, std::vector<Genome *> * offspring){};
+    virtual void mutation(LSystem LS, std::vector<Genome *> * offspring){};
 
 
-private:
 
-    std::vector<Genome *>  * population = new std::vector<Genome *>(); // contains the genomes of all the individuals of the population
+protected:
+
+
     std::map<std::string, double> params =  std::map<std::string, double>(); // contains the list of parameters loaded from parameter file
     std::map< std::string, Genome * >  * archive = new std::map< std::string , Genome * > ();
     // regularly spaced points in the grid of metrics: <identification of the point in space, <values for the dementions, values for comparisons>>
@@ -72,6 +74,9 @@ private:
     std::map<std::string, std::vector<double>> morphological_grid =  std::map<std::string, std::vector<double>>();
     Aux aux = Aux(this->experiment_name, this->getParams()); // contains general auxiliar methos for the experiments
     Tests tests = Tests(this->experiment_name, this->getParams()); // contains methods with tests for the system
+
+    std::vector<Genome *>  * population = new std::vector<Genome *>(); // contains the genomes of all the individuals of the population
+
 
 };
 
