@@ -63,10 +63,8 @@ public:
     std::map< std::string, GeneticString > getGrammar();
     void setGrammar(std::map< std::string, GeneticString > grammar);
     void removeMeasure(std::string key);
-    void setGenomeDistance(std::string id_genome, double distance);
-    std::map< std::string  ,double > getGenomeDistance();
-    void deleteGenomeDistance(std::string id_genome);
     void updateFitness(double fitness);
+    void addLetterGrammar(std::string letter, GeneticString lgs);
 
     void build_grammar(LSystem LS, std::map<std::string, double> params);
     void build_genome_direct(LSystem LS, std::map<std::string, double> params);
@@ -89,8 +87,7 @@ private:
     std::map< std::string, double >  measures = std::map< std::string, double >(); // list of body metrics about the genome
     // list of all components of the body, keys are coordinates, value is a letter
     std::map< std::pair<int, int>, std::string >  list_components = std::map< std::pair<int, int>, std::string >();
-    // <id of the genome with which this genome is being compared, <if this comparison is active, value of comparison> >
-    std::map< std::string, double>   genomes_distance = std::map< std::string, double>  ();
+
 
 };
 

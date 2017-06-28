@@ -15,9 +15,9 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
 
+
 #include <mlpack/core.hpp>
 #include <mlpack/methods/neighbor_search/neighbor_search.hpp>
-
 using namespace mlpack;
 using namespace mlpack::neighbor; // NeighborSearch and NearestNeighborSort
 using namespace mlpack::metric; // EuclideanDistance
@@ -144,18 +144,27 @@ void Evolution::addToArchive( std::vector<Genome *>  * individuals, double prob_
 
 
 /**
-*  Constructs the phenotype and exports it.
-*  @param argc - default argument
-*  @param argv[] - default argument
-*  @param LS - Lsystem structure containing the alphabet
+*  Copies the phenotypes of the selection population to a separate folder.
 *  @param generation - number of generation in evolution
-*  @param path - directory to where export the phenotypes
 **/
-void Evolution::exportPop(int argc, char* argv[], LSystem LS, int generation, std::string path){
+void Evolution::exportPop(int generation){
 
     for(int i=0; i < this->population->size(); i++) { // for each genome in the population
 
-        this->population->at(i)->constructor(argc, argv, this->params, path+std::to_string(generation)); // generates phenotype
+        //this->population->at(i)->constructor(argc, argv, this->params, path+std::to_string(generation)); // generates phenotype
+        // finds number of generation to which the genome belongs to
+        int generation_genome = (int)trunc((std::stoi(this->population->at(i)->getId()) -
+                                            (this->params["pop_size"]*this->params["prop_parent"]))
+                                           /(this->params["pop_size"]*this->params["prop_parent"]))+1;
+        if (generation_genome == 0) generation_genome = 1;
+
+        std::string filename = "/body_"+this->population->at(i)->getId()+"_p1_"+this->population->at(i)->getId_parent1()+"_p2_"+this->population->at(i)->getId_parent2()+".png";
+        std::string pathfrom =  "../../experiments/" + this->experiment_name + "/offspringpop"+ std::to_string(generation_genome)+filename;
+        std::string pathto =  "../../experiments/" + this->experiment_name + "/selectedpop"+ std::to_string(generation)+filename;
+
+        // copies phenotype file from offspring folder to selected population folder
+        system(("exec cp "+pathfrom+" "+pathto).c_str());
+
     }
 }
 
@@ -312,40 +321,7 @@ int Evolution::tournament(){
 
 
 
-/**
- * Loads population of genomes from files, from previous experiment.
- * @param argc - command line parameter
- * @param argv[] - command line parameter
- * @param size_pop - size of the population to be loaded.
- * @param test_folder - the path with folder/file from where to read the population files.
- * @param LS - Lsystem structure containing the alphabet.
- **/
 
-//void Evolution::loadPopulation(int argc, char* argv[],int size_pop, std::string test_folder, LSystem LS){
-//
-//    std::string line;
-//    std::stringstream convert;
-//
-//    for (int i=1; i<=size_pop; i++) { // for each genome file in the specified folder, reads its contents
-//
-//        convert << i; // if of genome
-//        std::ifstream myfile("../../experiments/" + test_folder + "/genome_" + convert.str() + ".txt");
-//        if (myfile.is_open()) {
-//            getline(myfile, line);
-//            std::vector<std::string> tokens;
-//            boost::split(tokens, line, boost::is_any_of(" ")); // items of the genetic-string separated by space
-//
-//            for(int j=0; j<tokens.size(); j++){
-//                // build genetic string vector!
-//            }
-//
-//            myfile.close();
-//        }else{
-//            std::cout<<"Cant open genome "<<i;
-//        }
-//    }
-
-//};
 
 
 /**
@@ -531,14 +507,162 @@ void Evolution::developIndividuals(int argc, char* argv[], LSystem LS, int gener
 }
 
 
+/**
+ * Loads population of genomes from files, from previous experiment.
+ * @param LS - Lsystem structure containing the alphabet.
+ **/
 
+void Evolution::loadPopulation(int generation){
+
+    // deletes possible remains of unfinished generation
+    std::string pathdir =  "../../experiments/" + this->experiment_name + "/selectedpop"+ std::to_string(generation+1);
+    system(("exec rm -r "+pathdir).c_str());
+    pathdir =  "../../experiments/" + this->experiment_name + "/offspringpop"+ std::to_string(generation+1);
+    system(("exec rm -r "+pathdir).c_str());
+
+    // generates list of files (genomes of last population)
+    std::system(("ls ../../experiments/" + this->experiment_name + "/selectedpop" +std::to_string(generation)+
+                 ">../../experiments/" + this->experiment_name + "/temp.txt").c_str());
+
+    std::ifstream listgenomes(("../../experiments/" + this->experiment_name + "/temp.txt").c_str());
+    std::string linegenome;
+
+    //for each file (genome)
+    while ( getline (listgenomes, linegenome) ) {
+        std::vector<std::string> tokens;
+        boost::split(tokens, linegenome, boost::is_any_of("_."));
+
+        std::string idgenome = tokens[1];
+        std::string idparent1 = tokens[3];
+        std::string idparent2 = tokens[5];
+
+        // recreates genome back to population
+        // fitness of the parents is not loaded, but it doesnt matter, because at this point it has been saved to the history already
+        Genome * gen = new Genome(idgenome, idparent1, idparent2, -1, -1);
+
+        // finds number of generation to which the genome belongs to
+        int generation_genome = (int)trunc((std::stoi(idgenome) -
+                                            (this->params["pop_size"]*this->params["prop_parent"]))
+                                           /(this->params["pop_size"]*this->params["prop_parent"]))+1;
+        if (generation_genome == 0) generation_genome = 1;
+
+        std::ifstream listalphabet("../../experiments/" + this->experiment_name + "/offspringpop"+ std::to_string(generation_genome) +"/genome" +idgenome + ".txt");
+        std::string linealphabet;
+        // for each letter of the alphabet
+        while ( getline (listalphabet, linealphabet) ) {
+
+            // gets letter and production rile from file
+            std::vector<std::string> items;
+            boost::split(items, linealphabet, boost::is_any_of(" "));
+            std::vector<std::string> items_rule(items.begin()+1, items.begin()+items.size()-1);
+
+            // build a genetic-string with the production rule for the letter
+            GeneticString lgs;
+            lgs = gen->build_genetic_string(lgs, items_rule );
+
+            // adds letter and its production rule (made a genetic-string) to the grammar of the genome
+            gen->addLetterGrammar(items[0], lgs);
+
+        }
+
+        std::ifstream listmeasures("../../experiments/" + this->experiment_name + "/offspringpop"+ std::to_string(generation_genome) +"/measures" +idgenome + ".txt");
+        std::string linemeasures;
+        // for each measure of the list
+        while ( getline (listmeasures, linemeasures) ) {
+
+            std::vector<std::string> tokens;
+            boost::split(tokens, linemeasures, boost::is_any_of(":"));
+
+            gen->updateMeasure(tokens[0], std::stod(tokens[1]));
+        }
+
+        this->population->push_back(gen);  // adds genome to the population
+
+    }
+
+
+
+};
+
+
+
+/**
+ * Loads archive of genomes from files, from previous experiment.
+ * @param LS - Lsystem structure containing the alphabet.
+ **/
+
+void Evolution::loadArchive(){
+
+    // generates list of files (genomes of last archive)
+    std::system(("ls ../../experiments/" + this->experiment_name + "/archive" +
+                 ">../../experiments/" + this->experiment_name + "/temp.txt").c_str());
+
+    std::ifstream listgenomes(("../../experiments/" + this->experiment_name + "/temp.txt").c_str());
+    std::string linegenome;
+
+    //for each file (genome)
+    while ( getline (listgenomes, linegenome) ) {
+
+        linegenome  = linegenome.substr(6, linegenome.size());
+
+        std::vector<std::string> tokens;
+        boost::split(tokens, linegenome , boost::is_any_of("."));
+
+        std::string idgenome = tokens[0];
+
+        // recreates genome back to population
+        // fitness of the parents is not loaded, but it doesnt matter, because at this point it has been saved to the history already
+        Genome * gen = new Genome(idgenome, "N", "N", -1, -1);
+
+
+        // finds number of generation to which the genome belongs to
+        int generation_genome = (int)trunc((std::stoi(idgenome) -
+                                            (this->params["pop_size"]*this->params["prop_parent"]))
+                                           /(this->params["pop_size"]*this->params["prop_parent"]))+1;
+
+        std::ifstream listalphabet("../../experiments/" + this->experiment_name + "/archive/genome" +idgenome + ".txt");
+        std::string linealphabet;
+        // for each letter of the alphabet
+        while ( getline (listalphabet, linealphabet) ) {
+
+            // gets letter and production rile from file
+            std::vector<std::string> items;
+            boost::split(items, linealphabet, boost::is_any_of(" "));
+            std::vector<std::string> items_rule(items.begin()+1, items.begin()+items.size()-1);
+
+            // build a genetic-string with the production rule for the letter
+            GeneticString lgs;
+            lgs = gen->build_genetic_string(lgs, items_rule );
+
+            // adds letter and its production rule (made a genetic-string) to the grammar of the genome
+            gen->addLetterGrammar(items[0], lgs);
+
+        }
+
+        std::ifstream listmeasures("../../experiments/" + this->experiment_name + "/offspringpop"+ std::to_string(generation_genome) +"/measures" +idgenome + ".txt");
+        std::string linemeasures;
+        // for each measure of the list
+        while ( getline (listmeasures, linemeasures) ) {
+
+            std::vector<std::string> tokens;
+            boost::split(tokens, linemeasures, boost::is_any_of(":"));
+
+            gen->updateMeasure(tokens[0], std::stod(tokens[1]));
+        }
+
+        this->archive->emplace(idgenome ,gen);  // adds genome to the archive
+
+    }
+
+
+};
 /**
 *  Evolution in the search for novelty.
 **/
 
 int Evolution::noveltySearch(int argc, char* argv[], int encodingtype) {
 
-    int niche_coverage = 0, max_niche_coverage = 0;
+    int niche_coverage = 0;
 
 
     // loads alphabet with letters and commands
@@ -566,8 +690,24 @@ int Evolution::noveltySearch(int argc, char* argv[], int encodingtype) {
         // initializes population
         this->initPopulation(LS);
 
-        // saves the number of the last generation created/evaluated
-        this->writesGeneration(gi);
+        // develops genomes of the initial population
+        this->developIndividuals(argc, argv, LS, gi, this->population, this->experiment_name+"/offspringpop",  encodingtype);
+
+        // measures phenotypes of the individuals
+        this->measureIndividuals(gi, this->population, "/offspringpop");
+
+        // updates the average measures for the population
+        this->evaluateIndividuals(gi, this->population, this->population);
+
+        // (possibly) adds genome to archive
+        this->addToArchive(this->population, this->params["prob_add_archive"], this->experiment_name);
+
+        // calculates quality state of the search for the generation
+        niche_coverage = this->calculateNicheCoverage();
+
+        // saves metrics of evolution to file
+        this->exportGenerationMetrics(gi, niche_coverage);
+
 
 
     // if experiment is set to continue from previous experiment
@@ -575,38 +715,21 @@ int Evolution::noveltySearch(int argc, char* argv[], int encodingtype) {
 
 
         this->logsTime("start");
-        this->createHeader();
 
         // loads state of parameters from previous experiment
         this->loadsParams();
         this->aux = Aux(this->experiment_name, this->getParams());
 
-        gi = this->readsGeneration(); // generation from which to start evolution
+        gi = std::stoi(this->readsEvolutionState()[0]); // last generation from loaded  experiment
+        niche_coverage = std::stoi(this->readsEvolutionState()[1]); //  niche_coverage from loaded experiment
+        this->next_id = std::stoi(this->readsEvolutionState()[2]); //  next_id from loaded experiment
 
-        this->aux.logs("---------------- generation "+std::to_string(gi)+" ----------------");
+        // loads experiment state: population/archive/etc
+        this->loadPopulation(gi);
+        this->loadArchive();
 
-        // loads population and archive
-       // this->loadPopulation(); // #FIX: finish it, loading pop/archive/state etc !!!!!!!
 
     }
-
-    // develops genomes of the initial population
-    this->developIndividuals(argc, argv, LS, gi, this->population, this->experiment_name+"/offspringpop",  encodingtype);
-
-    // measures phenotypes of the individuals
-    this->measureIndividuals(gi, this->population, "/offspringpop");
-
-    // updates the average measures for the population
-    this->evaluateIndividuals(gi, this->population, this->population);
-
-    // (possibly) adds genome to archive
-    this->addToArchive(this->population, this->params["prob_add_archive"], this->experiment_name);
-
-    // calculates quality state of the search for the generation
-    niche_coverage = this->calculateNicheCoverage();
-
-    // saves metrics of evolution to file
-    this->exportGenerationMetrics(gi, niche_coverage);
 
 
 
@@ -626,7 +749,7 @@ int Evolution::noveltySearch(int argc, char* argv[], int encodingtype) {
         // develops genomes of the offspring
         this->developIndividuals(argc, argv, LS, g, offspring, this->experiment_name+"/offspringpop",  encodingtype);
         // measures phenotypes of the offspring
-        this->measureIndividuals( g, offspring, "/offspringpop");
+        this->measureIndividuals(g, offspring, "/offspringpop");
 
 
         // BEGINNING: auxiliar pointers //
@@ -681,20 +804,18 @@ int Evolution::noveltySearch(int argc, char* argv[], int encodingtype) {
         this->exportGenerationMetrics(g, niche_coverage);
 
         // saves phenotypes of the selected population to a separated folder (only for visualization issues)
-        this->exportPop(argc, argv, LS, g, this->experiment_name+"/selectedpop");
+        this->exportPop(g);
+
 
         // saves the number of the last generation created/evaluated
-        this->writesGeneration(g);
+        this->writesEvolutionState(g, niche_coverage, this->next_id);
+
 
     }
 
     this->logsTime("end");
 
-    // updates the maximum niche coverage found so far
-    if(niche_coverage > max_niche_coverage) max_niche_coverage = niche_coverage;
-
-
-    return max_niche_coverage;
+    return niche_coverage;
 
 }
 
@@ -743,27 +864,33 @@ void Evolution::logsTime(std::string moment){
 /*
  * Logs the generation from which the recovered evolution should start from.
  * */
-void Evolution::writesGeneration(int generation) {
+void Evolution::writesEvolutionState(int generation, int max_niche_coverage, int next_id) {
 
     std::ofstream logs_file;
-    std::string path = "../../experiments/"+ this->experiment_name +"/recovergeneration.txt";
+    std::string path = "../../experiments/"+ this->experiment_name +"/evolutionstate.txt";
     logs_file.open(path);
-    logs_file << generation;
+    logs_file << generation <<" "<< max_niche_coverage <<" "<< next_id;
     logs_file.close();
 }
 
 /*
  * Reads number of the generation from which the recovered evolution should start from.
  * */
-int Evolution::readsGeneration() {
+std::vector<std::string> Evolution::readsEvolutionState() {
 
     std::string line;
-    std::ifstream myfile("../../experiments/"+ this->experiment_name +"/recovergeneration.txt");
+    std::ifstream myfile("../../experiments/"+ this->experiment_name +"/evolutionstate.txt");
     if (myfile.is_open()) {
+
         getline(myfile, line);
-        return std::stoi(line);
+        std::vector<std::string> tokens;
+        // parameters label and value separated by space
+        boost::split( tokens, line, boost::is_any_of(" ") );
+
+        return tokens;
+
     } else {
-        this->aux.logs("Unable to open generation file.");
+        this->aux.logs("Unable to open evolutionstate file.");
     }
     myfile.close();
 
@@ -776,9 +903,9 @@ int Evolution::readsGeneration() {
 int Evolution::calculateNicheCoverage() {
 
     // total number of points in the grid given the dimentions and spacing
-    //int total_points = std::pow(this->population->at(0)->getMeasures().size(),this->params["grid_bins"]);
+    //int total_points = std::pow(this->params["grid_bins"],this->population->at(0)->getMeasures().size());
 
-    this->morphological_grid =  std::map<std::string, std::vector<double>>();
+    this->morphological_grid =  std::map<std::string, std::vector<double>>(); // restart or not?
 
     for(int i = 0; i < this->population->size(); i++ ) {
 
@@ -814,7 +941,7 @@ int Evolution::calculateNicheCoverage() {
         // if point already exists in the array, adds an individual and the difference between them
         if(this->morphological_grid.count(key_point)>0) {
 
-            this->morphological_grid[key_point].push_back(distance);
+            this->morphological_grid[key_point].push_back(distance); // add map with key=id value=distance ?
 
         // if point does not exist in the array yet, , adds new point with its first individual and the difference between them
         }else {

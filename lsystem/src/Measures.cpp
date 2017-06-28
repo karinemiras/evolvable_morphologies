@@ -6,12 +6,9 @@
 #include <iostream>
 #include <fstream>
 #include <iterator>
-#include <map>
 #include <math.h>
 #include <random>
 #include <sstream>
-#include <string>
-#include <vector>
 
 #include "Genome.h"
 #include "Measures.h"
@@ -394,7 +391,7 @@ void Measures::measurePhenotype(std::map<std::string, double> params, std::strin
 
     for( const auto& mea : this->gen->getMeasures() ){
 
-        measures_file << mea.first << " : " << mea.second << std::endl;
+        measures_file << mea.first << ":" << mea.second << std::endl;
         measures_file_general <<"\t"<< mea.second;
 
     }

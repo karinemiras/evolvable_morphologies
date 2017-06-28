@@ -132,7 +132,7 @@ void Genome::build_grammar(LSystem LS, std::map<std::string, double> params) {
             }
         }
 
-        // build a genetic-string with the new production rule
+        // build a genetic-string with the the production rule for the letter
         GeneticString lgs;
         lgs = this->build_genetic_string(lgs, letter_items);
 
@@ -233,11 +233,13 @@ void Genome::exportGenome(std::string dirpath) {
     // writes each production rule of the grammar to a different line in a the file
     for ( auto &it : this->getGrammar()) {
 
+        genome_file << it.first << " "; // writes letter to line
+
         GeneticString::Node *current;
         current = this->getGrammar()[it.first].getStart();
         while (current != NULL) {
 
-            genome_file << current->item << " ";
+            genome_file << current->item << " "; // writes all items to line
             current = current->next;
         }
         genome_file << std::endl;
@@ -581,29 +583,14 @@ void Genome::updateFitness(double fitness){
 }
 
 
-/**
- * Saves the value representing the distance from one genome's measure to other genome's measure.
- * @param distance - distance between the measures
- */
-void Genome::setGenomeDistance(std::string id_genome,   double distance){
-
-    this->genomes_distance.emplace(id_genome, distance);
-}
-
-void Genome::deleteGenomeDistance(std::string id_genome){
-
-    this->genomes_distance.erase(id_genome);
-}
-
-
-std::map< std::string,  double  > Genome::getGenomeDistance(){
-
-    return genomes_distance;
-}
-
 
 std::map< std::string, GeneticString > Genome::getGrammar(){
 
     return this->grammar;
 }
 
+
+void Genome::addLetterGrammar(std::string letter, GeneticString lgs){
+
+    this->grammar.emplace(letter, lgs);
+}
