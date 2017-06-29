@@ -22,7 +22,7 @@ void Aux::createFolder(std::string dir) {
 void Aux::removeFolder(std::string dir) {
 
     std::string pathdir =  "../../experiments/"+dir;
-    system(("exec rm -r "+pathdir+"/*").c_str());
+    system(("exec rm -r "+pathdir).c_str());
 
 }
 

@@ -38,18 +38,18 @@ public:
     std::vector<Genome *>  * getPopulation();
     std::map<std::string, double> getParams();
     int noveltySearch(int argc, char* argv[], int encodingtype);
-    void exportGenerationMetrics(int generation, int niche_coverage);
+    void exportGenerationMetrics(int generation,  int niche_coverage_generation, int niche_coverage_accumulated);
     void exportPop(int generation);
     void addToArchive( std::vector<Genome *>  * individuals, double prob_add_archive, std::string path);
     void saveParameters();
     void logsTime(std::string moment);
     void setupEvolution();
-    void writesEvolutionState(int generation, int max_niche_coverage, int next_id);
+    void writesEvolutionState(int generation, int next_id);
     std::vector<std::string> readsEvolutionState();
     void loadsParams();
     void loadPopulation(int generation);
     void loadArchive();
-    int calculateNicheCoverage();
+    std::vector<int> calculateNicheCoverage();
     void createHeader();
     void updateParameter(std::string key, double value);
     void developIndividuals(int argc, char* argv[], LSystem LS, int generation, std::vector<Genome *>  * individuals, std::string path, int encodingtype);
@@ -69,7 +69,8 @@ protected:
     std::string experiment_name = ""; // name for the experiment
     int new_experiment; // if state of previous a experiment is being restored (1) or not (0)
     // points in a grid representing the morphological space
-    std::map<std::string, std::vector<double>> morphological_grid =  std::map<std::string, std::vector<double>>();
+    std::map<std::string, std::vector<double>> morphological_grid_generation =  std::map<std::string, std::vector<double>>();
+    std::map<std::string, std::vector<double>> morphological_grid_accumulated =  std::map<std::string, std::vector<double>>();
     Aux aux = Aux(this->experiment_name, this->getParams()); // contains general auxiliar methos for the experiments
     Tests tests = Tests(this->experiment_name, this->getParams()); // contains methods with tests for the system
 

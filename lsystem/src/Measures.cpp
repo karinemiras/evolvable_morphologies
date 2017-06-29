@@ -61,7 +61,7 @@ void Measures::initalizeMeasures(){
  * @param params - list of params read from configuration file.
  * @param dirpath - directory where file with measures will be saved.
  */
-void Measures::measurePhenotype(std::map<std::string, double> params, std::string dirpath){
+void Measures::measurePhenotype(std::map<std::string, double> params, std::string dirpath, int generation){
 
 
     // size of the component plus the spacing between components
@@ -381,18 +381,19 @@ void Measures::measurePhenotype(std::map<std::string, double> params, std::strin
     /* BEGINNING: exports measures to files */
 
     std::ofstream measures_file_general;
-    std::string path = "../../experiments/"+this->experiment_name+dirpath+"/measures.txt";
+    std::string path = "../../experiments/"+this->experiment_name+"/measures.txt";
     measures_file_general.open(path, std::ofstream::app);
 
     std::ofstream measures_file;
-    path = "../../experiments/"+this->experiment_name+dirpath+"/measures"+this->gen->getId()+".txt";
+    path = "../../experiments/"+this->experiment_name+dirpath+std::to_string(generation)+"/measures"+this->gen->getId()+".txt";
     measures_file.open(path);
     measures_file_general << this->gen->getId();
+    measures_file_general  <<" "<< std::to_string(generation);
 
     for( const auto& mea : this->gen->getMeasures() ){
 
         measures_file << mea.first << ":" << mea.second << std::endl;
-        measures_file_general <<"\t"<< mea.second;
+        measures_file_general <<" "<< mea.second;
 
     }
 

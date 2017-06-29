@@ -20,10 +20,10 @@ int main(int argc, char* argv[]) {
 
 
     // experiment: looking for global optimum of innovation
-     int niche_coverage = 0;
+     int niche_coverage_accumulated = 0;
      EvolutionIndirect * e = new EvolutionIndirect("test", 1);
-     niche_coverage = e->noveltySearch(argc, argv, 1); // 1-indirect TYPE is temporary, it will be replaced by genome parent class scheme
-     std::cout<<">>> niche coverage found "<<niche_coverage;
+     niche_coverage_accumulated = e->noveltySearch(argc, argv, 1); // 1-indirect TYPE is temporary, it will be replaced by genome parent class scheme
+     std::cout<<">>> accumulated niche coverage " << niche_coverage_accumulated;
 
     // e->testGeneticString(argc, argv,"spider3");
 
