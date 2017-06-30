@@ -53,6 +53,10 @@ public:
     void createHeader();
     void updateParameter(std::string key, double value);
     void developIndividuals(int argc, char* argv[], LSystem LS, int generation, std::vector<Genome *>  * individuals, std::string path, int encodingtype);
+    int loadExperiment();
+    int initExperiment(int argc, char* argv[], LSystem LS, int encodingtype);
+    void summaryNicheCoverage();
+    void compareIndividuals(int generation);
 
     virtual void initPopulation(LSystem LS){};
     virtual void crossover(LSystem LS, std::vector<Genome *> * offspring){};
