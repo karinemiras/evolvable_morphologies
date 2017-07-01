@@ -61,6 +61,7 @@ void EvolutionIndirect::initPopulation(LSystem LS){ // default arguments and Lsy
 void EvolutionIndirect::crossover(LSystem LS, std::vector<Genome *>  * offspring){
 
 
+
     // creates new individuals via crossover (size of offspring is relative to the size of population)
     for(int i = 0; i < ceil(this->params["pop_size"] * this->params["offspring_size"]); i++) {
 
@@ -96,83 +97,16 @@ void EvolutionIndirect::crossover(LSystem LS, std::vector<Genome *>  * offspring
         // for each letter in the grammar
         for ( auto &it : LS.getAlphabet()) {
 
-            std::uniform_int_distribution<int> dist_type_cross(1, 2); // distribution for the type of crossover
-            int  type_cross = dist_type_cross(generator);
+            if(prob(generator) <= prob(generator)) {
 
-            this->aux.logs("typecross "+it.first+" "+std::to_string(type_cross));
+                grammar.emplace(it.first, this->population->at(parent1)->getGrammar()[it.first]); // gets is from parent1
+            } else{
 
-            // gets a genetic-string from a single parent for each letter
-            if (type_cross == 1) {
-
-                if(prob(generator) <= params["prop_parent"]) {
-
-                    grammar.emplace(it.first, this->population->at(parent1)->getGrammar()[it.first]); // gets is from parent1
-                } else{
-
-                    grammar.emplace(it.first, this->population->at(parent2)->getGrammar()[it.first]); // gets is from parent2
-                }
+                grammar.emplace(it.first, this->population->at(parent2)->getGrammar()[it.first]); // gets is from parent2
             }
 
-            // gets a random part of the genetic-string from each parent for each letter
-            if (type_cross == 2) {
 
-                std::uniform_int_distribution<int> dist_pos_parent1_ini(1,
-                                                                        this->population->at(parent1)->getGrammar()[it.first].count()); // distribution for parent1 initial position
-                std::uniform_int_distribution<int> dist_pos_parent2_ini(1,
-                                                                        this->population->at(parent2)->getGrammar()[it.first].count()); // distribution for parent2 initial position
-
-                // raffles random positions for the start point (of the genetic string) for both parents
-                int pos_parent1_ini =  dist_pos_parent1_ini(generator);
-                int pos_parent2_ini =  dist_pos_parent2_ini(generator);
-
-                // however, if it is the production rule of the core-component
-                if(it.first == "C") {
-
-                    // forces parent1 to start from first position, preserving the core-component at the beginning
-                    pos_parent1_ini = 1;
-
-                    // if theres more than one item forming the genetic string of parent2
-                    if(this->population->at(parent2)->getGrammar()[it.first].count() > 1) {
-
-                        // makes sure that parent2 will start from a position which is not the first
-                        while (pos_parent2_ini == 1) {
-                            pos_parent2_ini = dist_pos_parent2_ini(generator);
-                        }
-                    }else{ // if core component is the only in the gs, includes nothing from this parent
-                        pos_parent2_ini = 0;
-                    }
-                }
-
-                std::uniform_int_distribution<int> dist_pos_parent1_end(pos_parent1_ini,
-                                                                        this->population->at(parent1)->getGrammar()[it.first].count()); // distribution for parent1 final position
-                std::uniform_int_distribution<int> dist_pos_parent2_end(pos_parent2_ini,
-                                                                        this->population->at(parent2)->getGrammar()[it.first].count()); // distribution for parent2 final position
-
-                int pos_parent1_end = dist_pos_parent1_end(generator);
-
-                // if theres more than one item forming the genetic string of parent2
-                int pos_parent2_end = 0;
-                if(this->population->at(parent2)->getGrammar()[it.first].count()>1) {
-
-                    pos_parent2_end = dist_pos_parent2_end(generator);
-                }else{
-                    pos_parent2_end = 0;
-                }
-
-                GeneticString gs;
-
-               // std::cout<<" ------- pos "<<pos_parent1_ini<<" "<<pos_parent1_end<<" "<<pos_parent2_ini<<" "<<pos_parent2_end <<std::endl;
-
-                gs.create_joined_list(pos_parent1_ini, pos_parent2_ini,
-                                      pos_parent1_end, pos_parent2_end,
-                                      this->population->at(parent1)->getGrammar()[it.first],
-                                      this->population->at(parent2)->getGrammar()[it.first]);
-
-
-                grammar.emplace(it.first, gs);
-            }
-
-             // grammar[it.first].display_list();
+            // grammar[it.first].display_list();
 
         }
 
@@ -196,6 +130,7 @@ void EvolutionIndirect::crossover(LSystem LS, std::vector<Genome *>  * offspring
 
 void EvolutionIndirect::mutation(LSystem LS, std::vector<Genome *> * offspring) {
 
+
     std::random_device rd;
     std::default_random_engine generator(rd());
 
@@ -216,6 +151,7 @@ void EvolutionIndirect::mutation(LSystem LS, std::vector<Genome *> * offspring) 
 
 
         for ( auto &it : offspring->at(i)->getGrammar()) { // for each letter in the grammar
+
 
             //  if there is at least more than two components, and if the raffled probability is within the constrained probability
             if (it.second.count() >= 2 and prob(generator) < this->params["mutation_delete_prob"]) {
@@ -243,7 +179,6 @@ void EvolutionIndirect::mutation(LSystem LS, std::vector<Genome *> * offspring) 
                 genetic_string_items.push_back(LS.getMountingCommands()[dist_mountingcommand(generator)]);
             }
 
-
             // if raffled probability is within the constrained probability
             if (prob(generator) < this->params["mutation_add_prob"]) {
 
@@ -260,14 +195,38 @@ void EvolutionIndirect::mutation(LSystem LS, std::vector<Genome *> * offspring) 
                 genetic_string_items.push_back(LS.getMovingCommands()[dist_movingcommand(generator)]);
             }
 
-            // distribution for position of insertion in the genetic-string
+
+//            // if raffled probability is within the constrained probability
+//            if (prob(generator) < this->params["mutation_delete_swap"]) {
+//
+//                // distribution for position of insertion/swap in the genetic-string
+//                std::uniform_int_distribution<int> pos_s(1, it.second.count());
+//
+//                // position of items to be swapped in the genetic-string
+//                int pos_swap1 = pos_s(generator);
+//                int pos_swap2 = pos_s(generator);
+//                int aux = 0;
+//
+//                if(it.first == "C" and pos_swap1 == 1) pos_swap1 = 2;
+//                if(it.first == "C" and pos_swap2 == 1) pos_swap2 = 2;
+//
+//                // makes sure position swap1 is before position swap2
+//                if(pos_swap1 > pos_swap2) {
+//                    aux = pos_swap1;
+//                    pos_swap2 = pos_swap1;
+//                    pos_swap1 = aux;
+//                }
+//
+//                it.second.swap(pos_swap1, pos_swap2); // removes item from chosen position
+//            }
+
+
+            // distribution for position of insertion/swap in the genetic-string
             std::uniform_int_distribution<int> pos_i(0, it.second.count());
             int pos_insertion = pos_i(generator);
 
             // if it is the production rule of the core-component, prevents new items from being inserted at the beginning, preserving the root
-            if(it.first == "C" and pos_insertion == 0){
-                pos_insertion++;
-            }
+            if(it.first == "C" and pos_insertion == 0) pos_insertion++;
 
             //  (possibly) alters genetic-string (production rule) adding items (letters or moving commands).
             it.second.add(pos_insertion, genetic_string_items);

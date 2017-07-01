@@ -129,7 +129,7 @@ void GeneticString::create_joined_list(int pos_parent1_ini, int pos_parent2_ini,
 
 /**
  * Deletes item from the genetic-string.
- * @param genetic_string_items - contains the items which will be added to the genetic-string in an specific position.
+ * @param pos - position of item to be deleted
  */
 void GeneticString::remove(int pos) {
 
@@ -152,6 +152,35 @@ void GeneticString::remove(int pos) {
     }
     if (next != NULL) {
         next->prev = previous;  // the item that was positioned after the removed item will point to the new item
+    }
+}
+
+
+/**
+ * Swaps item from positions in the genetic-string.
+ * @param genetic_string_items - contains the items which will be added to the genetic-string in an specific position.
+ */
+void GeneticString::swap(int pos_swap1, int pos_swap2) {
+
+    GeneticString::Node *current, *next, *previous;
+//    current = start;
+//    int current_pos = 1;
+//
+//    while (current_pos < pos) { // looks for chosen position
+//        current = current->next;
+//        current_pos++;
+//    }
+//
+//    previous = current->prev;
+//    next = current->next;
+//
+//    if (previous != NULL) {
+//        previous->next = next;  // that item that comes before the deleted item will point forward to the next item
+//    }else{
+//        start = next; // in case the removed item is the first, the next will be the first
+//    }
+//    if (next != NULL) {
+//        next->prev = previous;  // the item that was positioned after the removed item will point to the new item
     }
 }
 
