@@ -939,9 +939,9 @@ int Evolution::noveltySearch(int argc, char* argv[], int encodingtype) {
 
 
         //every 10 generations, compares distances among points
-//        if(g%10==0) {
-//            this->compareIndividuals(g);
-//        }
+        if(g%10==0) {
+            this->compareIndividuals(g);
+        }
 
 
         // saves the number of the last generation created/evaluated
@@ -950,7 +950,7 @@ int Evolution::noveltySearch(int argc, char* argv[], int encodingtype) {
 
     }
 
-    //this->summaryNicheCoverage();
+    this->summaryNicheCoverage();
 
 
     this->logsTime("end");

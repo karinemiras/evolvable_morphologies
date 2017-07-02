@@ -152,7 +152,6 @@ void EvolutionIndirect::mutation(LSystem LS, std::vector<Genome *> * offspring) 
         // for each letter in the grammar
         for (auto &it : offspring->at(i)->getGrammar()) {
 
-            std::cout << it.first << std::endl;
 
             // given the probability of mutation
             if (prob(generator) < this->params["mutation_prob"]) {
@@ -167,14 +166,10 @@ void EvolutionIndirect::mutation(LSystem LS, std::vector<Genome *> * offspring) 
                     //  if there is at least more than two components, and if the raffled probability is within the constrained probability
                     if (it.second.count() > 1) {
 
-             std::cout << " delete" << std::endl;
-
-             it.second.display_list();
-
                         // distribution for position of deletion in the genetic-string
                         std::uniform_int_distribution<int> pos_d(1, it.second.count()-1);
                         int pos_deletion = pos_d(generator);
-   std::cout << "del" << pos_deletion << std::endl;
+
                         // if it is the production rule of the core-component, prevents core-component from being deleted, preserving the root
                         if (it.first == "C" and pos_deletion == 1) {
                             // std::cout<<"cant delete the the core-component from the beginning of its rule";
@@ -182,8 +177,6 @@ void EvolutionIndirect::mutation(LSystem LS, std::vector<Genome *> * offspring) 
                             this->aux.logs("mutation: remove in " + offspring->at(i)->getId());
                             it.second.remove(pos_deletion); // removes item from chosen position
                         }
-             it.second.display_list();
-
                     }
                 }
 
@@ -207,11 +200,7 @@ void EvolutionIndirect::mutation(LSystem LS, std::vector<Genome *> * offspring) 
                         pos_swap2 = 0;
                     }
 
-
-                    std::cout << "pos swap " << pos_swap1 << " " << pos_swap2 << std::endl;
-                    it.second.display_list();
                     it.second.swap(pos_swap1, pos_swap2); // removes item from chosen position
-                    it.second.display_list();
                     this->aux.logs("mutation: swap in " + offspring->at(i)->getId());
 
                 }
@@ -253,12 +242,9 @@ void EvolutionIndirect::mutation(LSystem LS, std::vector<Genome *> * offspring) 
                         pos_insertion++;
                     }
 
-                    std::cout<<"add"<<std::endl;
-                    it.second.display_list();
-                    std::cout<<"posins "<<pos_insertion<<std::endl;
                     //  (possibly) alters genetic-string (production rule) adding items (letters or commands)
                     it.second.add(pos_insertion, genetic_string_items);
-                    it.second.display_list();
+
                 }
 
             }
