@@ -158,30 +158,33 @@ void GeneticString::remove(int pos) {
 
 /**
  * Swaps item from positions in the genetic-string.
- * @param genetic_string_items - contains the items which will be added to the genetic-string in an specific position.
+ * @param pos_swap1 - position for item 1 to be swapped
+ * @param pos_swap2 - position for item 2 to be swapped
  */
 void GeneticString::swap(int pos_swap1, int pos_swap2) {
 
-    GeneticString::Node *current, *next, *previous;
-//    current = start;
-//    int current_pos = 1;
-//
-//    while (current_pos < pos) { // looks for chosen position
-//        current = current->next;
-//        current_pos++;
-//    }
-//
-//    previous = current->prev;
-//    next = current->next;
-//
-//    if (previous != NULL) {
-//        previous->next = next;  // that item that comes before the deleted item will point forward to the next item
-//    }else{
-//        start = next; // in case the removed item is the first, the next will be the first
-//    }
-//    if (next != NULL) {
-//        next->prev = previous;  // the item that was positioned after the removed item will point to the new item
+    GeneticString::Node *current, *pos1;
+    current = start;
+    std::string aux = "";
+
+    int current_pos = 1;
+
+    while (current_pos < pos_swap1) { // looks for chosen position1
+        current = current->next;
+        current_pos++;
     }
+    pos1 = current;
+
+    while (current_pos < pos_swap2) { // looks for chosen position2
+        current = current->next;
+        current_pos++;
+    }
+    aux = current->item;
+
+    // inverts values
+    current->item = pos1->item;
+    pos1->item = aux;
+
 }
 
 /**

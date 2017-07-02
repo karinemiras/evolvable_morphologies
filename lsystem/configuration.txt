@@ -3,10 +3,7 @@ num_generations 100
 offspring_size 0.50
 num_initial_comp 3
 replacement_iterations 3
-mutation_add_prob 0.10
-mutation_delete_swap 0.15
-mutation_move_prob 0.30
-mutation_delete_prob 0.10
+mutation_prob 0.2
 prob_add_archive 0.05
 k_neighbors 15
 max_comps 30

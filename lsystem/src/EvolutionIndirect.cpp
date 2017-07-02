@@ -105,7 +105,6 @@ void EvolutionIndirect::crossover(LSystem LS, std::vector<Genome *>  * offspring
                 grammar.emplace(it.first, this->population->at(parent2)->getGrammar()[it.first]); // gets is from parent2
             }
 
-
             // grammar[it.first].display_list();
 
         }
@@ -115,7 +114,6 @@ void EvolutionIndirect::crossover(LSystem LS, std::vector<Genome *>  * offspring
         offspring->push_back(gen); // adds new individual to the offspring
 
     }
-
 
     this->mutation(LS, offspring); // mutates new individuals
 
@@ -147,93 +145,125 @@ void EvolutionIndirect::mutation(LSystem LS, std::vector<Genome *> * offspring) 
     std::uniform_real_distribution<double> prob(0.0, 1.0);
 
 
-    for(int i=0; i < offspring->size(); i++) {  // for each genome of the offspring
+    // for each genome of the offspring
+    for(int i=0; i < offspring->size(); i++) {
 
 
-        for ( auto &it : offspring->at(i)->getGrammar()) { // for each letter in the grammar
+        // for each letter in the grammar
+        for (auto &it : offspring->at(i)->getGrammar()) {
+
+            std::cout << it.first << std::endl;
+
+            // given the probability of mutation
+            if (prob(generator) < this->params["mutation_prob"]) {
+
+                std::uniform_int_distribution<int> type_mutation(1, 5);
+                int type_of_mutation = type_mutation(generator);
 
 
-            //  if there is at least more than two components, and if the raffled probability is within the constrained probability
-            if (it.second.count() >= 2 and prob(generator) < this->params["mutation_delete_prob"]) {
+                // # deletion
+                if (type_of_mutation == 1) {
 
-                // distribution for position of deletion in the genetic-string
-                std::uniform_int_distribution<int> pos_d(1, it.second.count());
-                int pos_deletion = pos_d(generator);
+                    //  if there is at least more than two components, and if the raffled probability is within the constrained probability
+                    if (it.second.count() > 1) {
 
-                // if it is the production rule of the core-component, prevents core-component from being deleted, preserving the root
-                if(it.first == "C" and pos_deletion == 1){
-                      // std::cout<<"cant delete the the core-component from the beginning of its rule";
-                }else{
-                    this->aux.logs("mutation: remove in "+ offspring->at(i)->getId());
-                    it.second.remove(pos_deletion); // removes item from chosen position
+             std::cout << " delete" << std::endl;
+
+             it.second.display_list();
+
+                        // distribution for position of deletion in the genetic-string
+                        std::uniform_int_distribution<int> pos_d(1, it.second.count()-1);
+                        int pos_deletion = pos_d(generator);
+   std::cout << "del" << pos_deletion << std::endl;
+                        // if it is the production rule of the core-component, prevents core-component from being deleted, preserving the root
+                        if (it.first == "C" and pos_deletion == 1) {
+                            // std::cout<<"cant delete the the core-component from the beginning of its rule";
+                        } else {
+                            this->aux.logs("mutation: remove in " + offspring->at(i)->getId());
+                            it.second.remove(pos_deletion); // removes item from chosen position
+                        }
+             it.second.display_list();
+
+                    }
                 }
+
+                // # swapping
+                if (type_of_mutation == 2) {
+
+
+                    // distribution for position of insertion/swap in the genetic-string
+                    std::uniform_int_distribution<int> pos_s(1, it.second.count());
+
+                    // position of items to be swapped in the genetic-string
+                    int pos_swap1 = pos_s(generator);
+                    int pos_swap2 = pos_s(generator);
+
+                    while (pos_swap2 < pos_swap1)
+                        pos_swap2 = pos_s(generator);  // makes sure position swap1 is before position swap2
+
+                    // never swaps core component
+                    if (it.first == "C" and pos_swap1 == 1) {
+                        pos_swap1 = 0;
+                        pos_swap2 = 0;
+                    }
+
+
+                    std::cout << "pos swap " << pos_swap1 << " " << pos_swap2 << std::endl;
+                    it.second.display_list();
+                    it.second.swap(pos_swap1, pos_swap2); // removes item from chosen position
+                    it.second.display_list();
+                    this->aux.logs("mutation: swap in " + offspring->at(i)->getId());
+
+                }
+
+
+                std::vector<std::string> genetic_string_items = std::vector<std::string>();
+
+                // # adding mounting command
+                if(type_of_mutation == 3) {
+
+                    this->aux.logs("mutation: add mounting command in " + offspring->at(i)->getId());
+                    genetic_string_items.push_back(LS.getMountingCommands()[dist_mountingcommand(generator)]);
+                }
+
+                // # adding letter
+                if(type_of_mutation == 4) {
+
+                    this->aux.logs("mutation: add letter in " + offspring->at(i)->getId());
+                    genetic_string_items.push_back(LS.getAlphabetIndex()[dist_letter(generator)]);
+                }
+
+
+                // # adding moving command
+                if(type_of_mutation == 5) {
+
+                    this->aux.logs("mutation: add moving command in " + offspring->at(i)->getId());
+                    genetic_string_items.push_back(LS.getMovingCommands()[dist_movingcommand(generator)]);
+                }
+
+                // add possible items
+                if(type_of_mutation == 3 or type_of_mutation == 4 or type_of_mutation == 5) {
+
+                    // distribution for position of insertion in the genetic-string
+                    std::uniform_int_distribution<int> pos_i(0, it.second.count());
+                    int pos_insertion = pos_i(generator);
+
+                    // if it is the production rule of the core-component, prevents new items from being inserted at the beginning, preserving the root
+                    if (it.first == "C" and pos_insertion == 0) {
+                        pos_insertion++;
+                    }
+
+                    std::cout<<"add"<<std::endl;
+                    it.second.display_list();
+                    std::cout<<"posins "<<pos_insertion<<std::endl;
+                    //  (possibly) alters genetic-string (production rule) adding items (letters or commands)
+                    it.second.add(pos_insertion, genetic_string_items);
+                    it.second.display_list();
+                }
+
             }
-
-            std::vector<std::string> genetic_string_items = std::vector<std::string>();
-
-            // if raffled probability is within the constrained probability
-            if (prob(generator) < this->params["mutation_add_prob"]) {
-
-                // raffles a command to add
-                this->aux.logs("mutation: add mounting command in " + offspring->at(i)->getId());
-                genetic_string_items.push_back(LS.getMountingCommands()[dist_mountingcommand(generator)]);
-            }
-
-            // if raffled probability is within the constrained probability
-            if (prob(generator) < this->params["mutation_add_prob"]) {
-
-                // raffles a letter to add
-                this->aux.logs("mutation: add letter in " + offspring->at(i)->getId());
-                genetic_string_items.push_back(LS.getAlphabetIndex()[dist_letter(generator)]);
-            }
-
-            // if raffled probability is within the constrained probability
-            if (prob(generator) < this->params["mutation_move_prob"]) {
-
-                // adds moving command
-                this->aux.logs("mutation: add moving command in " + offspring->at(i)->getId());
-                genetic_string_items.push_back(LS.getMovingCommands()[dist_movingcommand(generator)]);
-            }
-
-
-//            // if raffled probability is within the constrained probability
-//            if (prob(generator) < this->params["mutation_delete_swap"]) {
-//
-//                // distribution for position of insertion/swap in the genetic-string
-//                std::uniform_int_distribution<int> pos_s(1, it.second.count());
-//
-//                // position of items to be swapped in the genetic-string
-//                int pos_swap1 = pos_s(generator);
-//                int pos_swap2 = pos_s(generator);
-//                int aux = 0;
-//
-//                if(it.first == "C" and pos_swap1 == 1) pos_swap1 = 2;
-//                if(it.first == "C" and pos_swap2 == 1) pos_swap2 = 2;
-//
-//                // makes sure position swap1 is before position swap2
-//                if(pos_swap1 > pos_swap2) {
-//                    aux = pos_swap1;
-//                    pos_swap2 = pos_swap1;
-//                    pos_swap1 = aux;
-//                }
-//
-//                it.second.swap(pos_swap1, pos_swap2); // removes item from chosen position
-//            }
-
-
-            // distribution for position of insertion/swap in the genetic-string
-            std::uniform_int_distribution<int> pos_i(0, it.second.count());
-            int pos_insertion = pos_i(generator);
-
-            // if it is the production rule of the core-component, prevents new items from being inserted at the beginning, preserving the root
-            if(it.first == "C" and pos_insertion == 0) pos_insertion++;
-
-            //  (possibly) alters genetic-string (production rule) adding items (letters or moving commands).
-            it.second.add(pos_insertion, genetic_string_items);
 
         }
-
     }
 
 }
-
