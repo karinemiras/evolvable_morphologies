@@ -47,7 +47,6 @@ void Evolution::readParams(){
     *    replacement_iterations - number of replacement iterations for the l-system
     *    size_component - size of each component in pixels
     *    spacing - spacing between components in pixels
-    *    offspring_size - proportion of the size of the population to calculate the number of individuals of the offsfpring
     *    num_generations - number of generations of the evolution
     *    mutation_alter_prob - probability of adding/removing items (letters/commands) to the genetic-string in the mutation
     *    max_comps - maximum number of components allowed per phenotype
@@ -152,9 +151,8 @@ void Evolution::exportPop(int generation){
 
         //this->population->at(i)->constructor(argc, argv, this->params, path+std::to_string(generation)); // generates phenotype
         // finds number of generation to which the genome belongs to
-        int generation_genome = (int)trunc((std::stoi(this->population->at(i)->getId()) -
-                                            (this->params["pop_size"]*this->params["offspring_size"]))
-                                           /(this->params["pop_size"]*this->params["offspring_size"]))+1;
+        int generation_genome = (int)trunc(std::stoi(this->population->at(i)->getId())
+                                           /this->params["pop_size"])+1;
         if (generation_genome == 0) generation_genome = 1;
 
         std::string filename = "/body_"+this->population->at(i)->getId()+"_p1_"+this->population->at(i)->getId_parent1()+"_p2_"+this->population->at(i)->getId_parent2()+".png";
@@ -285,8 +283,6 @@ void Evolution::evaluateIndividuals(int generation, std::vector<Genome *>  * ind
         fitness = fitness/this->params["k_neighbors"];
         individuals_reference->at(i)->updateFitness(fitness);
 
-
-        this->aux.logs("fitness genome " + individuals_reference->at(i)->getId()+ " : "+ std::to_string(individuals_reference->at(i)->getFitness()));
 
         history_file << std::to_string(generation)<<" "     // generation
                      << individuals_reference->at(i)->getId()<<" "   // idgenome
@@ -625,9 +621,8 @@ void Evolution::loadPopulation(int generation){
         Genome * gen = new Genome(idgenome, idparent1, idparent2, -1, -1);
 
         // finds number of generation to which the genome belongs to
-        int generation_genome = (int)trunc((std::stoi(idgenome) -
-                                            (this->params["pop_size"]*this->params["offspring_size"]))
-                                           /(this->params["pop_size"]*this->params["offspring_size"]))+1;
+        int generation_genome = (int)trunc(std::stoi(idgenome)
+                                           /this->params["pop_size"])+1;
         if (generation_genome == 0) generation_genome = 1;
 
         std::ifstream listalphabet("../../experiments/" + this->experiment_name + "/offspringpop"+ std::to_string(generation_genome) +"/genome" +idgenome + ".txt");
@@ -700,9 +695,8 @@ void Evolution::loadArchive(){
 
 
         // finds number of generation to which the genome belongs to
-        int generation_genome = (int)trunc((std::stoi(idgenome) -
-                                            (this->params["pop_size"]*this->params["offspring_size"]))
-                                           /(this->params["pop_size"]*this->params["offspring_size"]))+1;
+        int generation_genome = (int)trunc(std::stoi(idgenome)
+                                           /this->params["pop_size"])+1;
 
         std::ifstream listalphabet("../../experiments/" + this->experiment_name + "/archive/genome" +idgenome + ".txt");
         std::string linealphabet;
@@ -939,9 +933,9 @@ int Evolution::noveltySearch(int argc, char* argv[], int encodingtype) {
 
 
         //every 10 generations, compares distances among points
-        if(g%10==0) {
-            this->compareIndividuals(g);
-        }
+//        if(g%10==0) {
+//            this->compareIndividuals(g);
+//        }
 
 
         // saves the number of the last generation created/evaluated
@@ -950,7 +944,7 @@ int Evolution::noveltySearch(int argc, char* argv[], int encodingtype) {
 
     }
 
-    this->summaryNicheCoverage();
+    //this->summaryNicheCoverage();
 
 
     this->logsTime("end");

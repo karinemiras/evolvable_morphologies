@@ -1,10 +1,9 @@
-pop_size 1000
+pop_size 100
 num_generations 100
-offspring_size 0.50
 num_initial_comp 3
 replacement_iterations 3
 mutation_prob 0.1
-prob_add_archive 0.05
+prob_add_archive 0.025
 k_neighbors 15
 max_comps 30
 grid_bins 100
