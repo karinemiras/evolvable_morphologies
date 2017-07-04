@@ -39,6 +39,7 @@ void Evolution::readParams(){
     std::ifstream myfile ("../../lsystem/configuration.txt");
 
     /*   pop_size - size of the population of genomes
+    *    offspring_prop - proportion of the population size to dcalculate size of offspring
     *    add_backtoparent_prob - probability of adding a back-to-parent command to genetic-strings
     *    num_initial_comp - number of initial (random) components in the production rules of the grammar
     *    show_phenotypes - flag to show the phenotype graphic
@@ -149,10 +150,14 @@ void Evolution::exportPop(int generation){
 
     for(int i=0; i < this->population->size(); i++) { // for each genome in the population
 
-        //this->population->at(i)->constructor(argc, argv, this->params, path+std::to_string(generation)); // generates phenotype
         // finds number of generation to which the genome belongs to
-        int generation_genome = (int)trunc(std::stoi(this->population->at(i)->getId())
-                                           /this->params["pop_size"])+1;
+        int generation_genome = 0;
+        int offspring_size = this->params["pop_size"]*this->params["offspring_prop"];
+        if(this->params["offspring_prop"] == 1)
+            generation_genome = (int)trunc(std::stoi(this->population->at(i)->getId()) /this->params["pop_size"])+1;
+        else
+            generation_genome = (int)trunc( (std::stoi(this->population->at(i)->getId())-offspring_size) /offspring_size)+1;
+
         if (generation_genome == 0) generation_genome = 1;
 
         std::string filename = "/body_"+this->population->at(i)->getId()+"_p1_"+this->population->at(i)->getId_parent1()+"_p2_"+this->population->at(i)->getId_parent2()+".png";
@@ -621,8 +626,13 @@ void Evolution::loadPopulation(int generation){
         Genome * gen = new Genome(idgenome, idparent1, idparent2, -1, -1);
 
         // finds number of generation to which the genome belongs to
-        int generation_genome = (int)trunc(std::stoi(idgenome)
-                                           /this->params["pop_size"])+1;
+        int generation_genome = 0;
+        int offspring_size = this->params["pop_size"]*this->params["offspring_prop"];
+        if(this->params["offspring_prop"] == 1)
+            generation_genome = (int)trunc(std::stoi(idgenome) /this->params["pop_size"])+1;
+        else
+            generation_genome = (int)trunc( (std::stoi(idgenome)-offspring_size) /offspring_size)+1;
+
         if (generation_genome == 0) generation_genome = 1;
 
         std::ifstream listalphabet("../../experiments/" + this->experiment_name + "/offspringpop"+ std::to_string(generation_genome) +"/genome" +idgenome + ".txt");
@@ -695,8 +705,13 @@ void Evolution::loadArchive(){
 
 
         // finds number of generation to which the genome belongs to
-        int generation_genome = (int)trunc(std::stoi(idgenome)
-                                           /this->params["pop_size"])+1;
+        int generation_genome = 0;
+        int offspring_size = this->params["pop_size"]*this->params["offspring_prop"];
+        if(this->params["offspring_prop"] == 1)
+            generation_genome = (int)trunc(std::stoi(idgenome) /this->params["pop_size"])+1;
+        else
+            generation_genome = (int)trunc( (std::stoi(idgenome)-offspring_size) /offspring_size)+1;
+
 
         std::ifstream listalphabet("../../experiments/" + this->experiment_name + "/archive/genome" +idgenome + ".txt");
         std::string linealphabet;

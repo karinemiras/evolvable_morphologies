@@ -61,84 +61,12 @@ void EvolutionIndirect::initPopulation(LSystem LS){ // default arguments and Lsy
 void EvolutionIndirect::crossover(LSystem LS, std::vector<Genome *>  * offspring){
 
 
-    std::random_device rd;
-    std::default_random_engine generator(rd());
-    std::uniform_real_distribution<double> prob(0.0, 1.0); // distribution for probabilities
-
-    // creates new individuals via crossover, with two complementary siblings per pair of parents
-    for(int i = 0; i < ceil(this->params["pop_size"] /2 ); i++) {
-
-        // selects parents for the crossover, according to INDEX
-        int parent1 = this->tournament();
-        int parent2 = parent1;
-
-        while(parent2 == parent1){ // makes sure that parent2 is different from parent1
-            parent2 = this->tournament();
-        }
-
-
-
-        // #TEST: Tests if selected parents are different.
-        this->tests.testParents(parent1, parent2);
-
-        // creates new offspring genome1
-        Genome * gen1 = new Genome(std::to_string(this->next_id),
-                                  this->population->at(parent1)->getId(),
-                                  this->population->at(parent2)->getId(),
-                                  this->population->at(parent1)->getFitness(),
-                                  this->population->at(parent2)->getFitness());
-
-        this->aux.logs(" crossover for genome " + std::to_string(this->next_id) + " - p1: " + this->population->at(parent1)->getId() + " p2: " + this->population->at(parent2)->getId());
-        this->next_id++;
-
-        // creates new offspring genome2
-        Genome * gen2 = new Genome(std::to_string(this->next_id),
-                                   this->population->at(parent1)->getId(),
-                                   this->population->at(parent2)->getId(),
-                                   this->population->at(parent1)->getFitness(),
-                                   this->population->at(parent2)->getFitness());
-
-        this->aux.logs(" crossover for genome " + std::to_string(this->next_id) + " - p1: " + this->population->at(parent1)->getId() + " p2: " + this->population->at(parent2)->getId());
-        this->next_id++;
-
-
-
-        std::map< std::string, GeneticString >  grammar1 = std::map< std::string, GeneticString >(), grammar2 = std::map< std::string, GeneticString >();
-
-
-        // for each letter in the grammar
-        for ( auto &it : LS.getAlphabet()) {
-
-            if(prob(generator) <= prob(generator)) {
-
-                this->aux.logs(it.first+"parent1");
-                grammar1.emplace(it.first, this->population->at(parent1)->getGrammar()[it.first]); // genome1 gets rule from parent1
-                grammar2.emplace(it.first, this->population->at(parent2)->getGrammar()[it.first]); // genome2 gets rule from parent2
-            } else{
-                this->aux.logs(it.first+"parent2");
-                grammar1.emplace(it.first, this->population->at(parent2)->getGrammar()[it.first]); // genome1 gets rule from parent2
-                grammar2.emplace(it.first, this->population->at(parent1)->getGrammar()[it.first]); // genome1 gets rule from parent1
-            }
-
-            // grammar[it.first].display_list();
-
-        }
-
-        gen1->setGrammar(grammar1); // sets grammar for the new genome1
-        gen2->setGrammar(grammar2); // sets grammar for the new genome2
-
-        offspring->push_back(gen1); // adds new individual1 to the offspring
-        offspring->push_back(gen2); // adds new individual2 to the offspring
-
-    }
-
-    this->mutation(LS, offspring); // mutates new individuals
-
-
-
+//    std::random_device rd;
+//    std::default_random_engine generator(rd());
+//    std::uniform_real_distribution<double> prob(0.0, 1.0); // distribution for probabilities
 //
-//    // creates new individuals via crossover (size of offspring is relative to the size of population)
-//    for(int i = 0; i < ceil(this->params["pop_size"] * this->params["offspring_size"]); i++) {
+//    // creates new individuals via crossover, with two complementary siblings per pair of parents
+//    for(int i = 0; i < ceil(this->params["pop_size"] /2 ); i++) {
 //
 //        // selects parents for the crossover, according to INDEX
 //        int parent1 = this->tournament();
@@ -148,49 +76,124 @@ void EvolutionIndirect::crossover(LSystem LS, std::vector<Genome *>  * offspring
 //            parent2 = this->tournament();
 //        }
 //
+//
+//
 //        // #TEST: Tests if selected parents are different.
 //        this->tests.testParents(parent1, parent2);
 //
-//        // creates new offspring genome
-//        Genome * gen = new Genome(std::to_string(this->next_id),
+//        // creates new offspring genome1
+//        Genome * gen1 = new Genome(std::to_string(this->next_id),
+//                                  this->population->at(parent1)->getId(),
+//                                  this->population->at(parent2)->getId(),
+//                                  this->population->at(parent1)->getFitness(),
+//                                  this->population->at(parent2)->getFitness());
+//
+//        this->aux.logs(" crossover for genome " +
+//                               std::to_string(this->next_id) + " - p1: " +
+//                               this->population->at(parent1)->getId() + " p2: " +
+//                               this->population->at(parent2)->getId());
+//        this->next_id++;
+//
+//        // creates new offspring genome2
+//        Genome * gen2 = new Genome(std::to_string(this->next_id),
 //                                   this->population->at(parent1)->getId(),
 //                                   this->population->at(parent2)->getId(),
 //                                   this->population->at(parent1)->getFitness(),
 //                                   this->population->at(parent2)->getFitness());
 //
 //        this->aux.logs(" crossover for genome " + std::to_string(this->next_id) + " - p1: " + this->population->at(parent1)->getId() + " p2: " + this->population->at(parent2)->getId());
-//
 //        this->next_id++;
 //
-//        std::map< std::string, GeneticString >  grammar = std::map< std::string, GeneticString >();
 //
-//        std::random_device rd;
-//        std::default_random_engine generator(rd());
 //
-//        std::uniform_real_distribution<double> prob(0.0, 1.0); // distribution for probabilities
+//        std::map< std::string, GeneticString >  grammar1 = std::map< std::string, GeneticString >(), grammar2 = std::map< std::string, GeneticString >();
+//
 //
 //        // for each letter in the grammar
 //        for ( auto &it : LS.getAlphabet()) {
 //
 //            if(prob(generator) <= prob(generator)) {
 //
-//                grammar.emplace(it.first, this->population->at(parent1)->getGrammar()[it.first]); // gets is from parent1
+//                this->aux.logs(it.first+"parent1");
+//                grammar1.emplace(it.first, this->population->at(parent1)->getGrammar()[it.first]); // genome1 gets rule from parent1
+//                grammar2.emplace(it.first, this->population->at(parent2)->getGrammar()[it.first]); // genome2 gets rule from parent2
 //            } else{
-//
-//                grammar.emplace(it.first, this->population->at(parent2)->getGrammar()[it.first]); // gets is from parent2
+//                this->aux.logs(it.first+"parent2");
+//                grammar1.emplace(it.first, this->population->at(parent2)->getGrammar()[it.first]); // genome1 gets rule from parent2
+//                grammar2.emplace(it.first, this->population->at(parent1)->getGrammar()[it.first]); // genome1 gets rule from parent1
 //            }
 //
 //            // grammar[it.first].display_list();
 //
 //        }
 //
-//        gen->setGrammar(grammar); // sets grammar for the new genome
+//        gen1->setGrammar(grammar1); // sets grammar for the new genome1
+//        gen2->setGrammar(grammar2); // sets grammar for the new genome2
 //
-//        offspring->push_back(gen); // adds new individual to the offspring
+//        offspring->push_back(gen1); // adds new individual1 to the offspring
+//        offspring->push_back(gen2); // adds new individual2 to the offspring
 //
 //    }
 //
 //    this->mutation(LS, offspring); // mutates new individuals
+
+
+
+
+    // creates new individuals via crossover (size of offspring is relative to the size of population)
+    for(int i = 0; i < ceil(this->params["pop_size"] * this->params["offspring_prop"]); i++) {
+
+        // selects parents for the crossover, according to INDEX
+        int parent1 = this->tournament();
+        int parent2 = parent1;
+
+        while(parent2 == parent1){ // makes sure that parent2 is different from parent1
+            parent2 = this->tournament();
+        }
+
+        // #TEST: Tests if selected parents are different.
+        this->tests.testParents(parent1, parent2);
+
+        // creates new offspring genome
+        Genome * gen = new Genome(std::to_string(this->next_id),
+                                   this->population->at(parent1)->getId(),
+                                   this->population->at(parent2)->getId(),
+                                   this->population->at(parent1)->getFitness(),
+                                   this->population->at(parent2)->getFitness());
+
+        this->aux.logs(" crossover for genome " + std::to_string(this->next_id) + " - p1: " + this->population->at(parent1)->getId() + " p2: " + this->population->at(parent2)->getId());
+
+        this->next_id++;
+
+        std::map< std::string, GeneticString >  grammar = std::map< std::string, GeneticString >();
+
+        std::random_device rd;
+        std::default_random_engine generator(rd());
+
+        std::uniform_real_distribution<double> prob(0.0, 1.0); // distribution for probabilities
+
+        // for each letter in the grammar
+        for ( auto &it : LS.getAlphabet()) {
+
+            if(prob(generator) <= prob(generator)) {
+
+                grammar.emplace(it.first, this->population->at(parent1)->getGrammar()[it.first]); // gets is from parent1
+            } else{
+
+                grammar.emplace(it.first, this->population->at(parent2)->getGrammar()[it.first]); // gets is from parent2
+            }
+
+            // grammar[it.first].display_list();
+
+        }
+
+        gen->setGrammar(grammar); // sets grammar for the new genome
+
+        offspring->push_back(gen); // adds new individual to the offspring
+
+    }
+
+    this->mutation(LS, offspring); // mutates new individuals
 
 }
 
