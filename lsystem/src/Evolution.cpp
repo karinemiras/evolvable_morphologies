@@ -148,6 +148,10 @@ void Evolution::addToArchive( std::vector<Genome *>  * individuals, double prob_
 **/
 void Evolution::exportPop(int generation){
 
+    std::ofstream measures_file_general;
+    std::string path = "../../experiments/"+this->experiment_name+"/measures2.txt";
+    measures_file_general.open(path, std::ofstream::app);
+
     for(int i=0; i < this->population->size(); i++) { // for each genome in the population
 
         // finds number of generation to which the genome belongs to
@@ -161,13 +165,29 @@ void Evolution::exportPop(int generation){
         if (generation_genome == 0) generation_genome = 1;
 
         std::string filename = "/body_"+this->population->at(i)->getId()+"_p1_"+this->population->at(i)->getId_parent1()+"_p2_"+this->population->at(i)->getId_parent2()+".png";
-        std::string pathfrom =  "../../experiments/" + this->experiment_name + "/offspringpop"+ std::to_string(generation_genome)+filename;
-        std::string pathto =  "../../experiments/" + this->experiment_name + "/selectedpop"+ std::to_string(generation)+filename;
+        std::string pathfrom =  "../../experiments/" + this->experiment_name + "/offspringpop"+ std::to_string(generation_genome);
+        std::string pathto =  "../../experiments/" + this->experiment_name + "/selectedpop"+ std::to_string(generation);
 
         // copies phenotype file from offspring folder to selected population folder
-        system(("exec cp "+pathfrom+" "+pathto).c_str());
+        system(("exec cp "+pathfrom+filename+" "+pathto+filename).c_str());
 
+        // copies values of metrics to file of selected population
+        std::string line;
+        std::ifstream measures("../../experiments/"+this->experiment_name+
+                                       "/offspringpop"+std::to_string(generation_genome)+"/measures"+this->population->at(i)->getId()+".txt");
+        while (getline (measures, line) ) {
+
+            std::vector<std::string> tokens;
+            boost::split( tokens, line, boost::is_any_of(":") );
+
+            measures_file_general << std::to_string(generation)<< " "
+                                  <<this->population->at(i)->getId()<< " "
+                                  << tokens[0] <<" " << tokens[1] <<std::endl;
+        }
     }
+
+    measures_file_general.close();
+
 }
 
 
@@ -214,6 +234,11 @@ void Evolution::createHeader(){
     path = "../../experiments/"+this->experiment_name+"/measures.txt";
     file.open(path);
     file << "generation"<<" idgenome" << " branching"<<" connectivity1"<<" effective_joints"<<" joints_per_limb"<<" length_ratio"<<" sparseness"<<" symmetry"<<" total_components"<<std::endl;
+    file.close();
+
+    path = "../../experiments/"+this->experiment_name+"/measures2.txt";
+    file.open(path);
+    file << "generation"<<" genome" << " measures"<<" value"<<std::endl;
     file.close();
 
     path = "../../experiments/"+this->experiment_name+"/nichecoverage_distances.txt";
@@ -959,7 +984,7 @@ int Evolution::noveltySearch(int argc, char* argv[], int encodingtype) {
 
     }
 
-    //this->summaryNicheCoverage();
+   // this->summaryNicheCoverage();
 
 
     this->logsTime("end");

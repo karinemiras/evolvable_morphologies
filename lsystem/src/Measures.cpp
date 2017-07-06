@@ -378,7 +378,7 @@ void Measures::measurePhenotype(std::map<std::string, double> params, std::strin
     tests.testMeasures(this->gen->getId(), this->gen->getMeasures());
 
 
-    /* BEGINNING: exports measures to files */
+/* BEGINNING: exports measures to files */
 
     std::ofstream measures_file_general;
     std::string path = "../../experiments/"+this->experiment_name+"/measures.txt";
@@ -387,14 +387,14 @@ void Measures::measurePhenotype(std::map<std::string, double> params, std::strin
     std::ofstream measures_file;
     path = "../../experiments/"+this->experiment_name+dirpath+std::to_string(generation)+"/measures"+this->gen->getId()+".txt";
     measures_file.open(path);
-    measures_file_general  <<" "<< std::to_string(generation);
-    measures_file_general << this->gen->getId();
+
+    measures_file_general  << std::to_string(generation);
+    measures_file_general <<" "<< this->gen->getId();
 
     for( const auto& mea : this->gen->getMeasures() ){
 
         measures_file << mea.first << ":" << mea.second << std::endl;
         measures_file_general <<" "<< mea.second;
-
     }
 
     measures_file_general << std::endl;
@@ -402,7 +402,8 @@ void Measures::measurePhenotype(std::map<std::string, double> params, std::strin
     measures_file.close();
     measures_file_general.close();
 
-    /* END: exports measures to files */
+/* END: exports measures to files */
+
 
 
 }
