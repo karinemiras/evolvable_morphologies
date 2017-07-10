@@ -11,6 +11,7 @@
 
 #include "Aux.h"
 #include "Genome.h"
+#include "Measures.h"
 #include "Tests.h"
 
 /**
@@ -57,6 +58,9 @@ public:
     int initExperiment(int argc, char* argv[], LSystem LS, int encodingtype);
     void summaryNicheCoverage();
     void compareIndividuals(int generation);
+    int getGeneration_genome(std::string idgenome);
+    double compareIndividual(Measures * m, std::string idgenome);
+    double compareParents(std::string idparent1, std::string idparent2);
 
     virtual void initPopulation(LSystem LS){};
     virtual void crossover(LSystem LS, std::vector<Genome *> * offspring){};

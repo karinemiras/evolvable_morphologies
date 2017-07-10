@@ -97,8 +97,6 @@ void EvolutionIndirect::crossover(LSystem LS, std::vector<Genome *>  * offspring
         for ( auto &it : LS.getAlphabet()) {
 
             if(prob(generator) <= prob(generator)) {
-            //if(prob(generator) <= 0.1) {
-            //if(1==1){
 
                 grammar.emplace(it.first, this->population->at(parent1)->getGrammar()[it.first]); // gets is from parent1
             } else{
@@ -107,7 +105,6 @@ void EvolutionIndirect::crossover(LSystem LS, std::vector<Genome *>  * offspring
             }
 
             // grammar[it.first].display_list();
-
         }
 
         gen->setGrammar(grammar); // sets grammar for the new genome
@@ -152,10 +149,8 @@ void EvolutionIndirect::mutation(LSystem LS, std::vector<Genome *> * offspring) 
 
     // for each genome of the offspring
     for(int i=0; i < offspring->size(); i++) {
-std::cout<<"--------------"<<i<<std::endl;
 
         std::string mutate_letter = LS.getAlphabetIndex()[dist_letter_target(generator)];
-    std::cout<<mutate_letter<<std::endl;
         // distribution for the type of mutation which will be performed
         std::uniform_int_distribution<int> type_mutation(1, 3);
         int type_of_mutation = type_mutation(generator);
@@ -180,24 +175,7 @@ std::cout<<"--------------"<<i<<std::endl;
                         // std::cout<<"cant delete the the core-component from the beginning of its rule";
                     } else {
                         this->aux.logs("mutation: remove in " + offspring->at(i)->getId() + " for " + mutate_letter);
-
-                        int aux_test = offspring->at(i)->getGrammar()[mutate_letter].count();
-
-                        offspring->at(i)->getGrammar()[mutate_letter].display_list();
-
-                        std::cout << "antes" << std::to_string(aux_test) << std::endl;
-
-                        offspring->at(i)->getGrammar()[mutate_letter].remove(
-                                pos_deletion); // removes item from chosen position
-
-                        std::cout << "depois" << std::to_string(offspring->at(i)->getGrammar()[mutate_letter].count())
-                                  << std::endl;
-                        offspring->at(i)->getGrammar()[mutate_letter].display_list();
-                        if (offspring->at(i)->getGrammar()[mutate_letter].count() < (aux_test - 1)) {
-                            std::cout << "problem with deletion for " << offspring->at(i)->getId();
-
-                            exit(EXIT_FAILURE);
-                        }
+                        offspring->at(i)->getGrammar()[mutate_letter].remove(pos_deletion); // removes item from chosen position
                      }
                 }
 
@@ -220,11 +198,8 @@ std::cout<<"--------------"<<i<<std::endl;
                     pos_swap1 = 0;
                     pos_swap2 = 0;
                 }
-                std::cout << "swap" << std::to_string(pos_swap1) << " " << std::to_string(pos_swap2) << std::endl;
-                offspring->at(i)->getGrammar()[mutate_letter].display_list();
-                offspring->at(i)->getGrammar()[mutate_letter].swap(pos_swap1,
-                                                                   pos_swap2); // removes item from chosen position
-                offspring->at(i)->getGrammar()[mutate_letter].display_list();
+
+                offspring->at(i)->getGrammar()[mutate_letter].swap(pos_swap1, pos_swap2); // removes item from chosen position
                 this->aux.logs("mutation: swap in " + offspring->at(i)->getId() + " for " + mutate_letter);
 
 
@@ -270,11 +245,8 @@ std::cout<<"--------------"<<i<<std::endl;
                 if (mutate_letter == "C" and pos_insertion == 0) {
                     pos_insertion++;
                 }
-                std::cout<<"insert"<<std::to_string(pos_insertion)<<std::endl;
-                offspring->at(i)->getGrammar()[mutate_letter].display_list();
                 //  (possibly) alters genetic-string (production rule) adding items (letters or commands)
                 offspring->at(i)->getGrammar()[mutate_letter].add(pos_insertion, genetic_string_items);
-                offspring->at(i)->getGrammar()[mutate_letter].display_list();
             }
         }
 

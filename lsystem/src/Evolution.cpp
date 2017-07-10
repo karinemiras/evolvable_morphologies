@@ -40,7 +40,6 @@ void Evolution::readParams(){
 
     /*   pop_size - size of the population of genomes
     *    offspring_prop - proportion of the population size to dcalculate size of offspring
-    *    add_backtoparent_prob - probability of adding a back-to-parent command to genetic-strings
     *    num_initial_comp - number of initial (random) components in the production rules of the grammar
     *    show_phenotypes - flag to show the phenotype graphic
     *    export_phenotypes - if exports the phenotypes to images (1) or not (0)
@@ -49,7 +48,7 @@ void Evolution::readParams(){
     *    size_component - size of each component in pixels
     *    spacing - spacing between components in pixels
     *    num_generations - number of generations of the evolution
-    *    mutation_alter_prob - probability of adding/removing items (letters/commands) to the genetic-string in the mutation
+    *    mutation_prob - probability of adding/removing/swaping items (letters/commands) to the genetic-string in the mutation
     *    max_comps - maximum number of components allowed per phenotype
     *    prob_add_archive - probability of adding any genome to the archive
     *    k_neighbors - number of neighbords to compare for fitness
@@ -132,7 +131,7 @@ void Evolution::addToArchive( std::vector<Genome *>  * individuals, double prob_
             Genome * gen_arc = nullptr;
             gen_arc = new Genome(*individuals->at(i)); // copies object of the genome to archive
 
-            this->archive->emplace(individuals->at(i)->getId(),gen_arc);
+            this->archive->emplace(individuals->at(i)->getId(), gen_arc);
 
             if(this->params["export_genomes"] == 1){
                 individuals->at(i)->exportGenome(path+"/archive");
@@ -140,6 +139,30 @@ void Evolution::addToArchive( std::vector<Genome *>  * individuals, double prob_
         }
     }
 }
+
+
+/* Finds out in which generation the genome was generated.
+ * @param idgenome - id of the genome for which to verify generation.
+ * */
+int Evolution::getGeneration_genome(std::string idgenome){
+
+    int generation_genome = 0;
+    int offspring_size = this->params["pop_size"] * this->params["offspring_prop"];
+
+    // generation of the genome can be found by its id, considering the size of the population and the offspring
+    if(this->params["offspring_prop"] == 1)
+        generation_genome = (int)trunc( std::stoi(idgenome)
+                                        /this->params["pop_size"])+1;
+    else
+        generation_genome = (int)trunc( (std::stoi(idgenome)-offspring_size)
+                                        /offspring_size)+1;
+
+    if (generation_genome == 0) generation_genome = 1;
+
+    return generation_genome;
+
+}
+
 
 
 /**
@@ -152,21 +175,21 @@ void Evolution::exportPop(int generation){
     std::string path = "../../experiments/"+this->experiment_name+"/measures2.txt";
     measures_file_general.open(path, std::ofstream::app);
 
+
     for(int i=0; i < this->population->size(); i++) { // for each genome in the population
 
+
         // finds number of generation to which the genome belongs to
-        int generation_genome = 0;
-        int offspring_size = this->params["pop_size"]*this->params["offspring_prop"];
-        if(this->params["offspring_prop"] == 1)
-            generation_genome = (int)trunc(std::stoi(this->population->at(i)->getId()) /this->params["pop_size"])+1;
-        else
-            generation_genome = (int)trunc( (std::stoi(this->population->at(i)->getId())-offspring_size) /offspring_size)+1;
+        int generation_genome = this->getGeneration_genome(this->population->at(i)->getId());
 
-        if (generation_genome == 0) generation_genome = 1;
+        std::string filename = "/body_"+this->population->at(i)->getId()
+                               +"_p1_"+this->population->at(i)->getId_parent1()+"_p2_"+this->population->at(i)->getId_parent2()+".png";
 
-        std::string filename = "/body_"+this->population->at(i)->getId()+"_p1_"+this->population->at(i)->getId_parent1()+"_p2_"+this->population->at(i)->getId_parent2()+".png";
-        std::string pathfrom =  "../../experiments/" + this->experiment_name + "/offspringpop"+ std::to_string(generation_genome);
-        std::string pathto =  "../../experiments/" + this->experiment_name + "/selectedpop"+ std::to_string(generation);
+        std::string pathfrom =  "../../experiments/"
+                                + this->experiment_name + "/offspringpop"+ std::to_string(generation_genome);
+
+        std::string pathto =  "../../experiments/"
+                              + this->experiment_name + "/selectedpop"+ std::to_string(generation);
 
         // copies phenotype file from offspring folder to selected population folder
         system(("exec cp "+pathfrom+filename+" "+pathto+filename).c_str());
@@ -174,7 +197,9 @@ void Evolution::exportPop(int generation){
         // copies values of metrics to file of selected population
         std::string line;
         std::ifstream measures("../../experiments/"+this->experiment_name+
-                                       "/offspringpop"+std::to_string(generation_genome)+"/measures"+this->population->at(i)->getId()+".txt");
+                                       "/offspringpop"+std::to_string(generation_genome)
+                               +"/measures"+this->population->at(i)->getId()+".txt");
+
         while (getline (measures, line) ) {
 
             std::vector<std::string> tokens;
@@ -191,6 +216,65 @@ void Evolution::exportPop(int generation){
 }
 
 
+/*
+ * Compare phenotype of the individual with its parent's.
+ * */
+double Evolution::compareIndividual(Measures * m, std::string idgenome){
+
+
+    int generation_genome = this->getGeneration_genome(idgenome);
+
+    std::string line;
+    std::ifstream measures("../../experiments/"+this->experiment_name+
+                           "/offspringpop"+std::to_string(generation_genome)+"/measures"+idgenome+".txt");
+
+    double dif = 0;
+    while (getline (measures, line) ) {
+
+        std::vector<std::string> tokens;
+        boost::split(tokens, line, boost::is_any_of(":"));
+
+        dif +=  std::pow(m->getGenome()->getMeasures()[tokens[0]] - std::stod(tokens[1]) , 2);
+    }
+    dif =  roundf(std::sqrt(dif)*100)/100;
+
+    return dif;
+
+}
+
+
+/*
+ * Compare phenotype of the parents.
+ * */
+double Evolution::compareParents(std::string idparent1, std::string idparent2){
+
+
+    int generation_genome_parent1 = this->getGeneration_genome(idparent1);
+    std::string line;
+    std::ifstream measures("../../experiments/"+this->experiment_name+
+                           "/offspringpop"+std::to_string(generation_genome_parent1)+"/measures"+idparent1+".txt");
+
+    int generation_genome_parent2 = this->getGeneration_genome(idparent2);
+    std::string line2;
+    std::ifstream measures2("../../experiments/"+this->experiment_name+
+                           "/offspringpop"+std::to_string(generation_genome_parent2)+"/measures"+idparent2+".txt");
+
+    double dif = 0;
+    while (getline (measures, line) ) {
+
+        getline (measures2, line2);
+
+        std::vector<std::string> tokens, tokens2;
+        boost::split(tokens, line, boost::is_any_of(":"));
+        boost::split(tokens2, line2, boost::is_any_of(":"));
+
+        dif +=  std::pow(std::stod(tokens[1]) - std::stod(tokens2[1]) , 2);
+    }
+    dif =  roundf(std::sqrt(dif)*100)/100;
+
+    return dif;
+
+}
 
 /**
  * Measures all the individuals of the population for several metrics.
@@ -205,69 +289,41 @@ void Evolution::measureIndividuals(int generation, std::vector<Genome *>  * indi
     std::string path = "../../experiments/"+this->experiment_name+"/differences.txt";
     differences_file.open(path, std::ofstream::app);
 
-    for(int i=0; i < individuals->size(); i++) {  // for each genome of the population
+
+    // for each genome of the population
+    for(int i=0; i < individuals->size(); i++) {
 
         Measures * m = new Measures(this->experiment_name, this->params);
         m->setGenome(individuals->at(i));
-        m->measurePhenotype(this->params, dirpath, generation); // measures phenotype
+        // measures phenotype
+        m->measurePhenotype(this->params, dirpath, generation);
 
 
-        if(individuals->at(i)->getId_parent1()!="N"){ // this is a test. change this method breaking into methods!
+        // compares measures between individuals
+        if(individuals->at(i)->getId_parent1()!="N"){
 
-                int generation_genome = 0;
-                int offspring_size = this->params["pop_size"]*this->params["offspring_prop"];
-                if(this->params["offspring_prop"] == 1)
-                    generation_genome = (int)trunc(std::stoi(individuals->at(i)->getId_parent1()) /this->params["pop_size"])+1;
-                else
-                    generation_genome = (int)trunc( (std::stoi(individuals->at(i)->getId_parent1())-offspring_size) /offspring_size)+1;
+            double dif = this->compareIndividual(m, individuals->at(i)->getId_parent1());
+            differences_file << individuals->at(i)->getId() << " " << dif;
 
-                if (generation_genome == 0) generation_genome = 1;
-                std::string line;
-                std::ifstream measures("../../experiments/"+this->experiment_name+
-                                       "/offspringpop"+std::to_string(generation_genome)+"/measures"+individuals->at(i)->getId_parent1()+".txt");
+            dif = this->compareIndividual(m, individuals->at(i)->getId_parent2());
+            differences_file <<  " " << dif;
 
-                double dif = 0;
-                while (getline (measures, line) ) {
-
-                    std::vector<std::string> tokens;
-                    boost::split(tokens, line, boost::is_any_of(":"));
-
-                    dif +=  std::pow(m->getGenome()->getMeasures()[tokens[0]] - std::stod(tokens[1]) , 2);
-                }
-                dif =  roundf(std::sqrt(dif)*100)/100;
-                differences_file << individuals->at(i)->getId() << " " << dif;
-
-
-
-                if(this->params["offspring_prop"] == 1)
-                    generation_genome = (int)trunc(std::stoi(individuals->at(i)->getId_parent2()) /this->params["pop_size"])+1;
-                else
-                    generation_genome = (int)trunc( (std::stoi(individuals->at(i)->getId_parent2())-offspring_size) /offspring_size)+1;
-
-                if (generation_genome == 0) generation_genome = 1;
-
-                std::ifstream measures2("../../experiments/"+this->experiment_name+
-                                       "/offspringpop"+std::to_string(generation_genome)+"/measures"+individuals->at(i)->getId_parent2()+".txt");
-
-                dif = 0;
-                while (getline (measures2, line) ) {
-
-                    std::vector<std::string> tokens;
-                    boost::split(tokens, line, boost::is_any_of(":"));
-
-                    dif +=  std::pow(m->getGenome()->getMeasures()[tokens[0]] - std::stod(tokens[1]) , 2);
-                }
-                dif =  roundf(std::sqrt(dif)*100)/100;
-                differences_file <<  " " << dif<<std::endl;
-
+            dif = this->compareParents(individuals->at(i)->getId_parent1(), individuals->at(i)->getId_parent2());
+            differences_file <<  " " << dif<<std::endl;
 
         }
 
+        delete m;
+    }
 
-        }
-    //delete m;
     differences_file.close();
 }
+
+
+
+/*
+ *
+ * */
 
 
 
@@ -282,7 +338,7 @@ void Evolution::createHeader(){
 
     std::string path = "../../experiments/"+this->experiment_name+"/history.txt";
     file.open(path);
-    file << "generation" << " idgenome" << " fitgenome" << " idparent1" << " fitparent1" << " idparent2" << " fitparent2" << std::endl;
+    file << "generation" << " idgenome" << " fitgenome" << " idparent1" << " fitparent1" << " idparent2" << " fitparent2" << " idfitparent2" << " idfitparent2" << std::endl;
     file.close();
 
     path = "../../experiments/"+this->experiment_name+"/evolution.txt";
@@ -307,7 +363,7 @@ void Evolution::createHeader(){
 
     path = "../../experiments/"+this->experiment_name+"/differences.txt";
     file.open(path);
-    file << "idgenome"  << " difference_parent1"  << " difference_parent2" << std::endl;
+    file << "idgenome"  << " difference_parent1"  << " difference_parent2"  << " difference_parents" << std::endl;
     file.close();
 
 
@@ -380,11 +436,13 @@ void Evolution::evaluateIndividuals(int generation, std::vector<Genome *>  * ind
 
         history_file << std::to_string(generation)<<" "     // generation
                      << individuals_reference->at(i)->getId()<<" "   // idgenome
-                     << std::to_string(individuals_reference->at(i)->getFitness())<<" "  // fitness genome
+                     << individuals_reference->at(i)->getFitness()<<" "  // fitness genome
                      << individuals_reference->at(i)->getId_parent1()<<" "  // id of parent1
                      << individuals_reference->at(i)->getFit_parent1()<<" "  // fitness of parent1
                      << individuals_reference->at(i)->getId_parent2()<<" " // id of parent2
-                     << individuals_reference->at(i)->getFit_parent2() // fitness of parent2
+                     << individuals_reference->at(i)->getFit_parent2()<<" " // fitness of parent2
+                     << individuals_reference->at(i)->getFitness()-individuals_reference->at(i)->getFit_parent1()<<" " // dif fitness from parent1
+                     << individuals_reference->at(i)->getFitness()-individuals_reference->at(i)->getFit_parent2() // dif fitness from parent2
                      << std::endl;
 
     }
@@ -668,16 +726,7 @@ void Evolution::developIndividuals(int argc, char* argv[], LSystem LS, int gener
 
         }
     }
-//
-//    if (encodingtype == 0) {
-//        // for each genome in the array
-//        for (int i = 0; i < individuals->size(); i++) {
-//
-//            // develops genome
-//            individuals->at(i)->developGenomeDirect(argc, argv, this->params, LS, generation, path);
-//
-//        }
-//    }
+
 }
 
 
@@ -718,13 +767,16 @@ void Evolution::loadPopulation(int generation){
         int generation_genome = 0;
         int offspring_size = this->params["pop_size"]*this->params["offspring_prop"];
         if(this->params["offspring_prop"] == 1)
-            generation_genome = (int)trunc(std::stoi(idgenome) /this->params["pop_size"])+1;
+            generation_genome = (int)trunc(std::stoi(idgenome)
+                                           /this->params["pop_size"])+1;
         else
-            generation_genome = (int)trunc( (std::stoi(idgenome)-offspring_size) /offspring_size)+1;
+            generation_genome = (int)trunc( (std::stoi(idgenome)-offspring_size)
+                                            /offspring_size)+1;
 
         if (generation_genome == 0) generation_genome = 1;
 
-        std::ifstream listalphabet("../../experiments/" + this->experiment_name + "/offspringpop"+ std::to_string(generation_genome) +"/genome" +idgenome + ".txt");
+        std::ifstream listalphabet("../../experiments/" + this->experiment_name + "/offspringpop"+
+                                           std::to_string(generation_genome) +"/genome" +idgenome + ".txt");
         std::string linealphabet;
         // for each letter of the alphabet
         while ( getline (listalphabet, linealphabet) ) {
@@ -743,7 +795,8 @@ void Evolution::loadPopulation(int generation){
 
         }
 
-        std::ifstream listmeasures("../../experiments/" + this->experiment_name + "/offspringpop"+ std::to_string(generation_genome) +"/measures" +idgenome + ".txt");
+        std::ifstream listmeasures("../../experiments/" + this->experiment_name + "/offspringpop"+
+                                           std::to_string(generation_genome) +"/measures" +idgenome + ".txt");
         std::string linemeasures;
         // for each measure of the list
         while ( getline (listmeasures, linemeasures) ) {
