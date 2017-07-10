@@ -98,10 +98,12 @@ void EvolutionIndirect::crossover(LSystem LS, std::vector<Genome *>  * offspring
 
             if(prob(generator) <= prob(generator)) {
 
-                grammar.emplace(it.first, this->population->at(parent1)->getGrammar()[it.first]); // gets is from parent1
+                this->aux.logs(it.first+" from parent1");
+                grammar.emplace(it.first, this->population->at(parent1)->getGrammar()[it.first]); // gets it from parent1
             } else{
 
-                grammar.emplace(it.first, this->population->at(parent2)->getGrammar()[it.first]); // gets is from parent2
+                this->aux.logs(it.first+" from parent2");
+                grammar.emplace(it.first, this->population->at(parent2)->getGrammar()[it.first]); // gets it from parent2
             }
 
             // grammar[it.first].display_list();
