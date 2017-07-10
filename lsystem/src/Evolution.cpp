@@ -338,7 +338,7 @@ void Evolution::createHeader(){
 
     std::string path = "../../experiments/"+this->experiment_name+"/history.txt";
     file.open(path);
-    file << "generation" << " idgenome" << " fitgenome" << " idparent1" << " fitparent1" << " idparent2" << " fitparent2" << " idfitparent2" << " idfitparent2" << std::endl;
+    file << "generation" << " idgenome" << " fitgenome" << " idparent1" << " fitparent1" << " idparent2" << " fitparent2" << " meandif" << std::endl;
     file.close();
 
     path = "../../experiments/"+this->experiment_name+"/evolution.txt";
@@ -441,8 +441,9 @@ void Evolution::evaluateIndividuals(int generation, std::vector<Genome *>  * ind
                      << individuals_reference->at(i)->getFit_parent1()<<" "  // fitness of parent1
                      << individuals_reference->at(i)->getId_parent2()<<" " // id of parent2
                      << individuals_reference->at(i)->getFit_parent2()<<" " // fitness of parent2
-                     << individuals_reference->at(i)->getFitness()-individuals_reference->at(i)->getFit_parent1()<<" " // dif fitness from parent1
-                     << individuals_reference->at(i)->getFitness()-individuals_reference->at(i)->getFit_parent2() // dif fitness from parent2
+                     <<   (individuals_reference->at(i)->getFitness()-individuals_reference->at(i)->getFit_parent1())
+                        + (individuals_reference->at(i)->getFitness()-individuals_reference->at(i)->getFit_parent2())
+                         / (float)2// mean dif fitness from parents
                      << std::endl;
 
     }
@@ -1118,7 +1119,7 @@ void Evolution::summaryNicheCoverage(){
 
     std::string path = "../../experiments/"+this->experiment_name+"/morphological_grid_summary.txt";
     file.open(path);
-    file << it.first+"point count"<< std::endl;
+    file << "point count"<< std::endl;
 
     for(const auto& it : this->morphological_grid_accumulated) {
 
