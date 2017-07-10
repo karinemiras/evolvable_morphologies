@@ -132,24 +132,32 @@ void GeneticString::create_joined_list(int pos_parent1_ini, int pos_parent2_ini,
  * @param pos - position of item to be deleted
  */
 void GeneticString::remove(int pos) {
+std::cout<<"pos"<<pos<<std::endl;
 
-    GeneticString::Node *current, *next, *previous;
+    GeneticString::Node *current = NULL, *next = NULL, *previous = NULL;
     current = start;
     int current_pos = 1;
 
     while (current_pos < pos) { // looks for chosen position
         current = current->next;
         current_pos++;
+        std::cout<<"while"<<std::endl;
     }
 
     previous = current->prev;
     next = current->next;
 
+std::cout<<"cur"<<current<<std::endl;
+std::cout<<"prev"<< current->prev<<std::endl;
+std::cout<<"next"<<current->next<<std::endl;
+
     if (previous != NULL) {
         previous->next = next;  // that item that comes before the deleted item will point forward to the next item
     }else{
+        std::cout<<"startttt"<<std::endl;
         start = next; // in case the removed item is the first, the next will be the first
     }
+    std::cout<<"start"<<start<<std::endl;
     if (next != NULL) {
         next->prev = previous;  // the item that was positioned after the removed item will point to the new item
     }

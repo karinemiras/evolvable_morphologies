@@ -201,13 +201,72 @@ void Evolution::exportPop(int generation){
  **/
 void Evolution::measureIndividuals(int generation, std::vector<Genome *>  * individuals, std::string dirpath){
 
+    std::ofstream differences_file;
+    std::string path = "../../experiments/"+this->experiment_name+"/differences.txt";
+    differences_file.open(path, std::ofstream::app);
+
     for(int i=0; i < individuals->size(); i++) {  // for each genome of the population
 
         Measures * m = new Measures(this->experiment_name, this->params);
         m->setGenome(individuals->at(i));
         m->measurePhenotype(this->params, dirpath, generation); // measures phenotype
-        delete m;
-    }
+
+
+        if(individuals->at(i)->getId_parent1()!="N"){ // this is a test. change this method breaking into methods!
+
+                int generation_genome = 0;
+                int offspring_size = this->params["pop_size"]*this->params["offspring_prop"];
+                if(this->params["offspring_prop"] == 1)
+                    generation_genome = (int)trunc(std::stoi(individuals->at(i)->getId_parent1()) /this->params["pop_size"])+1;
+                else
+                    generation_genome = (int)trunc( (std::stoi(individuals->at(i)->getId_parent1())-offspring_size) /offspring_size)+1;
+
+                if (generation_genome == 0) generation_genome = 1;
+                std::string line;
+                std::ifstream measures("../../experiments/"+this->experiment_name+
+                                       "/offspringpop"+std::to_string(generation_genome)+"/measures"+individuals->at(i)->getId_parent1()+".txt");
+
+                double dif = 0;
+                while (getline (measures, line) ) {
+
+                    std::vector<std::string> tokens;
+                    boost::split(tokens, line, boost::is_any_of(":"));
+
+                    dif +=  std::pow(m->getGenome()->getMeasures()[tokens[0]] - std::stod(tokens[1]) , 2);
+                }
+                dif =  roundf(std::sqrt(dif)*100)/100;
+                differences_file << individuals->at(i)->getId() << " " << dif;
+
+
+
+                if(this->params["offspring_prop"] == 1)
+                    generation_genome = (int)trunc(std::stoi(individuals->at(i)->getId_parent2()) /this->params["pop_size"])+1;
+                else
+                    generation_genome = (int)trunc( (std::stoi(individuals->at(i)->getId_parent2())-offspring_size) /offspring_size)+1;
+
+                if (generation_genome == 0) generation_genome = 1;
+
+                std::ifstream measures2("../../experiments/"+this->experiment_name+
+                                       "/offspringpop"+std::to_string(generation_genome)+"/measures"+individuals->at(i)->getId_parent2()+".txt");
+
+                dif = 0;
+                while (getline (measures2, line) ) {
+
+                    std::vector<std::string> tokens;
+                    boost::split(tokens, line, boost::is_any_of(":"));
+
+                    dif +=  std::pow(m->getGenome()->getMeasures()[tokens[0]] - std::stod(tokens[1]) , 2);
+                }
+                dif =  roundf(std::sqrt(dif)*100)/100;
+                differences_file <<  " " << dif<<std::endl;
+
+
+        }
+
+
+        }
+    //delete m;
+    differences_file.close();
 }
 
 
@@ -244,6 +303,11 @@ void Evolution::createHeader(){
     path = "../../experiments/"+this->experiment_name+"/nichecoverage_distances.txt";
     file.open(path);
     file << "generation"<<" average" << " stddev "<<std::endl;
+    file.close();
+
+    path = "../../experiments/"+this->experiment_name+"/differences.txt";
+    file.open(path);
+    file << "idgenome"  << " difference_parent1"  << " difference_parent2" << std::endl;
     file.close();
 
 
@@ -604,16 +668,16 @@ void Evolution::developIndividuals(int argc, char* argv[], LSystem LS, int gener
 
         }
     }
-
-    if (encodingtype == 0) {
-        // for each genome in the array
-        for (int i = 0; i < individuals->size(); i++) {
-
-            // develops genome
-            individuals->at(i)->developGenomeDirect(argc, argv, this->params, LS, generation, path);
-
-        }
-    }
+//
+//    if (encodingtype == 0) {
+//        // for each genome in the array
+//        for (int i = 0; i < individuals->size(); i++) {
+//
+//            // develops genome
+//            individuals->at(i)->developGenomeDirect(argc, argv, this->params, LS, generation, path);
+//
+//        }
+//    }
 }
 
 

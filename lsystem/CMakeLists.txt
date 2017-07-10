@@ -55,8 +55,6 @@ file(GLOB_RECURSE SOURCES
         main.cpp
         src/GeneticString.cpp
         src/Genome.cpp
-        src/GenomeIndirect.cpp
-        src/GenomeDirect.cpp
         src/LSystem.cpp
         src/Evolution.cpp
         src/EvolutionIndirect.cpp

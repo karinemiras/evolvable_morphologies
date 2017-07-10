@@ -69,7 +69,7 @@ public:
     void build_grammar(LSystem LS, std::map<std::string, double> params);
     void build_genome_direct(LSystem LS, std::map<std::string, double> params);
 
-private:
+protected:
 
     std::string id; // id identifying the genome
     std::string id_parent1; // id of parent1 of genome

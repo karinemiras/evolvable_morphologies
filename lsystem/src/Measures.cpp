@@ -24,6 +24,11 @@ void Measures::setGenome(Genome * gen){
     this->gen = gen;
 }
 
+Genome * Measures::getGenome(){
+    return this->gen;
+}
+
+
 /**
 * Adds and initializes items in the array of measures of the morphology of a genome.
 */
@@ -371,6 +376,7 @@ void Measures::measurePhenotype(std::map<std::string, double> params, std::strin
     this->gen->removeMeasure("coverage");
     this->gen->removeMeasure("horizontal_symmetry");
     this->gen->removeMeasure("vertical_symmetry");
+
 
 
     // #TEST: checks if there is any measure ouy of the expected range
