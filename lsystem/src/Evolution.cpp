@@ -543,7 +543,8 @@ int Evolution::tournament(){
     int genome2 =  dist_1(generator); // random genome 2
 
     // return the genome with higher fitness
-    if (this->population->at(genome1)->getFitness() >  this->population->at(genome2)->getFitness()){
+    if (this->population->at(genome1)->getFitness() > this->population->at(genome2)->getFitness()){
+
         return genome1;
     }else{
         return genome2;
@@ -1117,6 +1118,7 @@ void Evolution::summaryNicheCoverage(){
 
     std::string path = "../../experiments/"+this->experiment_name+"/morphological_grid_summary.txt";
     file.open(path);
+    file << it.first+"point count"<< std::endl;
 
     for(const auto& it : this->morphological_grid_accumulated) {
 
