@@ -404,6 +404,7 @@ nbproject/private/
 nbbuild/
 nbdist/
 .nb-gradle/
-cmake-build-debug/
+indirect/cmake-build-debug/
+direct/cmake-build-debug/
 fixed_morph/
-experiments/
+indirect/experiments/
