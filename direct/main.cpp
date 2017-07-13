@@ -49,9 +49,9 @@ int main(int argc, const char * argv[]) {
 
 
     std::string v1 = "../population/child2.txt";
-    std::string v2 = "../population/child2.txt";
+    std::string v2 = "../population/childbaby.txt";
     std::string v3 = "../Test/evolConf-full.txt";
-    std::string v4 = "baby";
+    std::string v4 = "baby2";
 
 
     boost::shared_ptr<RobotRepresentation> robot1(new RobotRepresentation());
@@ -65,7 +65,7 @@ int main(int argc, const char * argv[]) {
 
     boost::random::mt19937 rng(time(0));
 
-    std::string newFileName = "child" + std::string(v4);
+    std::string newFileName = "../population/child" + std::string(v4);
 
     Mutator mut(evo, rng);
     mut.createChild(robot1, robot2, newFileName);

@@ -1111,7 +1111,7 @@ void RobotRepresentation::toTextFile(std::string name) {
     
     this->neuralNetwork_->toTextFile(file);*/
     toJson(name + ".json");
-    std::string py_command = "python ../build/json_converter.py " + name + ".json " + name + ".txt";
+    std::string py_command = "python ../json_converter.py " + name + ".json " + name + ".txt";
     system(py_command.c_str());
     std::string del_command = "rm -rf " + name + ".json";
     system(del_command.c_str());
