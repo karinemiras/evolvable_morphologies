@@ -1,0 +1,627 @@
+{
+ "id": 1,
+ "body": {
+  "part": [
+   {
+    "orientation": 0,
+    "id": "P0E0",
+    "type": "CoreComponent",
+    "root": true
+   },
+   {
+    "orientation": 1,
+    "id": "P0I0",
+    "type": "ActiveHinge",
+    "root": false
+   },
+   {
+    "orientation": 0,
+    "id": "P0F0",
+    "type": "FixedBrick",
+    "root": false
+   },
+   {
+    "orientation": 0,
+    "id": "P0I1",
+    "type": "ActiveHinge",
+    "root": false
+   },
+   {
+    "orientation": 0,
+    "id": "P0F1",
+    "type": "FixedBrick",
+    "root": false
+   },
+   {
+    "orientation": 3,
+    "id": "P0I2",
+    "type": "ActiveHinge",
+    "root": false
+   },
+   {
+    "orientation": 0,
+    "id": "P0F2",
+    "type": "FixedBrick",
+    "root": false
+   },
+   {
+    "orientation": 1,
+    "id": "P0I3",
+    "type": "ActiveHinge",
+    "root": false
+   },
+   {
+    "orientation": 0,
+    "id": "P0F3",
+    "type": "FixedBrick",
+    "root": false
+   },
+   {
+    "orientation": 3,
+    "id": "P0I4",
+    "type": "ActiveHinge",
+    "root": false
+   },
+   {
+    "orientation": 0,
+    "id": "P0F4",
+    "type": "FixedBrick",
+    "root": false
+   },
+   {
+    "orientation": 1,
+    "id": "P0I5",
+    "type": "ActiveHinge",
+    "root": false
+   },
+   {
+    "orientation": 0,
+    "id": "P0F5",
+    "type": "FixedBrick",
+    "root": false
+   }
+  ],
+  "connection": [
+   {
+    "destSlot": 0,
+    "src": "P0E0",
+    "dest": "P0I0",
+    "srcSlot": 0
+   },
+   {
+    "destSlot": 0,
+    "src": "P0I0",
+    "dest": "P0F0",
+    "srcSlot": 1
+   },
+   {
+    "destSlot": 0,
+    "src": "P0E0",
+    "dest": "P0I1",
+    "srcSlot": 1
+   },
+   {
+    "destSlot": 0,
+    "src": "P0I1",
+    "dest": "P0F1",
+    "srcSlot": 1
+   },
+   {
+    "destSlot": 0,
+    "src": "P0F1",
+    "dest": "P0I2",
+    "srcSlot": 1
+   },
+   {
+    "destSlot": 0,
+    "src": "P0I2",
+    "dest": "P0F2",
+    "srcSlot": 1
+   },
+   {
+    "destSlot": 0,
+    "src": "P0F2",
+    "dest": "P0I3",
+    "srcSlot": 1
+   },
+   {
+    "destSlot": 0,
+    "src": "P0I3",
+    "dest": "P0F3",
+    "srcSlot": 1
+   },
+   {
+    "destSlot": 0,
+    "src": "P0F3",
+    "dest": "P0I4",
+    "srcSlot": 1
+   },
+   {
+    "destSlot": 0,
+    "src": "P0I4",
+    "dest": "P0F4",
+    "srcSlot": 1
+   },
+   {
+    "destSlot": 0,
+    "src": "P0F4",
+    "dest": "P0I5",
+    "srcSlot": 1
+   },
+   {
+    "destSlot": 0,
+    "src": "P0I5",
+    "dest": "P0F5",
+    "srcSlot": 1
+   }
+  ]
+ },
+ "brain": {
+  "neuron": [
+   {
+    "id": "P0E0-0",
+    "ioId": 0,
+    "layer": "input",
+    "type": "simple",
+    "bodyPartId": "P0E0",
+    "gain": 1.0
+   },
+   {
+    "id": "P0E0-1",
+    "ioId": 1,
+    "layer": "input",
+    "type": "simple",
+    "bodyPartId": "P0E0",
+    "gain": 1.0
+   },
+   {
+    "id": "P0E0-2",
+    "ioId": 2,
+    "layer": "input",
+    "type": "simple",
+    "bodyPartId": "P0E0",
+    "gain": 1.0
+   },
+   {
+    "id": "P0E0-3",
+    "ioId": 3,
+    "layer": "input",
+    "type": "simple",
+    "bodyPartId": "P0E0",
+    "gain": 1.0
+   },
+   {
+    "id": "P0E0-4",
+    "ioId": 4,
+    "layer": "input",
+    "type": "simple",
+    "bodyPartId": "P0E0",
+    "gain": 1.0
+   },
+   {
+    "id": "P0E0-5",
+    "ioId": 5,
+    "layer": "input",
+    "type": "simple",
+    "bodyPartId": "P0E0",
+    "gain": 1.0
+   },
+   {
+    "bias": 0.0,
+    "id": "P0I0-0",
+    "ioId": 0,
+    "layer": "output",
+    "type": "sigmoid",
+    "bodyPartId": "P0I0",
+    "gain": 1.0
+   },
+   {
+    "bias": 0.0,
+    "id": "P0I1-0",
+    "ioId": 0,
+    "layer": "output",
+    "type": "sigmoid",
+    "bodyPartId": "P0I1",
+    "gain": 1.0
+   },
+   {
+    "bias": 0.0,
+    "id": "P0I2-0",
+    "ioId": 0,
+    "layer": "output",
+    "type": "sigmoid",
+    "bodyPartId": "P0I2",
+    "gain": 1.0
+   },
+   {
+    "bias": -0.48607853055000305,
+    "id": "P0I3-0",
+    "ioId": 0,
+    "layer": "output",
+    "type": "sigmoid",
+    "bodyPartId": "P0I3",
+    "gain": 1.0
+   },
+   {
+    "bias": -0.017707465216517448,
+    "id": "P0I4-0",
+    "ioId": 0,
+    "layer": "output",
+    "type": "sigmoid",
+    "bodyPartId": "P0I4",
+    "gain": 1.0
+   },
+   {
+    "bias": 0.90611082315444946,
+    "id": "P0I5-0",
+    "ioId": 0,
+    "layer": "output",
+    "type": "sigmoid",
+    "bodyPartId": "P0I5",
+    "gain": 1.0
+   }
+  ],
+  "connection": [
+   {
+    "src": "P0E0-0",
+    "dest": "P0I0-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0E0-0",
+    "dest": "P0I1-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0E0-0",
+    "dest": "P0I2-0",
+    "weight": -0.92016851902008057
+   },
+   {
+    "src": "P0E0-0",
+    "dest": "P0I3-0",
+    "weight": -1.0062850713729858
+   },
+   {
+    "src": "P0E0-0",
+    "dest": "P0I4-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0E0-0",
+    "dest": "P0I5-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0E0-1",
+    "dest": "P0I0-0",
+    "weight": 0.92760294675827026
+   },
+   {
+    "src": "P0E0-1",
+    "dest": "P0I1-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0E0-1",
+    "dest": "P0I2-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0E0-1",
+    "dest": "P0I3-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0E0-1",
+    "dest": "P0I4-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0E0-1",
+    "dest": "P0I5-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0E0-2",
+    "dest": "P0I0-0",
+    "weight": 1.1328634023666382
+   },
+   {
+    "src": "P0E0-2",
+    "dest": "P0I1-0",
+    "weight": 0.36408299207687378
+   },
+   {
+    "src": "P0E0-2",
+    "dest": "P0I2-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0E0-2",
+    "dest": "P0I3-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0E0-2",
+    "dest": "P0I4-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0E0-2",
+    "dest": "P0I5-0",
+    "weight": 1.5302281379699707
+   },
+   {
+    "src": "P0E0-3",
+    "dest": "P0I0-0",
+    "weight": 0.57246029376983643
+   },
+   {
+    "src": "P0E0-3",
+    "dest": "P0I1-0",
+    "weight": -0.34801098704338074
+   },
+   {
+    "src": "P0E0-3",
+    "dest": "P0I2-0",
+    "weight": -0.749103844165802
+   },
+   {
+    "src": "P0E0-3",
+    "dest": "P0I3-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0E0-3",
+    "dest": "P0I4-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0E0-3",
+    "dest": "P0I5-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0E0-4",
+    "dest": "P0I0-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0E0-4",
+    "dest": "P0I1-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0E0-4",
+    "dest": "P0I2-0",
+    "weight": 1.7165120840072632
+   },
+   {
+    "src": "P0E0-4",
+    "dest": "P0I3-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0E0-4",
+    "dest": "P0I4-0",
+    "weight": -0.032504122704267502
+   },
+   {
+    "src": "P0E0-4",
+    "dest": "P0I5-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0E0-5",
+    "dest": "P0I0-0",
+    "weight": -0.7841264009475708
+   },
+   {
+    "src": "P0E0-5",
+    "dest": "P0I1-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0E0-5",
+    "dest": "P0I2-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0E0-5",
+    "dest": "P0I3-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0E0-5",
+    "dest": "P0I4-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0E0-5",
+    "dest": "P0I5-0",
+    "weight": -0.41542574763298035
+   },
+   {
+    "src": "P0I0-0",
+    "dest": "P0I0-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0I0-0",
+    "dest": "P0I1-0",
+    "weight": -0.07069280743598938
+   },
+   {
+    "src": "P0I0-0",
+    "dest": "P0I2-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0I0-0",
+    "dest": "P0I3-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0I0-0",
+    "dest": "P0I4-0",
+    "weight": 0.26415416598320007
+   },
+   {
+    "src": "P0I0-0",
+    "dest": "P0I5-0",
+    "weight": 0.11638997495174408
+   },
+   {
+    "src": "P0I1-0",
+    "dest": "P0I0-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0I1-0",
+    "dest": "P0I1-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0I1-0",
+    "dest": "P0I2-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0I1-0",
+    "dest": "P0I3-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0I1-0",
+    "dest": "P0I4-0",
+    "weight": 0.066079236567020416
+   },
+   {
+    "src": "P0I1-0",
+    "dest": "P0I5-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0I2-0",
+    "dest": "P0I0-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0I2-0",
+    "dest": "P0I1-0",
+    "weight": -0.060663178563117981
+   },
+   {
+    "src": "P0I2-0",
+    "dest": "P0I2-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0I2-0",
+    "dest": "P0I3-0",
+    "weight": -0.10890384763479233
+   },
+   {
+    "src": "P0I2-0",
+    "dest": "P0I4-0",
+    "weight": -0.66468578577041626
+   },
+   {
+    "src": "P0I2-0",
+    "dest": "P0I5-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0I3-0",
+    "dest": "P0I0-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0I3-0",
+    "dest": "P0I1-0",
+    "weight": 1.3164868354797363
+   },
+   {
+    "src": "P0I3-0",
+    "dest": "P0I2-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0I3-0",
+    "dest": "P0I3-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0I3-0",
+    "dest": "P0I4-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0I3-0",
+    "dest": "P0I5-0",
+    "weight": 0.180324986577034
+   },
+   {
+    "src": "P0I4-0",
+    "dest": "P0I0-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0I4-0",
+    "dest": "P0I1-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0I4-0",
+    "dest": "P0I2-0",
+    "weight": 0.65665662288665771
+   },
+   {
+    "src": "P0I4-0",
+    "dest": "P0I3-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0I4-0",
+    "dest": "P0I4-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0I4-0",
+    "dest": "P0I5-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0I5-0",
+    "dest": "P0I0-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0I5-0",
+    "dest": "P0I1-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0I5-0",
+    "dest": "P0I2-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0I5-0",
+    "dest": "P0I3-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0I5-0",
+    "dest": "P0I4-0",
+    "weight": 0.0
+   },
+   {
+    "src": "P0I5-0",
+    "dest": "P0I5-0",
+    "weight": 0.0
+   }
+  ]
+ }
+}

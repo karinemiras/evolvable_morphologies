@@ -1,0 +1,17 @@
+0 CoreComponent CoreComponent 0
+	0 ParametricJoint myid1001 3 0.0699 87.995 118.9144
+		0 PassiveHinge myid1004 2
+			0 ActiveWheg myid1002 1 0.0523
+	3 PassiveHinge myid1003 3
+	4 PassiveWheel myid1000 1 0.0567
+
+
+CoreComponent 0 myid1002 0 -1.07428133488
+CoreComponent 1 myid1002 0 0.0712597668171
+CoreComponent 2 myid1002 0 0.0
+CoreComponent 3 myid1002 0 0.0
+CoreComponent 4 myid1002 0 0.609216094017
+CoreComponent 5 myid1002 0 0.244053706527
+myid1002 0 myid1002 0 -0.17462413013
+
+myid1002 0 -0.127474457026

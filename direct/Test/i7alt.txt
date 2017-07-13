@@ -1,0 +1,13 @@
+0 E E0 0 RED
+	0 I I0 1 RED
+		0 F F0 0 RED
+	1 I I1 0 RED
+		0 F F1 0 RED
+			0 I I2 3 RED
+				0 F F2 0 RED
+					0 I I3 1 RED
+						0 F F3 0 RED
+							0 I I4 3 RED 
+								0 F F4 0 RED
+									0 I I5 1 RED
+										0 F F5 0 RED
