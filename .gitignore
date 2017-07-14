@@ -406,6 +406,5 @@ nbdist/
 .nb-gradle/
 indirect/experiments/
 experiments
-direct/population
 direct/cmake-build-debug
 indirect/cmake-build-debug
