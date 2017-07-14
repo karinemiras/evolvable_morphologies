@@ -96,17 +96,14 @@ void EvolutionIndirect::crossover(LSystem LS, std::vector<Genome *>  * offspring
         // for each letter in the grammar
         for ( auto &it : LS.getAlphabet()) {
 
-            GeneticString gs;
             if(prob(generator) <= prob(generator)) {
 
-                gs = this->population->at(parent1)->getGrammar()[it.first];
                 this->aux.logs(it.first+" from parent1");
-                grammar.emplace(it.first, gs); // gets it from parent1
+                grammar.emplace(it.first, this->population->at(parent1)->getGrammar()[it.first]); // gets it from parent1
             } else{
 
-                gs = this->population->at(parent2)->getGrammar()[it.first];
                 this->aux.logs(it.first+" from parent2");
-                grammar.emplace(it.first, gs); // gets it from parent2
+                grammar.emplace(it.first, this->population->at(parent2)->getGrammar()[it.first]); // gets it from parent2
             }
 
             // grammar[it.first].display_list();
@@ -118,7 +115,7 @@ void EvolutionIndirect::crossover(LSystem LS, std::vector<Genome *>  * offspring
 
     }
 
-   this->mutation(LS, offspring); // mutates new individuals
+    this->mutation(LS, offspring); // mutates new individuals
 
 }
 
@@ -184,7 +181,7 @@ void EvolutionIndirect::mutation(LSystem LS, std::vector<Genome *> * offspring) 
                      }
                 }
 
-            // # swap
+                // # swapping
             } else if (type_of_mutation == 2) {
 
 
@@ -208,7 +205,7 @@ void EvolutionIndirect::mutation(LSystem LS, std::vector<Genome *> * offspring) 
                 this->aux.logs("mutation: swap in " + offspring->at(i)->getId() + " for " + mutate_letter);
 
 
-            // # addition
+            // # adding
             } else if (type_of_mutation == 3) {
 
 
