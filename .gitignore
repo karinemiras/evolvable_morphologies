@@ -404,9 +404,8 @@ nbproject/private/
 nbbuild/
 nbdist/
 .nb-gradle/
-indirect/cmake-build-debug/
-cmake-build-debug/
-direct/cmake-build-debug/
 indirect/experiments/
 experiments
 direct/population
+direct/cmake-build-debug
+indirect/cmake-build-debug
