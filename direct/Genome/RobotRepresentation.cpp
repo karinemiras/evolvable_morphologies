@@ -383,9 +383,6 @@ bool RobotRepresentation::init() {
 bool RobotRepresentation::init(std::string robotTextFile, std::string idPref) {
 
 	// open file
-
-
-	std::string linha;
 	std::ifstream file;
 
 	file.open(robotTextFile.c_str());

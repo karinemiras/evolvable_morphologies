@@ -1,5 +1,22 @@
 project(RobotCrossover)
-cmake_minimum_required(VERSION 2.6)
+
+cmake_minimum_required(VERSION 2.8.12)
+
+set(CMAKE_CXX_STANDARD 11)
+
+
+# MacOS X needed variables
+if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    # adaptable according to individual needs
+    set(CMAKE_MACOSX_RPATH ON)
+    #    set(CMAKE_SKIP_BUILD_RPATH FALSE)
+    #    set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+    #    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+    #    set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+endif ()
+
+
+
 
 #set(Boost_USE_STATIC_LIBS       ON)
 set(Boost_USE_MULTITHREADED     ON)
@@ -15,6 +32,11 @@ find_package(OpenSceneGraph REQUIRED)
 include_directories(${OPENSCENEGRAPH_INCLUDE_DIRS})
 
 find_package(PkgConfig)
+
+find_package(Qt5 COMPONENTS
+        Core
+        Widgets
+        )
 
 pkg_check_modules(ODE REQUIRED ode)
 include_directories(${ODE_INCLUDE_DIRS})
@@ -63,9 +85,14 @@ set(RobotCrossover_SRCS main.cpp
     Genome/ODE_Check/models/ServoMotor.cpp
     Genome/ODE_Check/models/TouchSensor.cpp
     Genome/ODE_Check/models/TouchSensorModel.cpp
-)
+    convertion/DecodedGeneticString.cpp
+    convertion/Genome.cpp
+    convertion/LSystem.cpp
+    convertion/Measures.cpp)
 
-include_directories("Transceivers" "Genome" "Genome/ODE_Check")
+include_directories("Transceivers" "Genome" "convertion" "Genome/ODE_Check")
 
 add_executable(RobotCrossover ${RobotCrossover_SRCS})
-target_link_libraries(RobotCrossover ${Boost_LIBRARIES} ${PROTOBUF_LIBRARIES} ${ODE_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${JANSSON_LIBRARIES})
+target_link_libraries(RobotCrossover ${Boost_LIBRARIES} ${PROTOBUF_LIBRARIES} ${ODE_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${JANSSON_LIBRARIES} Qt5::Widgets)
+
+
