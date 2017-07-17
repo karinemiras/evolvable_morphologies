@@ -38,7 +38,7 @@ public:
     unsigned int getTo();
     std::vector<std::string> getAxiom();
     void generate_final_string(int  replacement_iterations, int export_genomes, int generation, std::string path);
-    void decodeGeneticString(std::string genome_direct,std::map<std::string, double> params);
+    void decodeGeneticString(std::map<std::string, double> params);
     void constructor(int argc, char* argv[], std::map<std::string, double> params, std::string path);
     void draw_component(std::string reference, std::string direction, QGraphicsScene * scene, std::vector<QGraphicsRectItem *>  items,DecodedGeneticString::Vertex * c1, DecodedGeneticString::Vertex * c2, std::map<std::string, double> params);
     std::string getId();
@@ -46,9 +46,9 @@ public:
     std::string getId_parent2();
     double getFit_parent1();
     double getFit_parent2();
-    void exportGenome(std::string path);
+   // void exportGenome(std::string path);
     void createEmbryo();
-    void developGenomeIndirect(int argc, char* argv[], std::map<std::string, double> params, std::string genome_direct, int generation, std::string path);
+    void developGenomeIndirect(int argc, char* argv[], std::map<std::string, double> params, int generation, std::string path);
     DecodedGeneticString getDgs();
     std::map< std::string, double > getMeasures();
     std::map< std::pair<int, int>, std::string >  getList_components();
@@ -59,8 +59,7 @@ public:
     void updateFitness(double fitness);
     void setDecodedGeneticString(DecodedGeneticString dgs);
 
-    void build_grammar(LSystem LS, std::map<std::string, double> params);
-    void build_genome_direct(LSystem LS, std::map<std::string, double> params);
+
 
 protected:
 

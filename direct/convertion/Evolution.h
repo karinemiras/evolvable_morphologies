@@ -14,6 +14,10 @@
 #include "Measures.h"
 #include "Tests.h"
 
+#include "../Genome/RobotRepresentation.h"
+#include "../Genome/Mutator.h"
+#include "../Genome/EvolverConfiguration.h"
+
 /**
  * Evolutionary algorithm.
  */
@@ -61,8 +65,8 @@ public:
     int getGeneration_genome(std::string idgenome);
     double compareIndividual(Measures * m, std::string idgenome);
     double compareParents(std::string idparent1, std::string idparent2);
+    void initPopulation(LSystem LS);
 
-    virtual void initPopulation(LSystem LS){};
     virtual void crossover(LSystem LS, std::vector<Genome *> * offspring){};
     virtual void mutation(LSystem LS, std::vector<Genome *> * offspring){};
 

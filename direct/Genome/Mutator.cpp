@@ -110,7 +110,7 @@ void Mutator::createChild(boost::shared_ptr<RobotRepresentation> robot1,
     //std::cout << offspring1->toString() << std::endl;
 }
 
-void Mutator::growBodyRandomly(boost::shared_ptr<RobotRepresentation>& robot) {
+void Mutator::growBodyRandomly(boost::shared_ptr<RobotRepresentation>& robot, std::string v1) {
 
 	boost::random::uniform_int_distribution<> dist(conf_->minNumInitialParts,
 			conf_->maxNumInitialParts);
@@ -137,7 +137,7 @@ void Mutator::growBodyRandomly(boost::shared_ptr<RobotRepresentation>& robot) {
 			}
 		}
 	}
-	robot->toTextFile("../population/oi");
+	robot->toTextFile(v1);
 }
 
 void Mutator::randomizeBrain(boost::shared_ptr<RobotRepresentation>& robot) {

@@ -68,7 +68,7 @@ public:
 			boost::shared_ptr<RobotRepresentation> parent1,
 			boost::shared_ptr<RobotRepresentation> parent2);
 
-	void growBodyRandomly(boost::shared_ptr<RobotRepresentation>& robot);
+	void growBodyRandomly(boost::shared_ptr<RobotRepresentation>& robot, std::string v1);
 	void randomizeBrain(boost::shared_ptr<RobotRepresentation>& robot);
     
     /**

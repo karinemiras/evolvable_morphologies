@@ -38,6 +38,11 @@ find_package(Qt5 COMPONENTS
         Widgets
         )
 
+find_package(mlpack)
+
+find_package(armadillo)
+
+
 pkg_check_modules(ODE REQUIRED ode)
 include_directories(${ODE_INCLUDE_DIRS})
 
@@ -92,11 +97,14 @@ set(RobotCrossover_SRCS main.cpp
     convertion/Tests.cpp
     convertion/Aux.cpp
     convertion/Evolution.cpp
-    convertion/EvolutionIndirect.cpp)
+        )
 
 include_directories("Transceivers" "Genome" "convertion" "Genome/ODE_Check")
 
 add_executable(RobotCrossover ${RobotCrossover_SRCS})
-target_link_libraries(RobotCrossover ${Boost_LIBRARIES} ${PROTOBUF_LIBRARIES} ${ODE_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${JANSSON_LIBRARIES} Qt5::Widgets)
+target_link_libraries(RobotCrossover ${Boost_LIBRARIES} ${PROTOBUF_LIBRARIES} ${ODE_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${JANSSON_LIBRARIES}
+        Qt5::Widgets
+        mlpack
+        armadillo)
 
 

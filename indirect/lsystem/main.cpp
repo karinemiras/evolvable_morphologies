@@ -8,7 +8,6 @@
 #include<iostream>
 
 #include "EvolutionIndirect.h"
-#include "EvolutionDirect.h"
 #include "Tuning.h"
 
 
