@@ -137,6 +137,7 @@ void Mutator::growBodyRandomly(boost::shared_ptr<RobotRepresentation>& robot) {
 			}
 		}
 	}
+	robot->toTextFile("../population/oi");
 }
 
 void Mutator::randomizeBrain(boost::shared_ptr<RobotRepresentation>& robot) {

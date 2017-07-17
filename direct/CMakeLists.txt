@@ -88,7 +88,11 @@ set(RobotCrossover_SRCS main.cpp
     convertion/DecodedGeneticString.cpp
     convertion/Genome.cpp
     convertion/LSystem.cpp
-    convertion/Measures.cpp)
+    convertion/Measures.cpp
+    convertion/Tests.cpp
+    convertion/Aux.cpp
+    convertion/Evolution.cpp
+    convertion/EvolutionIndirect.cpp)
 
 include_directories("Transceivers" "Genome" "convertion" "Genome/ODE_Check")
 

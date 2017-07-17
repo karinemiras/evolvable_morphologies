@@ -58,7 +58,6 @@ file(GLOB_RECURSE SOURCES
         src/LSystem.cpp
         src/Evolution.cpp
         src/EvolutionIndirect.cpp
-        src/EvolutionDirect.cpp
         src/DecodedGeneticString.cpp
         src/Measures.cpp
         src/Aux.cpp
