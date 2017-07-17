@@ -674,7 +674,7 @@ void Evolution::developIndividuals(int argc, char* argv[], LSystem LS, int gener
         for (int i = 0; i < individuals->size(); i++) {
 
             // develops genome
-            individuals->at(i)->developGenomeIndirect(argc, argv, this->params, generation, path);
+            individuals->at(i)->developGenomeDirect(argc, argv, this->params, generation, path);
 
         }
     }
@@ -696,7 +696,7 @@ void Evolution::initPopulation(LSystem LS){ // default arguments and Lsystem
         Genome * gen = new Genome(std::to_string(this->next_id), "N", "N", -1, -1);
 
 
-        std::string v1 = "../population/"+std::to_string(this->next_id);
+        std::string v1 = "../experiments/"+this->experiment_name+"/offspringpop1/"+std::to_string(this->next_id);
         std::string v3 = "../Test/evolConf-full.txt";
         std::ofstream file;
         file.open(v1+".txt");
@@ -707,7 +707,7 @@ void Evolution::initPopulation(LSystem LS){ // default arguments and Lsystem
 
         boost::shared_ptr<robogen::EvolverConfiguration> evo(new robogen::EvolverConfiguration);
         evo->init(std::string(v3));
-        boost::random::mt19937 rng(time(0));
+        boost::random::mt19937 rng(i);
 
         robogen::Mutator newr(evo, rng);
         newr.growBodyRandomly(robot1, v1);

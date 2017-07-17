@@ -24,7 +24,7 @@ void DecodedGeneticString::decode(std::string genome_file, std::map<std::string,
 
     std::string line;
     std::ifstream file;
-
+    
     file.open(genome_file);
     if (!file.is_open()) {
         std::cout << "Could not open robot text file " << std::endl;
