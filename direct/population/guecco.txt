@@ -1,13 +1,1 @@
 0 CoreComponent E0 0 GREEN
-	0 ActiveHinge I0 1 GREEN
-		0 FixedBrick F0 0 GREEN
-			0 ActiveHinge I1 1 GREEN
-				0 FixedBrick F1 0 GREEN
-					1 ActiveHinge I2 1 GREEN
-						0 FixedBrick F2 0 GREEN
-					2 ActiveHinge I3 3 GREEN
-						0 FixedBrick F3 0 GREEN
-	1 ActiveHinge I4 1 GREEN
-		0 FixedBrick F4 0 GREEN
-	3 ActiveHinge I5 3 GREEN
-		0 FixedBrick F5 0 GREEN
