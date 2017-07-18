@@ -15,16 +15,16 @@
 
 
 /**
- * Transforms the main genetic-string of the genome into a graph that logically represents the connections among the components.
- * @param gs - main genetic-string of the genome.
- * @param LS - Lsystem structure containing the alphabet.
+ * Transforms the direct encoding into a graph that logically represents the connections among the components.
+ * @param genome_file - path and name of the file
+ * @param LS - parameters
  */
 void DecodedGeneticString::decode(std::string genome_file, std::map<std::string, double> params) {
 
 
     std::string line;
     std::ifstream file;
-    
+
     file.open(genome_file);
     if (!file.is_open()) {
         std::cout << "Could not open robot text file " << std::endl;
@@ -35,6 +35,7 @@ void DecodedGeneticString::decode(std::string genome_file, std::map<std::string,
         int num_components = 0;
         DecodedGeneticString::Vertex  *current_component = NULL;
 
+        // translation of components names
         std::map<std::string, std::string> letters;
         letters["CoreComponent"] = "C";
         letters["FixedBrick"] = "B";
@@ -45,10 +46,12 @@ void DecodedGeneticString::decode(std::string genome_file, std::map<std::string,
         int level = 0, previous_level = 0;
 
 
+        // creates a data structure (graph) logically representing the phenotype
+
         while (getline(file, line) and line != "") {
 
 
-            if(num_components <= params["max_comps"]) {
+            if(num_components < params["max_comps"]) {
 
                 std::vector<std::string> tokens, tokens_level;
                 boost::split(tokens_level, line, boost::is_any_of("\t"));
@@ -60,6 +63,7 @@ void DecodedGeneticString::decode(std::string genome_file, std::map<std::string,
                 letter = tokens[1];
                 std::string mounting_command = "";
 
+                // adds new component to the graph
                 DecodedGeneticString::Vertex *new_component;
                 new_component = new DecodedGeneticString::Vertex;
                 id++;
@@ -70,12 +74,11 @@ void DecodedGeneticString::decode(std::string genome_file, std::map<std::string,
                 new_component->right = NULL;
 
 
+                // controls the hierarchical level of the tree of components
                 if (level < previous_level) {
 
                     int num = (int) (previous_level - level)+1;
-
-                    for (int j = 1; j <= num; j++)
-                        current_component = current_component->back;
+                    for (int j = 1; j <= num; j++) current_component = current_component->back;
                 }
 
 

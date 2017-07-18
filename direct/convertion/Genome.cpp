@@ -75,14 +75,15 @@ double Genome::getFitness(){
 
 
 /**
- *  Decodes the genetic-string into a graph of components.
- *  @param LS - Lsystem structure containing the alphabet.
+ *  Translates the direct encoding into a graph of components.
+ *  @param path - directory
+ *  @param params - parameters
  */
 void Genome::decodeGeneticString(std::string path, std::map<std::string, double> params) {
 
     try {
         this->dgs = DecodedGeneticString();
-        this->dgs.decode("../experiments/"+path+"/"+this->id+".txt", params);
+        this->dgs.decode("../experiments/"+path+"/genome"+this->id+".txt", params);
 
     } catch (const std::exception &e) {
         std::cout << "ERROR decoding genetic-string: " << e.what() << std::endl;
@@ -91,16 +92,15 @@ void Genome::decodeGeneticString(std::string path, std::map<std::string, double>
 }
 
 /**
- *  Decodes the genetic-string into a graph of components.
- *  @param LS - Lsystem structure containing the alphabet.
+ *  Builds phenotype.
  */
 void Genome::developGenomeDirect(int argc, char* argv[], std::map<std::string, double> params, int generation, std::string path) {
 
-    // decodes the final genetic-string into a tree of components
-    this->decodeGeneticString(path+std::to_string(generation), params);
+    // translates the direct encoding into a graph of components.
+    this->decodeGeneticString(path, params);
 
     // generates robot-graphics
-    this->constructor(argc, argv, params, path+std::to_string(generation));
+    this->constructor(argc, argv, params, path);
 }
 
 /**
@@ -333,10 +333,6 @@ void Genome::draw_component( std::string reference, std::string direction, QGrap
 
 
 }
-
-
-
-
 
 
 void Genome::updateFitness(double fitness){

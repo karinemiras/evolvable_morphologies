@@ -190,7 +190,7 @@ void Evolution::exportPop(int generation){
                                +"_p1_"+this->population->at(i)->getId_parent1()+"_p2_"+this->population->at(i)->getId_parent2()+".png";
 
         std::string pathfrom =  "../experiments/"
-                                + this->experiment_name + "/offspringpop"+ std::to_string(generation_genome);
+                                + this->experiment_name + "/offspringpop";
 
         std::string pathto =  "../experiments/"
                               + this->experiment_name + "/selectedpop"+ std::to_string(generation);
@@ -201,7 +201,7 @@ void Evolution::exportPop(int generation){
         // copies values of metrics to file of selected population
         std::string line;
         std::ifstream measures("../experiments/"+this->experiment_name+
-                                       "/offspringpop"+std::to_string(generation_genome)
+                                       "/offspringpop"
                                +"/measures"+this->population->at(i)->getId()+".txt");
 
         while (getline (measures, line) ) {
@@ -650,7 +650,7 @@ void Evolution::setupEvolution(){
 
     aux.createFolder(this->experiment_name);
     aux.createFolder(this->experiment_name+"/archive");
-    aux.createFolder(this->experiment_name+"/offspringpop1");
+    aux.createFolder(this->experiment_name+"/offspringpop");
 
     // logs parameters configuration
     this->saveParameters();
@@ -695,24 +695,26 @@ void Evolution::initPopulation(LSystem LS){ // default arguments and Lsystem
         // initial genomes receive personal ids, but the ids of the parents are none
         Genome * gen = new Genome(std::to_string(this->next_id), "N", "N", -1, -1);
 
-
-        std::string v1 = "../experiments/"+this->experiment_name+"/offspringpop1/"+std::to_string(this->next_id);
+        // creates a new genome file only with core component
+        std::string v1 = "../experiments/"+this->experiment_name+"/offspringpop/genome"+std::to_string(this->next_id);
         std::string v3 = "../Test/evolConf-full.txt";
         std::ofstream file;
         file.open(v1+".txt");
         file<<"0 CoreComponent E0 0 GREEN";
         file.close();
+
         boost::shared_ptr<robogen::RobotRepresentation> robot1(new robogen::RobotRepresentation());
         robot1->init(std::string(v1)+".txt", "P0");
-
         boost::shared_ptr<robogen::EvolverConfiguration> evo(new robogen::EvolverConfiguration);
         evo->init(std::string(v3));
         boost::random::mt19937 rng(i);
 
+        // adds random parts to initialize the genome
         robogen::Mutator newr(evo, rng);
         newr.growBodyRandomly(robot1, v1);
 
-        this->population->push_back(gen);  // adds genome to the population
+        // adds genome to the population
+        this->population->push_back(gen);
 
         // increments id that will be used for any next genome created
         this->next_id++;
@@ -798,94 +800,93 @@ int Evolution::noveltySearch(int argc, char* argv[], int encodingtype) {
 
 
 
-//    // evolves population through out generations
-//    for(int g = gi+1; g <= params["num_generations"]; g++) {
-//
-//        this->aux.logs("---------------- generation " + std::to_string(g) + " ----------------");
-//
-//        std::vector<Genome *> * offspring =  new std::vector<Genome *>();
-//
-//        // creates offspring
-//        this->crossover(LS, offspring);
-//
-//        this->aux.createFolder(this->experiment_name+"/offspringpop"+std::to_string(g));
-//        this->aux.createFolder(this->experiment_name+"/selectedpop"+std::to_string(g));
-//
-//        // develops genomes of the offspring
-//        this->developIndividuals(argc, argv, LS, g, offspring, this->experiment_name+"/offspringpop",  encodingtype);
-//        // measures phenotypes of the offspring
-//        this->measureIndividuals(g, offspring, "/offspringpop");
-//
-//
-//        // BEGINNING: auxiliar pointers //
-//
-//            std::vector<Genome *> * temp_pop_reference =  new std::vector<Genome *>();
-//            std::vector<Genome *> * temp_pop_compare = new std::vector<Genome *>();
-//
-//            for(int j=0; j < this->getPopulation()->size(); j++){
-//
-//                temp_pop_reference->push_back(this->getPopulation()->at(j));
-//                temp_pop_compare->push_back(this->getPopulation()->at(j));
-//
-//            }
-//
-//            for(int j=0; j < offspring->size(); j++){
-//
-//                temp_pop_reference->push_back(offspring->at(j));
-//                temp_pop_compare->push_back(offspring->at(j));
-//            }
-//
-//            for ( auto &it : *this->archive){
-//
-//                temp_pop_compare->push_back(this->archive->at(it.first));
-//            }
-//
-//
-//        // END: auxiliar pointers //
-//
-//
-//        // evaluates population (parents+offspring)
-//        this->evaluateIndividuals(g, temp_pop_reference, temp_pop_compare);
-//
-//        // (possibly) adds genomes to archive
-//        this->addToArchive(offspring, this->params["prob_add_archive"], this->experiment_name);
-//        // logs arquive
-//        for( const auto& it : *this->archive ){
-//            this->aux.logs(" archive " + it.first);
-//        }
-//
-//        // adds new individuals to population
-//        for(int j=0; j < offspring->size(); j++){
-//            this->population->push_back(offspring->at(j));
-//        }
-//
-//        // selects individuals, keeping the population with a fixed size
-//        this->selection();
-//
-//        // calculates quality state of the search for the generation
-//        niche_coverage_generation  = this->calculateNicheCoverage()[0];
-//        niche_coverage_accumulated  = this->calculateNicheCoverage()[1];
-//
-//        // saves metrics of evolution to file
-//        this->exportGenerationMetrics(g, niche_coverage_generation, niche_coverage_accumulated);
-//
-//        // saves phenotypes of the selected population to a separated folder (only for visualization issues)
-//        this->exportPop(g);
-//
-//
-//        //every 10 generations, compares distances among points
-//        if(g%10==0) {
-//            this->compareIndividuals(g);
-//        }
-//
-//
-//        // saves the number of the last generation created/evaluated
-//        this->writesEvolutionState(g, this->next_id);
-//
-//
-//    }
-//
-//    this->summaryNicheCoverage();
+    // evolves population through out generations
+    for(int g = gi+1; g <= params["num_generations"]; g++) {
+
+        this->aux.logs("---------------- generation " + std::to_string(g) + " ----------------");
+
+        std::vector<Genome *> * offspring =  new std::vector<Genome *>();
+
+        // creates offspring
+        this->crossover(LS, offspring, g);
+
+        this->aux.createFolder(this->experiment_name+"/selectedpop"+std::to_string(g));
+
+        // develops genomes of the offspring
+        this->developIndividuals(argc, argv, LS, g, offspring, this->experiment_name+"/offspringpop",  encodingtype);
+        // measures phenotypes of the offspring
+        this->measureIndividuals(g, offspring, "/offspringpop");
+
+
+        // BEGINNING: auxiliar pointers //
+
+            std::vector<Genome *> * temp_pop_reference =  new std::vector<Genome *>();
+            std::vector<Genome *> * temp_pop_compare = new std::vector<Genome *>();
+
+            for(int j=0; j < this->getPopulation()->size(); j++){
+
+                temp_pop_reference->push_back(this->getPopulation()->at(j));
+                temp_pop_compare->push_back(this->getPopulation()->at(j));
+
+            }
+
+            for(int j=0; j < offspring->size(); j++){
+
+                temp_pop_reference->push_back(offspring->at(j));
+                temp_pop_compare->push_back(offspring->at(j));
+            }
+
+            for ( auto &it : *this->archive){
+
+                temp_pop_compare->push_back(this->archive->at(it.first));
+            }
+
+
+        // END: auxiliar pointers //
+
+
+        // evaluates population (parents+offspring)
+        this->evaluateIndividuals(g, temp_pop_reference, temp_pop_compare);
+
+        // (possibly) adds genomes to archive
+        this->addToArchive(offspring, this->params["prob_add_archive"], this->experiment_name);
+        // logs arquive
+        for( const auto& it : *this->archive ){
+            this->aux.logs(" archive " + it.first);
+        }
+
+        // adds new individuals to population
+        for(int j=0; j < offspring->size(); j++){
+            this->population->push_back(offspring->at(j));
+        }
+
+        // selects individuals, keeping the population with a fixed size
+        this->selection();
+
+        // calculates quality state of the search for the generation
+        niche_coverage_generation  = this->calculateNicheCoverage()[0];
+        niche_coverage_accumulated  = this->calculateNicheCoverage()[1];
+
+        // saves metrics of evolution to file
+        this->exportGenerationMetrics(g, niche_coverage_generation, niche_coverage_accumulated);
+
+        // saves phenotypes of the selected population to a separated folder (only for visualization issues)
+        this->exportPop(g);
+
+
+        //every 10 generations, compares distances among points
+        if(g%10==0) {
+            this->compareIndividuals(g);
+        }
+
+
+        // saves the number of the last generation created/evaluated
+        this->writesEvolutionState(g, this->next_id);
+
+
+    }
+
+    this->summaryNicheCoverage();
 
 
     this->logsTime("end");
@@ -893,6 +894,74 @@ int Evolution::noveltySearch(int argc, char* argv[], int encodingtype) {
     return niche_coverage_accumulated;
 
 }
+
+
+
+
+/**
+*   Performs crossover among individuals in the population.
+**/
+
+void Evolution::crossover(LSystem LS, std::vector<Genome *>  * offspring, int generation){
+
+
+    // creates new individuals via crossover (size of offspring is relative to the size of population)
+    for(int i = 0; i < ceil(this->params["pop_size"] * this->params["offspring_prop"]); i++) {
+
+        // selects parents for the crossover, according to INDEX
+        int parent1 = this->tournament();
+        int parent2 = parent1;
+
+        while(parent2 == parent1){ // makes sure that parent2 is different from parent1
+            parent2 = this->tournament();
+        }
+
+        // #TEST: Tests if selected parents are different.
+        this->tests.testParents(parent1, parent2);
+
+        // creates new offspring genome
+        Genome * gen = new Genome(std::to_string(this->next_id),
+                                  this->population->at(parent1)->getId(),
+                                  this->population->at(parent2)->getId(),
+                                  this->population->at(parent1)->getFitness(),
+                                  this->population->at(parent2)->getFitness());
+
+        this->aux.logs(" crossover for genome " + std::to_string(this->next_id) + " - p1: " + this->population->at(parent1)->getId() + " p2: " + this->population->at(parent2)->getId());
+
+        this->next_id++;
+
+
+        // creates a new genome
+
+        std::string v1 = "../experiments/"+this->experiment_name+"/offspringpop/genome"+this->population->at(parent1)->getId()+".txt";
+        std::string v2 = "../experiments/"+this->experiment_name+"/offspringpop/genome"+this->population->at(parent2)->getId()+".txt";
+        std::string v3 = "../Test/evolConf-full.txt";
+
+        std::string v4 = "../experiments/"+this->experiment_name+"/offspringpop/genome"+std::to_string(this->next_id);
+
+        boost::shared_ptr<robogen::RobotRepresentation> robot1(new robogen::RobotRepresentation());
+        boost::shared_ptr<robogen::RobotRepresentation> robot2(new robogen::RobotRepresentation());
+        robot1->init(std::string(v1), "P0");
+        robot2->init(std::string(v2), "P1");
+
+        boost::shared_ptr<robogen::EvolverConfiguration> evo(new robogen::EvolverConfiguration);
+        evo->init(std::string(v3));
+        boost::random::mt19937 rng(i);
+
+        evo->init(std::string(v3));
+        robogen::Mutator mut(evo, rng);
+        mut.createChild(robot1, robot2, v4);
+
+
+        // adds new individual to the offspring
+        offspring->push_back(gen);
+
+    }
+
+
+}
+
+
 
 
 void Evolution::summaryNicheCoverage(){
