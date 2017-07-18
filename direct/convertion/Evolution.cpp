@@ -200,8 +200,7 @@ void Evolution::exportPop(int generation){
 
         // copies values of metrics to file of selected population
         std::string line;
-        std::ifstream measures("../experiments/"+this->experiment_name+
-                                       "/offspringpop"
+        std::ifstream measures("../experiments/"+this->experiment_name+ "/offspringpop"
                                +"/measures"+this->population->at(i)->getId()+".txt");
 
         while (getline (measures, line) ) {
@@ -230,7 +229,7 @@ double Evolution::compareIndividual(Measures * m, std::string idgenome){
 
     std::string line;
     std::ifstream measures("../experiments/"+this->experiment_name+
-                           "/offspringpop"+std::to_string(generation_genome)+"/measures"+idgenome+".txt");
+                           "/offspringpop/measures"+idgenome+".txt");
 
     double dif = 0;
     while (getline (measures, line) ) {
@@ -256,12 +255,12 @@ double Evolution::compareParents(std::string idparent1, std::string idparent2){
     int generation_genome_parent1 = this->getGeneration_genome(idparent1);
     std::string line;
     std::ifstream measures("../experiments/"+this->experiment_name+
-                           "/offspringpop"+std::to_string(generation_genome_parent1)+"/measures"+idparent1+".txt");
+                           "/offspringpop/measures"+idparent1+".txt");
 
     int generation_genome_parent2 = this->getGeneration_genome(idparent2);
     std::string line2;
     std::ifstream measures2("../experiments/"+this->experiment_name+
-                           "/offspringpop"+std::to_string(generation_genome_parent2)+"/measures"+idparent2+".txt");
+                           "/offspringpop/measures"+idparent2+".txt");
 
     double dif = 0;
     while (getline (measures, line) ) {
@@ -928,9 +927,6 @@ void Evolution::crossover(LSystem LS, std::vector<Genome *>  * offspring, int ge
 
         this->aux.logs(" crossover for genome " + std::to_string(this->next_id) + " - p1: " + this->population->at(parent1)->getId() + " p2: " + this->population->at(parent2)->getId());
 
-        this->next_id++;
-
-
         // creates a new genome
 
         std::string v1 = "../experiments/"+this->experiment_name+"/offspringpop/genome"+this->population->at(parent1)->getId()+".txt";
@@ -955,6 +951,8 @@ void Evolution::crossover(LSystem LS, std::vector<Genome *>  * offspring, int ge
 
         // adds new individual to the offspring
         offspring->push_back(gen);
+
+        this->next_id++;
 
     }
 
