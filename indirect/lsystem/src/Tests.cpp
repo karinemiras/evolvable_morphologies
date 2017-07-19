@@ -7,6 +7,7 @@
 
 #include "Aux.h"
 #include "Tests.h"
+#include <math.h>
 
 /**
  * Tests if calculated measures are within the expected range. - for class Measures
@@ -18,18 +19,13 @@ void Tests::testMeasures(std::string id_genome, std::map< std::string, double> m
     for( const auto& mea : measures ){ // for each measure
 
         // if measure is out of the expected range
-        if(mea.second < 0 or mea.second > 1) {
+        if(mea.second < 0 or mea.second > 1 ) {
 
             std::cout<< "#TEST ERROR: measure "<<mea.first<<" out of range for genome "<< id_genome <<", with value "<<mea.second<<std::endl;
             exit (EXIT_FAILURE);
 
-        }else{ //+ " for genome " + id_genome + " has value " + std::to_string(mea.second)+std::endl
-
-            //this->aux = Aux(this->experiment_name, this->params);
-           // this->aux.logs("measure " + mea.first + " for genome " + id_genome+ " has value "+ std::to_string(mea.second));
-
-
         }
+
     }
 }
 

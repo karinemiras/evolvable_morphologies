@@ -57,7 +57,7 @@ void Measures::initalizeMeasures(){
     this->gen->updateMeasure("length_ratio", 0); // length of the shortest side dived by the longest
     this->gen->updateMeasure("sparseness", 0); // average distance of each component from each other in the axises x/y, divided by the total of components
     this->gen->updateMeasure("joints_per_limb", 0); //  proportion of effective joints per limb
-    this->gen->updateMeasure("branching",0); // sum of 1*connectivty3 and 2*connectivity4,  divided by the total of components
+    this->gen->updateMeasure("branching",0); // sum of 1*connectivity3 and 2*connectivity4,  divided by the total of components
 }
 
 
@@ -104,29 +104,40 @@ void Measures::measurePhenotype(std::map<std::string, double> params, std::strin
     this->gen->updateMeasure("effective_joints",     this->gen->getMeasures()["effective_joints"]
                                                      + this->gen->getMeasures()["viable_horizontal_joints"]);
 
-    // if there are any limbs
+    // practical limits for effective joints
+    int limit_joints = std::trunc((this->gen->getMeasures()["total_components"]-1)/2);
+
+
     if( this->gen->getMeasures()["connectivity1"]>0 ) {
+
+        // practical limits for joints per limb
+        double limit_jointperlimb = 0;
+        limit_jointperlimb =  limit_joints/(float)this->gen->getMeasures()["connectivity1"];
 
         // calculates percentage of number of effective joints per total of limbs
         this->gen->updateMeasure("joints_per_limb",
                                  this->gen->getMeasures()["effective_joints"]
-                                 /  (double) this->gen->getMeasures()["connectivity1"]);
+                                 /  (float) this->gen->getMeasures()["connectivity1"]);
 
-        // normalizes per number of components, because there may be more joints than limbs
-        this->gen->updateMeasure("joints_per_limb",
-                                 roundf(
-                                         ( (float) this->gen->getMeasures()["joints_per_limb"]
-                                           /   (float) this->gen->getMeasures()["total_components"])
-                                         * 100) / 100 );
+        // normalizes given the limit
+        if(limit_jointperlimb>0) {
+            this->gen->updateMeasure("joints_per_limb",
+                                     roundf(
+                                             ((float) this->gen->getMeasures()["joints_per_limb"]
+                                              / (float) limit_jointperlimb)
+                                             * 100) / 100);
+        }
 
     }
 
-    // normalizes the number of effective joints per total of components
-    this->gen->updateMeasure("effective_joints",
-                             roundf(
-                                     ( (float) this->gen->getMeasures()["effective_joints"]
-                                       /   (float) this->gen->getMeasures()["total_components"])
-                                     * 100) / 100 );
+    // normalizes the number of effective joints given a practical limit
+    if(limit_joints>0) {
+        this->gen->updateMeasure("effective_joints",
+                                 roundf(
+                                         ((float) this->gen->getMeasures()["effective_joints"]
+                                          / (float) limit_joints)
+                                         * 100) / 100);
+    }
 
 
     // normalizes the number of limbs per total of components
@@ -135,15 +146,29 @@ void Measures::measurePhenotype(std::map<std::string, double> params, std::strin
                                      ( (float) this->gen->getMeasures()["connectivity1"]
                                        / (float) this->gen->getMeasures()["total_components"])
                                      * 100) / 100);
+//
+//    this->gen->updateMeasure("connectivity2",
+//                             roundf (
+//                                     ( (float) this->gen->getMeasures()["connectivity2"]
+//                                       / (float) this->gen->getMeasures()["total_components"])
+//                                     * 100) / 100);
+//
+//    this->gen->updateMeasure("branching",
+//                             roundf (
+//                                     (float)    (   ((     this->gen->getMeasures()["connectivity3"])
+//                                                     +  ( 2 * this->gen->getMeasures()["connectivity4"]))
+//                                                    / (float) this->gen->getMeasures()["total_components"])
+//                                                * 100) / 100);
 
-
-    // accounts for conenctivity in levels 3 (weight 1) and 4 (weight 2)
-    this->gen->updateMeasure("branching",
-                             roundf (
-                                     (   (float) ( this->gen->getMeasures()["connectivity3"] + 2*this->gen->getMeasures()["connectivity4"])
-                                       / (float) this->gen->getMeasures()["total_components"])
-                                     * 100) / 100);
-
+    // normalizes branching given a practical limit
+    int limit_branching = std::trunc((this->gen->getMeasures()["total_components"]-2)/3);
+    if(limit_branching>0) {
+        this->gen->updateMeasure("branching",
+                                 roundf(
+                                         (float) (this->gen->getMeasures()["connectivity4"]
+                                                  / (float) limit_branching)
+                                         * 100) / 100);
+    }
 
 
     /* BEGINNING:  length ratio: shortest length by longest length  */
@@ -177,118 +202,117 @@ void Measures::measurePhenotype(std::map<std::string, double> params, std::strin
 
     /* BEGINNING:   calculates the average distance among components */
 
-    double dist_comps = 0;
-    // if there are more components than one
-    if( this->gen->getList_components().size() > 1 ) {
-
-        // for each component
-        for( const auto& iter1 : this->gen->getList_components() ){
-
-            int dist_comp = 0;
-            // compares with all other components
-            for( const auto& iter2 : this->gen->getList_components() ){
-
-                // sum of distances from the component to all the other components
-                dist_comp += (   abs(iter1.first.first - iter2.first.first)
-                                 + abs( iter1.first.second - iter2.first.second)) ;
-
-            }
-
-            // average of the distances for the component
-            dist_comp /= this->gen->getList_components().size() - 1;
-
-            dist_comps += dist_comp; // acumulate average distance
-        }
-
-        // average of all the averages
-        dist_comps /= this->gen->getList_components().size();
-    }
+//    double dist_comps = 0;
+//    // if there are more components than one
+//    if( this->gen->getList_components().size() > 1 ) {
+//
+//        // for each component
+//        for( const auto& iter1 : this->gen->getList_components() ){
+//
+//            int dist_comp = 0;
+//            // compares with all other components
+//            for( const auto& iter2 : this->gen->getList_components() ){
+//
+//                // sum of distances from the component to all the other components
+//                dist_comp += (   abs(iter1.first.first - iter2.first.first)
+//                                 + abs( iter1.first.second - iter2.first.second)) ;
+//
+//            }
+//
+//            // average of the distances for the component
+//            dist_comp /= this->gen->getList_components().size() - 1;
+//
+//            dist_comps += dist_comp; // acumulate average distance
+//        }
+//
+//        // average of all the averages
+//        dist_comps /= this->gen->getList_components().size();
+//    }
 
     // the division by size is for counting only one uni per component
-    dist_comps = (dist_comps / (double) size);
+//    dist_comps = (dist_comps / (double) size);
 
     // normalizes average distance by the number of components
-    this->gen->updateMeasure("sparseness",
-                             roundf((
-                                            (float) dist_comps
-                                            / (float) this->gen->getMeasures()["total_components"] )
-                                    * 100) / 100);
+//    this->gen->updateMeasure("sparseness",
+//                             roundf((
+//                                            (float) dist_comps
+//                                            / (float) this->gen->getMeasures()["total_components"] )
+//                                    * 100) / 100);
 
     /* END:   calculates the average distance among components */
 
     /* BEGINNING:   symmetry */
 
 
-    // horizontal symmetry
-    int ncomp = 0;
-    for( const auto& it : this->gen->getList_components() ){
+        // horizontal symmetry
+        int ncomp = 0;
+        for( const auto& it : this->gen->getList_components() ){
 
-        int x = it.first.first;
-        int y = it.first.second;
-        if( x < 0 or x >= size ) { // if component is not on horizontal the spine of the morphology
-            ncomp +=1;
-            std::pair<int, int> l_key = std::make_pair(x * (-1), y); // the horizontal-opposite coordinate
+            int x = it.first.first;
+            int y = it.first.second;
+            if( x < 0 or x >= size ) { // if component is not on horizontal the spine of the morphology
+                ncomp +=1;
+                std::pair<int, int> l_key = std::make_pair(x * (-1), y); // the horizontal-opposite coordinate
 
-            // if any component is found in the opposite coordinate
-            auto l_it = this->gen->getList_components().find(l_key);
-            if ( this->gen->getList_components().count(l_key)>0) {
+                // if any component is found in the opposite coordinate
+                auto l_it = this->gen->getList_components().find(l_key);
+                if ( this->gen->getList_components().count(l_key)>0) {
 
-                this->gen->updateMeasure("horizontal_symmetry", this->gen->getMeasures()["horizontal_symmetry"] + 1 ); }
+                    this->gen->updateMeasure("horizontal_symmetry", this->gen->getMeasures()["horizontal_symmetry"] + 1 ); }
+            }
         }
-    }
-    if(ncomp > 0){ this->gen->updateMeasure("horizontal_symmetry" ,
-                                            roundf( (
-                                                            (float)this->gen->getMeasures()["horizontal_symmetry"]
-                                                            / (float) ncomp)*100)/100); }
+        if(ncomp > 0){ this->gen->updateMeasure("horizontal_symmetry" ,
+                                                roundf( (
+                                                                (float)this->gen->getMeasures()["horizontal_symmetry"]
+                                                                / (float) ncomp)*100)/100); }
 
 
-    // vertical symmetry
-    ncomp = 0;
-    for( const auto& it : this->gen->getList_components() ){
+        // vertical symmetry
+        ncomp = 0;
+        for( const auto& it : this->gen->getList_components() ){
 
-        int x = it.first.first;
-        int y = it.first.second;
-        if(y < 0 or y >= size ) { // if component is not on vertical the spine of the morphology
-            ncomp +=1;
-            std::pair<int, int> l_key = std::make_pair(x, y * (-1)); // the vertical-opposite coordinate
+            int x = it.first.first;
+            int y = it.first.second;
+            if(y < 0 or y >= size ) { // if component is not on vertical the spine of the morphology
+                ncomp +=1;
+                std::pair<int, int> l_key = std::make_pair(x, y * (-1)); // the vertical-opposite coordinate
 
-            // if any component is found in the opposite coordinate
-            auto l_it = this->gen->getList_components().find(l_key);
-            if ( this->gen->getList_components().count(l_key)>0) {
+                // if any component is found in the opposite coordinate
+                auto l_it = this->gen->getList_components().find(l_key);
+                if ( this->gen->getList_components().count(l_key)>0) {
 
-                this->gen->updateMeasure("vertical_symmetry", this->gen->getMeasures()["vertical_symmetry"]+ 1 ); }
+                    this->gen->updateMeasure("vertical_symmetry", this->gen->getMeasures()["vertical_symmetry"]+ 1 ); }
+            }
         }
-    }
-    if(ncomp > 0){ this->gen->updateMeasure("vertical_symmetry",
-                                            roundf( (
-                                                            (float) this->gen->getMeasures()["vertical_symmetry"]
-                                                            / (float) ncomp)*100 )/100); }
+        if(ncomp > 0){ this->gen->updateMeasure("vertical_symmetry",
+                                                roundf( (
+                                                                (float) this->gen->getMeasures()["vertical_symmetry"]
+                                                                / (float) ncomp)*100 )/100); }
 
 
-    // selects the maximum symmetry
-    this->gen->updateMeasure("symmetry",
-                             std::max(this->gen->getMeasures()["vertical_symmetry"],
-                                      this->gen->getMeasures()["horizontal_symmetry"]) );
+        // selects the maximum symmetry
+        this->gen->updateMeasure("symmetry",
+                                 std::max(this->gen->getMeasures()["vertical_symmetry"],
+                                          this->gen->getMeasures()["horizontal_symmetry"]) );
 
     /* END:   symmetry */
-
-    // normalizes total number of components by maximum possible number of components
-    this->gen->updateMeasure("total_components", this->gen->getMeasures()["total_components"] / params["max_comps"]);
 
 
     /* BEGINNING: covered area  */
 
-    // number of components which would fit in the area calculated given the verified lengths
-    //        int expected_components =  (horizontal_length / size) * (vertical_length / size);
-    //
-    //        // actual number of components per expected number of components
-    //        this->gen->updateMeasure("coverage",
-    //                                            roundf(
-    //                                                    (  (float) this->gen->getMeasures()["total_components"]
-    //                                                     / (float) expected_components)
-    //                                            *100)/100);
+        // number of components which would fit in the area calculated given the verified lengths
+        int expected_components =  (horizontal_length / size) * (vertical_length / size);
+
+        // actual number of components per expected number of components
+        this->gen->updateMeasure("coverage",
+                                            roundf(
+                                                    (  (float) this->gen->getMeasures()["total_components"]
+                                                     / (float) expected_components)
+                                            *100)/100);
 
     /* END: covered area  */
+
+
 
     //        this->gen->updateMeasure("total_bricks", roundf((  (float) this->gen->getMeasures()["total_bricks"] / (float)this->gen->getMeasures()["total_components"])*100)/100 );
     //        this->gen->updateMeasure("total_fixed_joints_horizontal", roundf((this->gen->getMeasures()["total_fixed_joints_horizontal"] / (double)this->gen->getMeasures()["total_components"])*100)/100);
@@ -301,60 +325,10 @@ void Measures::measurePhenotype(std::map<std::string, double> params, std::strin
     //        this->gen->updateMeasure("connectivity3", roundf ((this->gen->getMeasures()["connectivity3"] / (double)this->gen->getMeasures()["total_components"])*100)/100);
     //        this->gen->updateMeasure("connectivity4", roundf ((this->gen->getMeasures()["connectivity4"] / (double)this->gen->getMeasures()["total_components"])*100)/100);
 
-    // calculates center of mass of the body
 
-    //        double PI = 3.14159265;
-    //        int avg_x = 0;
-    //        int avg_y = 0;
-    //        std::vector<int> x = std::vector<int>();
-    //        std::vector<int> y = std::vector<int>();
-    //        std::vector<double> a = std::vector<double>();
-    //
-    //        for( const auto& iter : this->points ){
-    //            avg_x += iter.first.first;
-    //            avg_y += iter.first.second;
-    //
-    //            x.push_back(iter.first.first);
-    //            y.push_back(iter.first.second);
-    //        }
-    //        avg_x = avg_x / (double)this->points.size();
-    //        avg_y = avg_y / (double)this->points.size();
 
-    //std::cout<<" >>mass x "<<avg_x<<" y "<<avg_y<<std::endl;
-
-    // orders the set of points clockwise
-
-    //        for( const auto& iter : this->points ) {
-    //            double angle = atan2(iter.first.second - avg_y, iter.first.first - avg_x)* 180 / PI;
-    //            a.push_back(angle);
-    //            this->points[std::make_pair(iter.first.first,iter.first.second)] = angle;
-    //        }
-    //
-    //        int temp = 0;
-    //        for(int i = 0 ; i < x.size() ; i++) {
-    //            for(int j = i+1 ; j < x.size() ; j++) {
-    //
-    //                if(a[i] > a[j]) {
-    //
-    //                    temp = a[j] ;
-    //                    a[j] = a[i] ;
-    //                    a[i] = temp ;
-    //
-    //                    temp = x[j] ;
-    //                    x[j] = x[i] ;
-    //                    x[i] = temp ;
-    //
-    //                    temp = y[j] ;
-    //                    y[j] = y[i] ;
-    //                    y[i] = temp ;
-    //                }
-    //            }
-    //        }
-    //
-    // for(int i = 0 ; i < x.size() ; i++) {
-    //   std::cout<<"point: a "<<a[i]<<"  x " <<x[i]<<" y "<<y[i]<<std::endl;
-    // }
-
+    // normalizes total number of components by maximum possible number of components
+    this->gen->updateMeasure("total_components", this->gen->getMeasures()["total_components"] / params["max_comps"]);
 
 
     /* END:  calculating measures  */
@@ -372,8 +346,8 @@ void Measures::measurePhenotype(std::map<std::string, double> params, std::strin
     this->gen->removeMeasure("connectivity2");
     this->gen->removeMeasure("connectivity3");
     this->gen->removeMeasure("connectivity4");
+    this->gen->removeMeasure("sparseness");
     this->gen->removeMeasure("viable_horizontal_joints");
-    this->gen->removeMeasure("coverage");
     this->gen->removeMeasure("horizontal_symmetry");
     this->gen->removeMeasure("vertical_symmetry");
 
@@ -384,31 +358,31 @@ void Measures::measurePhenotype(std::map<std::string, double> params, std::strin
     tests.testMeasures(this->gen->getId(), this->gen->getMeasures());
 
 
-/* BEGINNING: exports measures to files */
+    /* BEGINNING: exports measures to files */
 
-    std::ofstream measures_file_general;
-    std::string path = "../../experiments/"+this->experiment_name+"/measures.txt";
-    measures_file_general.open(path, std::ofstream::app);
+        std::ofstream measures_file_general;
+        std::string path = "../../experiments/"+this->experiment_name+"/measures.txt";
+        measures_file_general.open(path, std::ofstream::app);
 
-    std::ofstream measures_file;
-    path = "../../experiments/"+this->experiment_name+dirpath+std::to_string(generation)+"/measures"+this->gen->getId()+".txt";
-    measures_file.open(path);
+        std::ofstream measures_file;
+        path = "../../experiments/"+this->experiment_name+dirpath+std::to_string(generation)+"/measures"+this->gen->getId()+".txt";
+        measures_file.open(path);
 
-    measures_file_general  << std::to_string(generation);
-    measures_file_general <<" "<< this->gen->getId();
+        measures_file_general  << std::to_string(generation);
+        measures_file_general <<" "<< this->gen->getId();
 
-    for( const auto& mea : this->gen->getMeasures() ){
+        for( const auto& mea : this->gen->getMeasures() ){
 
-        measures_file << mea.first << ":" << mea.second << std::endl;
-        measures_file_general <<" "<< mea.second;
-    }
+            measures_file << mea.first << ":" << mea.second << std::endl;
+            measures_file_general <<" "<< mea.second;
+        }
 
-    measures_file_general << std::endl;
+        measures_file_general << std::endl;
 
-    measures_file.close();
-    measures_file_general.close();
+        measures_file.close();
+        measures_file_general.close();
 
-/* END: exports measures to files */
+    /* END: exports measures to files */
 
 
 

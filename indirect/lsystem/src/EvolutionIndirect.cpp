@@ -119,6 +119,113 @@ void EvolutionIndirect::crossover(LSystem LS, std::vector<Genome *>  * offspring
 
 }
 
+//
+//
+//void EvolutionIndirect::crossover(LSystem LS, std::vector<Genome *>  * offspring){
+//
+//
+//    // creates new individuals via crossover (size of offspring is relative to the size of population)
+//    for(int i = 0; i < ceil(this->params["pop_size"] * this->params["offspring_prop"]); i++) {
+//
+//        // selects parents for the crossover, according to INDEX
+//        int parent1 = this->tournament();
+//        int parent2 = parent1;
+//
+//        while(parent2 == parent1){ // makes sure that parent2 is different from parent1
+//            parent2 = this->tournament();
+//        }
+//
+//        // #TEST: Tests if selected parents are different.
+//        this->tests.testParents(parent1, parent2);
+//
+//        // creates new offspring genome
+//        Genome * gen = new Genome(std::to_string(this->next_id),
+//                                   this->population->at(parent1)->getId(),
+//                                   this->population->at(parent2)->getId(),
+//                                   this->population->at(parent1)->getFitness(),
+//                                   this->population->at(parent2)->getFitness());
+//
+//        this->aux.logs(" crossover for genome " + std::to_string(this->next_id) + " - p1: " + this->population->at(parent1)->getId() + " p2: " + this->population->at(parent2)->getId());
+//
+//        this->next_id++;
+//
+//        std::map< std::string, GeneticString >  grammar = std::map< std::string, GeneticString >();
+//
+//        std::random_device rd;
+//        std::default_random_engine generator(rd());
+//
+//        std::uniform_real_distribution<double> prob(0.0, 1.0); // distribution for probabilities
+//
+//        // for each letter in the grammar
+//        for ( auto &it : LS.getAlphabet()) {
+//
+//            // gets a random part of the genetic-string from each parent for each letter
+//
+//            std::uniform_int_distribution<int> dist_pos_parent1_ini(1,
+//                                                                    this->population->at(parent1)->getGrammar()[it.first].count()); // distribution for parent1 initial position
+//            std::uniform_int_distribution<int> dist_pos_parent2_ini(1,
+//                                                                    this->population->at(parent2)->getGrammar()[it.first].count()); // distribution for parent2 initial position
+//
+//            // raffles random positions for the start point (of the genetic string) for both parents
+//            int pos_parent1_ini =  dist_pos_parent1_ini(generator);
+//            int pos_parent2_ini =  dist_pos_parent2_ini(generator);
+//
+//            // however, if it is the production rule of the core-component
+//            if(it.first == "C") {
+//
+//                // forces parent1 to start from first position, preserving the core-component at the beginning
+//                pos_parent1_ini = 1;
+//
+//                // if theres more than one item forming the genetic string of parent2
+//                if(this->population->at(parent2)->getGrammar()[it.first].count() > 1) {
+//
+//                    // makes sure that parent2 will start from a position which is not the first
+//                    while (pos_parent2_ini == 1) {
+//                        pos_parent2_ini = dist_pos_parent2_ini(generator);
+//                    }
+//                }else{ // if core component is the only in the gs, includes nothing from this parent
+//                    pos_parent2_ini = 0;
+//                }
+//            }
+//
+//            std::uniform_int_distribution<int> dist_pos_parent1_end(pos_parent1_ini,
+//                                                                    this->population->at(parent1)->getGrammar()[it.first].count()); // distribution for parent1 final position
+//            std::uniform_int_distribution<int> dist_pos_parent2_end(pos_parent2_ini,
+//                                                                    this->population->at(parent2)->getGrammar()[it.first].count()); // distribution for parent2 final position
+//
+//            int pos_parent1_end = dist_pos_parent1_end(generator);
+//
+//            // if theres more than one item forming the genetic string of parent2
+//            int pos_parent2_end = 0;
+//            if(this->population->at(parent2)->getGrammar()[it.first].count()>1) {
+//
+//                pos_parent2_end = dist_pos_parent2_end(generator);
+//            }else{
+//                pos_parent2_end = 0;
+//            }
+//
+//            GeneticString gs;
+//
+//            //std::cout<<" ------- pos "<<pos_parent1_ini<<" "<<pos_parent1_end<<" "<<pos_parent2_ini<<" "<<pos_parent2_end <<std::endl;
+//
+//            gs.create_joined_list(pos_parent1_ini, pos_parent2_ini,
+//                                  pos_parent1_end, pos_parent2_end,
+//                                  this->population->at(parent1)->getGrammar()[it.first],
+//                                  this->population->at(parent2)->getGrammar()[it.first]);
+//
+//
+//            grammar.emplace(it.first, gs);
+//        }
+//
+//        gen->setGrammar(grammar); // sets grammar for the new genome
+//
+//        offspring->push_back(gen); // adds new individual to the offspring
+//
+//    }
+//
+//    this->mutation(LS, offspring); // mutates new individuals
+//
+//}
 
 /**
  * Performs mutation to individuals of the offspring.

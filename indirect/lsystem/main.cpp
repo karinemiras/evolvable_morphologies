@@ -17,7 +17,7 @@ int main(int argc, char* argv[]) {
      // experiment: looking for global optimum of innovation
      int niche_coverage_accumulated = 0;
 
-     EvolutionIndirect * e = new EvolutionIndirect("test_max", 1);
+     EvolutionIndirect * e = new EvolutionIndirect("indirect", 1);
      // 1-indirect TYPE is temporary, it will be replaced by genome parent class scheme
      niche_coverage_accumulated = e->noveltySearch(argc, argv, 1);
 
