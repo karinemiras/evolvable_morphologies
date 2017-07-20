@@ -341,32 +341,32 @@ void Evolution::createHeader(){
     
     std::ofstream file;
     
-    std::string path = "../../experiments/"+this->experiment_name+"/history.txt";
+    std::string path = "../experiments/"+this->experiment_name+"/history.txt";
     file.open(path);
     file << "generation idgenome fitgenome idparent1 fitparent1 idparent2 fitparent2 meandif" << std::endl;
     file.close();
     
-    path = "../../experiments/"+this->experiment_name+"/evolution.txt";
+    path = "../experiments/"+this->experiment_name+"/evolution.txt";
     file.open(path);
     file << "generation maxfitness meanfitness nichecoverage_generation nichecoverage_accumulated" << std::endl;
     file.close();
     
-    path = "../../experiments/"+this->experiment_name+"/measures.txt";
+    path = "../experiments/"+this->experiment_name+"/measures.txt";
     file.open(path);
     file << "generation idgenome branching connectivity1 coverage effective_joints joints_per_limb length_ratio symmetry total_components"<<std::endl;
     file.close();
     
-    path = "../../experiments/"+this->experiment_name+"/measures2.txt";
+    path = "../experiments/"+this->experiment_name+"/measures2.txt";
     file.open(path);
     file << "generation genome measures value"<<std::endl;
     file.close();
     
-    path = "../../experiments/"+this->experiment_name+"/nichecoverage_distances.txt";
+    path = "../experiments/"+this->experiment_name+"/nichecoverage_distances.txt";
     file.open(path);
     file << "generation average stddev "<<std::endl;
     file.close();
     
-    path = "../../experiments/"+this->experiment_name+"/differences.txt";
+    path = "../experiments/"+this->experiment_name+"/differences.txt";
     file.open(path);
     file << "idgenome difference_parent1 difference_parent2 difference_parents" << std::endl;
     file.close();
