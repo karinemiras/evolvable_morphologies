@@ -592,7 +592,7 @@ void Evolution::testGeneticString(int argc, char* argv[],std::string test_genome
         // creates new genome with id equal 1, using the just read genetic-string
         Genome * gen = new Genome(test_genome, test_genome, test_genome, -1, -1);
         gen->setGeneticString(gen->build_genetic_string(gen->getGeneticString(), gs));
-        gen->getGeneticString().display_list();
+        gen->getGeneticString()->display_list();
 
         // decodes the final genetic-string into a tree of components
         //std::cout << " >> decoding ... " << std::endl;
@@ -789,7 +789,7 @@ void Evolution::loadPopulation(int generation){
             std::vector<std::string> items_rule(items.begin()+1, items.begin()+items.size()-1);
 
             // build a genetic-string with the production rule for the letter
-            GeneticString lgs;
+            GeneticString * lgs;
             lgs = gen->build_genetic_string(lgs, items_rule );
 
             // adds letter and its production rule (made a genetic-string) to the grammar of the genome
@@ -868,7 +868,7 @@ void Evolution::loadArchive(){
             std::vector<std::string> items_rule(items.begin()+1, items.begin()+items.size()-1);
 
             // build a genetic-string with the production rule for the letter
-            GeneticString lgs;
+            GeneticString * lgs;
             lgs = gen->build_genetic_string(lgs, items_rule );
 
             // adds letter and its production rule (made a genetic-string) to the grammar of the genome

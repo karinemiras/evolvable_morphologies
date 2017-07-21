@@ -12,9 +12,9 @@
  * Add items to the genetic-string.
  * @param genetic_string_items - contains the items which will be added to the genetic-string in an specific position.
  */
-void GeneticString::add(int pos, std::vector<std::string> genetic_string_items) {
+void GeneticString::add(int pos, std::string genetic_string_item) {
 
-    GeneticString::Node *current, *next, *inode, *previous;
+    GeneticString::Node *current = NULL, *next = NULL, *inode  = NULL, *previous  = NULL;
     current = start;
     int current_pos = 1;
 
@@ -33,27 +33,22 @@ void GeneticString::add(int pos, std::vector<std::string> genetic_string_items) 
         next = current;
     }
 
-    for (int i = 0; i < genetic_string_items.size(); i++) {
+    // the new item
+    inode = new GeneticString::Node;
+    inode->item = genetic_string_item;
+    inode->prev = previous;
+    inode->next = next;
 
-        // the new item
-        inode = new GeneticString::Node;
-        inode->item = genetic_string_items[i];
-        inode->prev = previous;
-        inode->next = next;
-
-        if (previous != NULL) {
-            previous->next = inode;  // the item that comes before the chosen position points forward to the new one
-        }else{
-            start = inode; // in case the added item should become the first
-        }
-
-        if (next != NULL) { // the item that comes after the chosen position points back to the new one
-            next->prev = inode;
-        }
-
-        previous = inode; // passes by (forward) the new node
-        next = inode->next;
+    if (previous != NULL) {
+        previous->next = inode;  // the item that comes before the chosen position points forward to the new one
+    }else{
+        start = inode; // in case the added item should become the first
     }
+
+    if (next != NULL) { // the item that comes after the chosen position points back to the new one
+        next->prev = inode;
+    }
+
 }
 
 
@@ -62,7 +57,7 @@ void GeneticString::add(int pos, std::vector<std::string> genetic_string_items) 
  * @param gs_parent1 - genetic-string of parent1
  * @param gs_parent2 - genetic-string of parent2
  */
-void GeneticString::create_joined_list(int pos_parent1_ini, int pos_parent2_ini, int pos_parent1_end, int pos_parent2_end, GeneticString gs_parent1,  GeneticString gs_parent2)
+void GeneticString::create_joined_list(int pos_parent1_ini, int pos_parent2_ini, int pos_parent1_end, int pos_parent2_end, GeneticString * gs_parent1,  GeneticString * gs_parent2)
 {
 
     GeneticString::Node *current, *inode, *current_parent1, *current_parent2;
@@ -71,8 +66,8 @@ void GeneticString::create_joined_list(int pos_parent1_ini, int pos_parent2_ini,
     int pos_parent2 = 1;
 
     current = start; // genetic-string of the offspring
-    current_parent1 = gs_parent1.start; // genetic-string of the parent1
-    current_parent2 = gs_parent2.start; // genetic-string of the parent2
+    current_parent1 = gs_parent1->start; // genetic-string of the parent1
+    current_parent2 = gs_parent2->start; // genetic-string of the parent2
 
     while(pos_parent1 <= pos_parent1_end){
 
@@ -192,7 +187,7 @@ void GeneticString::swap(int pos_swap1, int pos_swap2) {
  * Performs replacements in the genetic-string given the production rules of the grammar.
  * @param grammar - contains the production rules for each letter of the alphabet.
  */
-void GeneticString::replaces(std::map< std::string, GeneticString >  grammar){
+void GeneticString::replaces(std::map< std::string, GeneticString *>  grammar){
 
     if (start == NULL)
     {
@@ -207,7 +202,7 @@ void GeneticString::replaces(std::map< std::string, GeneticString >  grammar){
 
         if (!(grammar.find(current->item) == grammar.end() )){ // checks if the item is a letter of the grammar
 
-            current_replacement = grammar[current->item].start; // pointer to the first item of the genetic-string of the production rule for the letter (item)
+            current_replacement = grammar[current->item]->start; // pointer to the first item of the genetic-string of the production rule for the letter (item)
 
             // removes letter from the main genetic-string, once it will be replaced by other item/s
             previous = current->prev;

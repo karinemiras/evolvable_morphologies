@@ -18,11 +18,11 @@ unsigned int Genome::getTo() {
     //return 4; //test of testing
 }
 
-void Genome::setGeneticString(GeneticString _gs){
+void Genome::setGeneticString(GeneticString * _gs){
     this->gs = _gs;
 }
 
-GeneticString Genome::getGeneticString(){
+GeneticString * Genome::getGeneticString(){
     return this->gs;
 }
 
@@ -72,7 +72,7 @@ void Genome::removeMeasure(std::string key){
 }
 
 
-void Genome::setGrammar(std::map<std::string, GeneticString> grammar) {
+void Genome::setGrammar(std::map<std::string, GeneticString *> grammar) {
     this->grammar = grammar;
 }
 
@@ -133,7 +133,7 @@ void Genome::build_grammar(LSystem LS, std::map<std::string, double> params) {
         }
 
         // build a genetic-string with the the production rule for the letter
-        GeneticString lgs;
+        GeneticString * lgs = new GeneticString();
         lgs = this->build_genetic_string(lgs, letter_items);
 
         // adds letter and its production rule (made a genetic-string) to the grammar of the genome
@@ -190,9 +190,9 @@ void Genome::build_genome_direct(LSystem LS, std::map<std::string, double> param
     }
 
     // build the genetic-string
-    GeneticString gs;
+    GeneticString * gs;
     this->gs = this->build_genetic_string(gs, letter_items);
-    this->gs.display_list();
+    this->gs->display_list();
 
 }
 
@@ -209,7 +209,7 @@ void Genome::generate_final_string(int  replacement_iterations, int export_genom
     for(int i=1; i<=replacement_iterations ;i++) {
 
         // replacement is made given the grammar
-        this->gs.replaces(this->grammar);
+        this->gs->replaces(this->grammar);
     }
 
     //this->gs.display_list();
@@ -236,7 +236,7 @@ void Genome::exportGenome(std::string dirpath) {
         genome_file << it.first << " "; // writes letter to line
 
         GeneticString::Node *current;
-        current = this->getGrammar()[it.first].getStart();
+        current = this->getGrammar()[it.first]->getStart();
         while (current != NULL) {
 
             genome_file << current->item << " "; // writes all items to line
@@ -253,10 +253,10 @@ void Genome::exportGenome(std::string dirpath) {
  * @param _gs - new genetic-string to be populated with the vector of items.
  * @param genetic_string_items - vector of items that will compose teh genetic-string.
  */
-GeneticString Genome::build_genetic_string(GeneticString _gs, std::vector<std::string> genetic_string_items){
+GeneticString * Genome::build_genetic_string(GeneticString * _gs, std::vector<std::string> genetic_string_items){
 
     try {
-        _gs.create_list(genetic_string_items);
+        _gs->create_list(genetic_string_items);
         return _gs;
 
     } catch (const std::exception& e) {
@@ -274,7 +274,7 @@ void Genome::decodeGeneticString(LSystem LS,std::map<std::string, double> params
 
     try {
         this->dgs = DecodedGeneticString();
-        this->dgs.decode(this->gs,LS,  params);
+        this->dgs.decode(this->gs, LS,  params);
 
     } catch (const std::exception& e) {
         std::cout <<"ERROR decoding genetic-string: " << e.what() << std::endl;
@@ -525,7 +525,7 @@ void Genome::createEmbryo(){
     axiom.push_back("C");
 
     // initializes the genetic-string with the axiom
-    GeneticString gs;
+    GeneticString * gs = new GeneticString();
     this->setGeneticString(this->build_genetic_string(gs, axiom));
 
 }
@@ -584,13 +584,13 @@ void Genome::updateFitness(double fitness){
 
 
 
-std::map< std::string, GeneticString > Genome::getGrammar(){
+std::map< std::string, GeneticString *> Genome::getGrammar(){
 
     return this->grammar;
 }
 
 
-void Genome::addLetterGrammar(std::string letter, GeneticString lgs){
+void Genome::addLetterGrammar(std::string letter, GeneticString * lgs){
 
     this->grammar.emplace(letter, lgs);
 }

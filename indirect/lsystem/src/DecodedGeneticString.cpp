@@ -16,18 +16,18 @@
  * @param gs - main genetic-string of the genome.
  * @param LS - Lsystem structure containing the alphabet.
  */
-void DecodedGeneticString::decode(GeneticString gs, LSystem LS, std::map<std::string, double> params) {
+void DecodedGeneticString::decode(GeneticString * gs, LSystem LS, std::map<std::string, double> params) {
 
     int id = 0; // id of the component
     int num_components = 0;
     std::string mountingcommand = "";
     DecodedGeneticString::Vertex  *current_component = NULL;
     GeneticString::Node *current_gs_item;
-    current_gs_item = gs.getStart();
+    current_gs_item = gs->getStart();
 
 
 
-    for (int i = 0; i < gs.count(); i++) { // for each item of the main genetic-string
+    for (int i = 0; i < gs->count(); i++) { // for each item of the main genetic-string
 
 
         // if limit number of components has not been reached

@@ -22,19 +22,19 @@ public:
     struct Node
     {
         std::string item; // string that represents the item
-        Node *next;
+        Node *next ;
         Node *prev;
-        Node() { next=prev=NULL; }
+        Node() { item="";next=prev=NULL; }
     };
 
     void create_list(std::vector<std::string> genetic_string_items);
     void display_list();
     int count();
-    void replaces(std::map< std::string, GeneticString >  grammar);
+    void replaces(std::map< std::string, GeneticString * >  grammar);
     GeneticString::Node * getStart();
-    void add(int pos, std::vector<std::string> genetic_string_items);
+    void add(int pos, std::string genetic_string_item);
     void remove(int pos);
-    void create_joined_list(int pos_parent1_ini, int pos_parent2_ini, int pos_parent1_end, int pos_parent2_end,  GeneticString  gs_parent1, GeneticString  gs_parent2);
+    void create_joined_list(int pos_parent1_ini, int pos_parent2_ini, int pos_parent1_end, int pos_parent2_end,  GeneticString * gs_parent1, GeneticString * gs_parent2);
     void swap(int pos_swap1, int pos_swap2);
 
     GeneticString()
@@ -44,7 +44,7 @@ public:
 
 private:
 
-    Node *start; // item of the genetic-string (doubly-linked list)
+    Node *start = NULL; // item of the genetic-string (doubly-linked list)
 
 };
 

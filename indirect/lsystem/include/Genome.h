@@ -37,9 +37,9 @@ public:
     }
 
     unsigned int getTo();
-    GeneticString build_genetic_string(GeneticString gs, std::vector<std::string> genetic_string_items);
-    GeneticString getGeneticString();
-    void setGeneticString(GeneticString _gs);
+    GeneticString * build_genetic_string(GeneticString * gs, std::vector<std::string> genetic_string_items);
+    GeneticString * getGeneticString();
+    void setGeneticString(GeneticString * _gs);
     std::vector<std::string> getAxiom();
     void generate_final_string(int  replacement_iterations, int export_genomes, int generation, std::string path);
     void decodeGeneticString(LSystem LS,std::map<std::string, double> params);
@@ -60,11 +60,11 @@ public:
     void updateMeasure(std::string key, double value);
     void calculateFitness(int k_neighboards);
     double getFitness();
-    std::map< std::string, GeneticString > getGrammar();
-    void setGrammar(std::map< std::string, GeneticString > grammar);
+    std::map< std::string, GeneticString * > getGrammar();
+    void setGrammar(std::map< std::string, GeneticString *> grammar);
     void removeMeasure(std::string key);
     void updateFitness(double fitness);
-    void addLetterGrammar(std::string letter, GeneticString lgs);
+    void addLetterGrammar(std::string letter, GeneticString * lgs);
 
     void build_grammar(LSystem LS, std::map<std::string, double> params);
     void build_genome_direct(LSystem LS, std::map<std::string, double> params);
@@ -77,13 +77,13 @@ protected:
     double fit_parent1;  // fit of parent1 of genome
     double fit_parent2;  // fit of parent2 of genome
     double fitness = 0; // fitness of the genome
-    GeneticString gs; // main genetic-string of the genome
+    GeneticString * gs; // main genetic-string of the genome
     DecodedGeneticString dgs; // graph that logically represents the connections among the components forming the body
     QGraphicsScene * scene; // scene holding the phenotype
     // letter(s) of the alphabet to build the initial developmental state of the genetic-string
     std::vector<std::string> axiom = std::vector<std::string>();
     // genetic-strings of production rules for each letter of the alphabet
-    std::map< std::string, GeneticString >  grammar = std::map< std::string, GeneticString >();
+    std::map< std::string, GeneticString * >  grammar = std::map< std::string, GeneticString * >();
     std::map< std::string, double >  measures = std::map< std::string, double >(); // list of body metrics about the genome
     // list of all components of the body, keys are coordinates, value is a letter
     std::map< std::pair<int, int>, std::string >  list_components = std::map< std::pair<int, int>, std::string >();
