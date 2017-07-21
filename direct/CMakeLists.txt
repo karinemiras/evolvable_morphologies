@@ -1,6 +1,6 @@
 project(RobotCrossover)
 
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 2.8.9)
 
 set(CMAKE_CXX_STANDARD 11)
 
@@ -37,6 +37,9 @@ find_package(Qt5 COMPONENTS
         Core
         Widgets
         )
+
+find_package(MPI)
+include_directories(SYSTEM ${MPI_INCLUDE_PATH})
 
 find_package(mlpack)
 
@@ -102,9 +105,10 @@ set(RobotCrossover_SRCS main.cpp
 include_directories("Transceivers" "Genome" "convertion" "Genome/ODE_Check")
 
 add_executable(RobotCrossover ${RobotCrossover_SRCS})
-target_link_libraries(RobotCrossover ${Boost_LIBRARIES} ${PROTOBUF_LIBRARIES} ${ODE_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${JANSSON_LIBRARIES}
+target_link_libraries(RobotCrossover ${Boost_LIBRARIES} ${PROTOBUF_LIBRARIES} ${ODE_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${JANSSON_LIBRARIES} ${MPI_C_LIBRARIES}
         Qt5::Widgets
         mlpack
-        armadillo)
+        armadillo
+        )
 
 

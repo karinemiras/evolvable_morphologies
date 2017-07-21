@@ -39,6 +39,9 @@ find_package(Qt5 COMPONENTS
         Widgets
         )
 
+find_package(MPI)
+include_directories(SYSTEM ${MPI_INCLUDE_PATH})
+
 find_package(mlpack)
 
 find_package(armadillo)
@@ -73,4 +76,5 @@ add_executable(lsystem_proto ${SOURCES})
 target_link_libraries(lsystem_proto
         Qt5::Widgets
         mlpack
-        armadillo)
+        armadillo
+        ${MPI_C_LIBRARIES})
