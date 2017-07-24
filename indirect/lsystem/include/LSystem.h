@@ -30,7 +30,7 @@ private:
     // vector with the commands to mount components in the turtle
     std::vector<std::string> mounting_commands = std::vector<std::string>();
     // alphabet with the letters
-    std::map< std::string, std::string > alphabet = std::map<std::string, std::string>();
+    std::map< std::string, std::string > alphabet = std::map<std::string, std::string >();
     // auxiliar vector for the alphabet letters
     std::vector<std::string> alphabet_index = std::vector<std::string>();
 };

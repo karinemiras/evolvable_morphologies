@@ -15,6 +15,12 @@
 #include <QtWidgets/QGraphicsRectItem>
 #include <QtWidgets/QGraphicsLineItem>
 
+//#include <QtGui/QGraphicsScene>
+//#include <QtGui/QGraphicsView>
+//#include <QtGui/QApplication>
+//#include <QtGui/QGraphicsRectItem>
+//#include <QtGui/QGraphicsLineItem>
+
 #include "DecodedGeneticString.h"
 #include "GeneticString.h"
 #include "LSystem.h"

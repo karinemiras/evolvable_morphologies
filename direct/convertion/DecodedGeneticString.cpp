@@ -40,6 +40,8 @@ void DecodedGeneticString::decode(std::string genome_file, std::map<std::string,
         letters["CoreComponent"] = "C";
         letters["FixedBrick"] = "B";
         letters["ActiveHinge"] = "AJ2";
+        letters["PassiveHinge"] = "PJ2";
+        letters["ParametricJoint"] = "J2";
 
         int position = 0;
         std::string letter = "";
@@ -107,7 +109,9 @@ void DecodedGeneticString::decode(std::string genome_file, std::map<std::string,
                         if (position == 2) mounting_command = "addr";
                     }
 
-                    if (current_component->item == "AJ2") mounting_command = "addf";
+                    if (current_component->item == "AJ2" 
+                       or current_component->item == "PJ2"
+                       or current_component->item == "J2") mounting_command = "addf";
 
 
                     // mounts the component in the right position

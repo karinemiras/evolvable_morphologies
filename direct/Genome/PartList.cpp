@@ -40,9 +40,9 @@ std::map<char, std::string> initPartTypeMap() {
 	partTypeMap['E'] = PART_TYPE_CORE_COMPONENT;
 	partTypeMap['F'] = PART_TYPE_FIXED_BRICK;
 	//partTypeMap['L'] = PART_TYPE_LIGHT_SENSOR;
-	//partTypeMap['B'] = PART_TYPE_PARAM_JOINT;
+	partTypeMap['B'] = PART_TYPE_PARAM_JOINT;
 	//partTypeMap['C'] = PART_TYPE_PASSIVE_CARDAN;
-	//partTypeMap['H'] = PART_TYPE_PASSIVE_HINGE;
+	partTypeMap['H'] = PART_TYPE_PASSIVE_HINGE;
 	//partTypeMap['W'] = PART_TYPE_PASSIVE_WHEEL;
 	//partTypeMap['R'] = PART_TYPE_ROTATOR;
 	//partTypeMap['T'] = PART_TYPE_TOUCH_SENSOR;

@@ -44,7 +44,7 @@ public:
 
 private:
 
-    Node *start = NULL; // item of the genetic-string (doubly-linked list)
+    Node *start; // item of the genetic-string (doubly-linked list)
 
 };
 
