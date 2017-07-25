@@ -353,9 +353,9 @@ void Evolution::createHeader(){
     
     path = "../experiments/"+this->experiment_name+"/measures.txt";
     file.open(path);
-    file << "generation idgenome branching connectivity1 coverage effective_joints joints_per_limb length_ratio symmetry total_components"<<std::endl;
+    file << "generation idgenome branching connectivity1 connectivity2 coverage effective_joints length_ratio symmetry total_components"<<std::endl;
     file.close();
-    
+
     path = "../experiments/"+this->experiment_name+"/measures2.txt";
     file.open(path);
     file << "generation genome measures value"<<std::endl;
