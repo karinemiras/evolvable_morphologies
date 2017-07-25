@@ -109,7 +109,7 @@ void DecodedGeneticString::decode(std::string genome_file, std::map<std::string,
                         if (position == 2) mounting_command = "addr";
                     }
 
-                    if (current_component->item == "AJ2" 
+                    if (current_component->item == "AJ2"
                        or current_component->item == "PJ2"
                        or current_component->item == "J2") mounting_command = "addf";
 

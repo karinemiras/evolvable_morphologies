@@ -108,27 +108,27 @@ void Measures::measurePhenotype(std::map<std::string, double> params, std::strin
     int limit_joints = std::trunc((this->gen->getMeasures()["total_components"]-1)/2);
 
 
-    if( this->gen->getMeasures()["connectivity1"]>0 ) {
-
-        // practical limits for joints per limb
-        double limit_jointperlimb = 0;
-        limit_jointperlimb =  limit_joints/(float)this->gen->getMeasures()["connectivity1"];
-
-        // calculates percentage of number of effective joints per total of limbs
-        this->gen->updateMeasure("joints_per_limb",
-                                 this->gen->getMeasures()["effective_joints"]
-                                 /  (float) this->gen->getMeasures()["connectivity1"]);
-
-        // normalizes given the limit
-        if(limit_jointperlimb>0) {
-            this->gen->updateMeasure("joints_per_limb",
-                                     roundf(
-                                             ((float) this->gen->getMeasures()["joints_per_limb"]
-                                              / (float) limit_jointperlimb)
-                                             * 100) / 100);
-        }
-
-    }
+//    if( this->gen->getMeasures()["connectivity1"]>0 ) {
+//
+//        // practical limits for joints per limb
+//        double limit_jointperlimb = 0;
+//        limit_jointperlimb =  limit_joints/(float)this->gen->getMeasures()["connectivity1"];
+//
+//        // calculates percentage of number of effective joints per total of limbs
+//        this->gen->updateMeasure("joints_per_limb",
+//                                 this->gen->getMeasures()["effective_joints"]
+//                                 /  (float) this->gen->getMeasures()["connectivity1"]);
+//
+//        // normalizes given the limit
+//        if(limit_jointperlimb>0) {
+//            this->gen->updateMeasure("joints_per_limb",
+//                                     roundf(
+//                                             ((float) this->gen->getMeasures()["joints_per_limb"]
+//                                              / (float) limit_jointperlimb)
+//                                             * 100) / 100);
+//        }
+//
+//    }
 
     // normalizes the number of effective joints given a practical limit
     if(limit_joints>0) {
@@ -146,19 +146,13 @@ void Measures::measurePhenotype(std::map<std::string, double> params, std::strin
                                      ( (float) this->gen->getMeasures()["connectivity1"]
                                        / (float) this->gen->getMeasures()["total_components"])
                                      * 100) / 100);
-//
-//    this->gen->updateMeasure("connectivity2",
-//                             roundf (
-//                                     ( (float) this->gen->getMeasures()["connectivity2"]
-//                                       / (float) this->gen->getMeasures()["total_components"])
-//                                     * 100) / 100);
-//
-//    this->gen->updateMeasure("branching",
-//                             roundf (
-//                                     (float)    (   ((     this->gen->getMeasures()["connectivity3"])
-//                                                     +  ( 2 * this->gen->getMeasures()["connectivity4"]))
-//                                                    / (float) this->gen->getMeasures()["total_components"])
-//                                                * 100) / 100);
+
+    this->gen->updateMeasure("connectivity2",
+                             roundf (
+                                     ( (float) this->gen->getMeasures()["connectivity2"]
+                                       / (float) (this->gen->getMeasures()["total_components"]-2))
+                                     * 100) / 100);
+
 
     // normalizes branching given a practical limit
     int limit_branching = std::trunc((this->gen->getMeasures()["total_components"]-2)/3);
@@ -343,10 +337,10 @@ void Measures::measurePhenotype(std::map<std::string, double> params, std::strin
     this->gen->removeMeasure("total_fixed_joints_vertical");
     this->gen->removeMeasure("total_passive_joints_vertical");
     this->gen->removeMeasure("total_active_joints_vertical");
-    this->gen->removeMeasure("connectivity2");
     this->gen->removeMeasure("connectivity3");
     this->gen->removeMeasure("connectivity4");
     this->gen->removeMeasure("sparseness");
+    this->gen->removeMeasure("joints_per_limb");
     this->gen->removeMeasure("viable_horizontal_joints");
     this->gen->removeMeasure("horizontal_symmetry");
     this->gen->removeMeasure("vertical_symmetry");
