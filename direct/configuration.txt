@@ -6,7 +6,7 @@ mutation_prob 0.1
 offspring_prop 0.5
 prob_add_archive 0.025
 k_neighbors 15
-max_comps 15
+max_comps 20
 grid_bins 100
 logs_to_screen 0
 logs_to_file 1

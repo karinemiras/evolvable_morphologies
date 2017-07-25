@@ -147,11 +147,14 @@ void Measures::measurePhenotype(std::map<std::string, double> params, std::strin
                                        / (float) this->gen->getMeasures()["total_components"])
                                      * 100) / 100);
 
-    this->gen->updateMeasure("connectivity2",
-                             roundf (
-                                     ( (float) this->gen->getMeasures()["connectivity2"]
-                                       / (float) (this->gen->getMeasures()["total_components"]-2))
-                                     * 100) / 100);
+    int limit_connectivity2 = this->gen->getMeasures()["total_components"]-2;
+    if(limit_connectivity2>0) {
+        this->gen->updateMeasure("connectivity2",
+                                 roundf(
+                                         ((float) this->gen->getMeasures()["connectivity2"]
+                                          / (float) limit_connectivity2)
+                                         * 100) / 100);
+    }
 
 
     // normalizes branching given a practical limit
