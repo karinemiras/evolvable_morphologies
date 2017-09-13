@@ -148,6 +148,20 @@ void Genome::constructor(int argc, char* argv[], std::map<std::string, double> p
     if (params["show_phenotypes"] == 1){
         app.exec();
     }
+
+
+    foreach (QGraphicsItem* pItem, this->scene->items ())
+            if (qgraphicsitem_cast<QGraphicsTextItem*> (pItem)) {
+
+                    this->scene->removeItem (pItem);
+            }
+
+    delete this->scene;
+
+
+
+
+
 }
 
 

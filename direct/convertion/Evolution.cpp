@@ -123,10 +123,10 @@ void Evolution::loadsParams(){
 void Evolution::addToArchive( std::vector<Genome *>  * individuals, double prob_add_archive, std::string path){
 
     std::random_device rd;
-    
+
 std::default_random_engine generator(rd());
     // distribution for 0-1 probabilities
-    
+
 std::uniform_real_distribution<double> prob(0.0, 1.0);
 
     for(int i=0; i < individuals->size(); i++) {
@@ -338,19 +338,19 @@ void Evolution::measureIndividuals(int generation, std::vector<Genome *>  * indi
  */
 
 void Evolution::createHeader(){
-    
+
     std::ofstream file;
-    
+
     std::string path = "../experiments/"+this->experiment_name+"/history.txt";
     file.open(path);
     file << "generation idgenome fitgenome idparent1 fitparent1 idparent2 fitparent2 meandif" << std::endl;
     file.close();
-    
+
     path = "../experiments/"+this->experiment_name+"/evolution.txt";
     file.open(path);
     file << "generation maxfitness meanfitness nichecoverage_generation nichecoverage_accumulated" << std::endl;
     file.close();
-    
+
     path = "../experiments/"+this->experiment_name+"/measures.txt";
     file.open(path);
     file << "generation idgenome branching connectivity1 connectivity2 coverage effective_joints length_ratio symmetry total_components"<<std::endl;
@@ -360,18 +360,18 @@ void Evolution::createHeader(){
     file.open(path);
     file << "generation genome measures value"<<std::endl;
     file.close();
-    
+
     path = "../experiments/"+this->experiment_name+"/nichecoverage_distances.txt";
     file.open(path);
     file << "generation average stddev "<<std::endl;
     file.close();
-    
+
     path = "../experiments/"+this->experiment_name+"/differences.txt";
     file.open(path);
     file << "idgenome difference_parent1 difference_parent2 difference_parents" << std::endl;
     file.close();
-    
-    
+
+
 }
 
 
@@ -550,13 +550,16 @@ int Evolution::tournament(){
     int genome1 =  dist_1(generator); // random genome 1
     int genome2 =  dist_1(generator); // random genome 2
 
-    // return the genome with higher fitness
-    if (this->population->at(genome1)->getFitness() > this->population->at(genome2)->getFitness()){
+    // random search
+    return dist_1(generator);
 
-        return genome1;
-    }else{
-        return genome2;
-    }
+    // return the genome with higher fitness
+//    if (this->population->at(genome1)->getFitness() > this->population->at(genome2)->getFitness()){
+//
+//        return genome1;
+//    }else{
+//        return genome2;
+//    }
 
 }
 
@@ -587,15 +590,15 @@ void Evolution::selection() {
         selected->push_back(this->population->at(genome));
         index_selected.push_back(genome);
     }
-
-    for(int i=0; i < this->params["pop_size"]; i++) {
-
-        // if genome is not on the selected list
-        if(!(std::find(index_selected.begin(), index_selected.end(), i) != index_selected.end())){
-            delete this->population->at(i); // frees memory for the not selected genomes
-            this->population->at(i) = NULL;
-        }
-    }
+//
+//    for(int i=0; i < this->params["pop_size"]; i++) {
+//
+//        // if genome is not on the selected list
+//        if(!(std::find(index_selected.begin(), index_selected.end(), i) != index_selected.end())){
+//            delete this->population->at(i); // frees memory for the not selected genomes
+//            this->population->at(i) = NULL;
+//        }
+//    }
 
     this->population = selected; // substitutes current population for the selected subset
 
@@ -1150,4 +1153,3 @@ std::vector<int> Evolution::calculateNicheCoverage() {
 
 
 }
-

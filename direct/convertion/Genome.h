@@ -35,6 +35,8 @@ public:
         fit_parent2 = _fit_parent2;
     }
 
+
+
     unsigned int getTo();
     std::vector<std::string> getAxiom();
     void decodeGeneticString(std::string path, std::map<std::string, double> params);

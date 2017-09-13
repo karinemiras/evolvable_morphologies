@@ -119,9 +119,11 @@ void Evolution::loadsParams(){
 void Evolution::addToArchive( std::vector<Genome *>  * individuals, double prob_add_archive, std::string path){
 
     std::random_device rd;
-     std::default_random_engine generator(rd());
+    
+std::default_random_engine generator(rd());
     // distribution for 0-1 probabilities
-     std::uniform_real_distribution<double> prob(0.0, 1.0);
+    
+std::uniform_real_distribution<double> prob(0.0, 1.0);
 
     for(int i=0; i < individuals->size(); i++) {
 
@@ -543,7 +545,12 @@ int Evolution::tournament(){
     int genome1 =  dist_1(generator); // random genome 1
     int genome2 =  dist_1(generator); // random genome 2
 
-    // return the genome with higher fitness
+        //random selection test
+        //return dist_1(generator);
+    
+    
+    // return the genome with higher fitness / novelty search
+    
     if (this->population->at(genome1)->getFitness() > this->population->at(genome2)->getFitness()){
 
         return genome1;
@@ -635,14 +642,14 @@ void Evolution::selection() {
         index_selected.push_back(genome);
     }
 
-    for(int i=0; i < this->params["pop_size"]; i++) {
-
-        // if genome is not on the selected list
-        if(!(std::find(index_selected.begin(), index_selected.end(), i) != index_selected.end())){
-            delete this->population->at(i); // frees memory for the not selected genomes
-            this->population->at(i) = NULL;
-        }
-    }
+//    for(int i=0; i < this->params["pop_size"]; i++) {
+//
+//        // if genome is not on the selected list
+//        if(!(std::find(index_selected.begin(), index_selected.end(), i) != index_selected.end())){
+//            delete this->population->at(i); // frees memory for the not selected genomes
+//            this->population->at(i) = NULL;
+//        }
+//    }
 
     this->population = selected; // substitutes current population for the selected subset
 
@@ -1092,9 +1099,9 @@ int Evolution::noveltySearch(int argc, char* argv[], int encodingtype) {
 
 
         //every 10 generations, compares distances among points
-        if(g%10==0) {
-            this->compareIndividuals(g);
-        }
+        //if(g%10==0) {
+        //    this->compareIndividuals(g);
+        //}
 
 
         // saves the number of the last generation created/evaluated
@@ -1107,6 +1114,11 @@ int Evolution::noveltySearch(int argc, char* argv[], int encodingtype) {
 
 
     this->logsTime("end");
+
+    this->morphological_grid_generation =  std::map<std::string, std::vector<double>>();
+    this->morphological_grid_accumulated = std::map<std::string, std::vector<double>>();
+    //delete this->archive;
+    //delete this->population;
 
     return niche_coverage_accumulated;
 
@@ -1210,7 +1222,7 @@ std::vector<std::string> Evolution::readsEvolutionState() {
  * */
 std::vector<int> Evolution::calculateNicheCoverage() {
 
-    // total number of points in the grid given the dimentions and spacing
+    // total number of points in the grid given the dimensions and spacing
     //int total_points = std::pow(this->params["grid_bins"],this->population->at(0)->getMeasures().size()
 
     this->morphological_grid_generation =  std::map<std::string, std::vector<double>>();

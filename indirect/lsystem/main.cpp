@@ -9,7 +9,7 @@
 
 #include "EvolutionIndirect.h"
 
-#include "mpi.h"
+//#include "mpi.h"
 
 using namespace std;
 
@@ -42,13 +42,29 @@ int main(int argc, char* argv[]) {
 //
 //        MPI_Finalize ();
 
-    // END: parallel repetitions of experiments
+    //  END: parallel repetitions of experiments
+//
+//for (int i = 9; i <= 12; i++) {
+//    int niche_coverage_accumulated = 0;
+//    EvolutionIndirect *e = new EvolutionIndirect("indirect"+std::to_string(i), 1);
+//    niche_coverage_accumulated = e->noveltySearch(argc, argv, 1);
+//    std::cout << ">>> accumulated niche coverage " << niche_coverage_accumulated;
+//    delete e;
+//}
+
+ 
+    int niche_coverage_accumulated = 0;
+    EvolutionIndirect *e = new EvolutionIndirect("indirect-random", 1);
+    niche_coverage_accumulated = e->noveltySearch(argc, argv, 1);
+    std::cout << ">>> accumulated niche coverage " << niche_coverage_accumulated;
+    //delete e;
+ 
 
 
-     int niche_coverage_accumulated = 0;
-     EvolutionIndirect * e = new EvolutionIndirect("indirect", 1);
-     niche_coverage_accumulated = e->noveltySearch(argc, argv, 1);
-     std::cout<<">>> accumulated niche coverage " << niche_coverage_accumulated;
+//    int niche_coverage_accumulated = 0;
+//    EvolutionIndirect *e = new EvolutionIndirect("indirect6", 1);
+//    niche_coverage_accumulated = e->noveltySearch(argc, argv, 1);
+//    std::cout << ">>> accumulated niche coverage " << niche_coverage_accumulated;
 
 
     // e->testGeneticString(argc, argv,"spider3");
