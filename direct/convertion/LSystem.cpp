@@ -36,23 +36,23 @@ void LSystem::build_alphabet(){
     alphabet["C"]  = "C";  // core component
     alphabet_index.push_back("C");
 
-    alphabet["J1"] = "J1";       // fixed joint - horizontal
-    alphabet_index.push_back("J1");
-
-    alphabet["J2"] = "J2";       // fixed joint - vertical
-    alphabet_index.push_back("J2");
-
-    alphabet["AJ1"] = "AJ1";     // active joint - horizontal
-    alphabet_index.push_back("AJ1");
+//    alphabet["J1"] = "J1";       // fixed joint - horizontal
+//    alphabet_index.push_back("J1");
+//
+//    alphabet["J2"] = "J2";       // fixed joint - vertical
+//    alphabet_index.push_back("J2");
+//
+//    alphabet["AJ1"] = "AJ1";     // active joint - horizontal
+//    alphabet_index.push_back("AJ1");
 
     alphabet["AJ2"] = "AJ2";     // active joint - vertical
     alphabet_index.push_back("AJ2");
-
-    alphabet["PJ1"] = "PJ1";     // passive joint - horizontal
-    alphabet_index.push_back("PJ1");
-
-    alphabet["PJ2"] = "PJ2";     // passive joint - vertical
-    alphabet_index.push_back("PJ2");
+//
+//    alphabet["PJ1"] = "PJ1";     // passive joint - horizontal
+//    alphabet_index.push_back("PJ1");
+//
+//    alphabet["PJ2"] = "PJ2";     // passive joint - vertical
+//    alphabet_index.push_back("PJ2");
 
     alphabet["B"] = "B";   // brick
     alphabet_index.push_back("B");

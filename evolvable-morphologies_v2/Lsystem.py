@@ -18,25 +18,21 @@ class Lsystem:
     def build_alphabet(self):
 
         self.alphabet.append('C')    # core component
-        self.alphabet.append('J')    # fixed joint
-        self.alphabet.append('AJ1')  # active joint - horizontal
-        self.alphabet.append('AJ2')  # active joint - vertical
-        self.alphabet.append('PJ1')  # passive joint - horizontal
-        self.alphabet.append('PJ2')  # passive joint - vertical
+        self.alphabet.append('AJ ')  # active joint
         self.alphabet.append('B')    # brick
 
     # Builds a list with the possible mounting commands for the l-system.
     def build_mounting_commands(self):
 
-        self.mounting_commands.append('bd_addl') # add component to the left side of the parent-reference
-        self.mounting_commands.append('bd_addf') # add component to the front side of the parent-reference
-        self.mounting_commands.append('bd_addr') # add component to the right side of the parent-reference
+        self.mounting_commands.append('addl') # add component to the left side of the parent-reference
+        self.mounting_commands.append('addf') # add component to the front side of the parent-reference
+        self.mounting_commands.append('addr') # add component to the right side of the parent-reference
 
 
     # Builds a list with the possible moving commands for the l-system.
     def build_moving_commands(self):
 
-        self.moving_commands.append('bd_moveb') # move back to parent in the turtle
-        self.moving_commands.append('bd_movel') # move to the left in the turtle
-        self.moving_commands.append('bd_movef') # move forward in the turtle
-        self.moving_commands.append('bd_mover') # move to the right in the turtle
+        self.moving_commands.append('moveb') # move back to parent in the turtle
+        self.moving_commands.append('movel') # move to the left in the turtle
+        self.moving_commands.append('movef') # move forward in the turtle
+        self.moving_commands.append('mover') # move to the right in the turtle

@@ -551,15 +551,15 @@ int Evolution::tournament(){
     int genome2 =  dist_1(generator); // random genome 2
 
     // random search
-    return dist_1(generator);
+   // return dist_1(generator);
 
     // return the genome with higher fitness
-//    if (this->population->at(genome1)->getFitness() > this->population->at(genome2)->getFitness()){
-//
-//        return genome1;
-//    }else{
-//        return genome2;
-//    }
+    if (this->population->at(genome1)->getFitness() > this->population->at(genome2)->getFitness()){
+
+        return genome1;
+    }else{
+        return genome2;
+    }
 
 }
 
@@ -881,9 +881,9 @@ int Evolution::noveltySearch(int argc, char* argv[], int encodingtype) {
 
 
         //every 10 generations, compares distances among points
-        if(g%10==0) {
-            this->compareIndividuals(g);
-        }
+//        if(g%10==0) {
+//            this->compareIndividuals(g);
+//        }
 
 
         // saves the number of the last generation created/evaluated
