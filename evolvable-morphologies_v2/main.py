@@ -1,3 +1,5 @@
-class LSystem:
+from Evolution import *
 
-    alphabet =
+
+e = Evolution()
+e.iniExperiment()
