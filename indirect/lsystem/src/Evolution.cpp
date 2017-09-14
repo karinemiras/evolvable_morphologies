@@ -546,17 +546,17 @@ int Evolution::tournament(){
     int genome2 =  dist_1(generator); // random genome 2
 
         //random selection test
-        //return dist_1(generator);
+        return dist_1(generator);
     
     
     // return the genome with higher fitness / novelty search
     
-    if (this->population->at(genome1)->getFitness() > this->population->at(genome2)->getFitness()){
+    //if (this->population->at(genome1)->getFitness() > this->population->at(genome2)->getFitness()){
 
-        return genome1;
-    }else{
-        return genome2;
-    }
+//        return genome1;
+//    }else{
+//        return genome2;
+//    }
 
 }
 

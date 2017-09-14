@@ -36,7 +36,7 @@ void LSystem::build_alphabet(){
     alphabet["C"]  = "C";  // core component
     alphabet_index.push_back("C");
 
-    //alphabet["J1"] = "J1";       // fixed joint - horizontal
+    //alphabet["J1"] = "J";       // fixed joint - horizontal
     //alphabet_index.push_back("J1");
 
     alphabet["J2"] = "J2";       // fixed joint - vertical
