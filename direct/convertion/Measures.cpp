@@ -331,6 +331,7 @@ void Measures::measurePhenotype(std::map<std::string, double> params, std::strin
     this->gen->updateMeasure("total_components", this->gen->getMeasures()["total_components"] / params["max_comps"]);
 
 
+
     /* END:  calculating measures  */
 
 

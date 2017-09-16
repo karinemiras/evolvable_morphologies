@@ -779,7 +779,7 @@ int Evolution::initExperiment(int argc, char* argv[], LSystem LS, int encodingty
 *  Evolution in the search for novelty.
 **/
 
-void Evolution::noveltySearch(int argc, char* argv[], int encodingtype) {
+int Evolution::noveltySearch(int argc, char* argv[], int encodingtype) {
 
  
 
@@ -897,7 +897,7 @@ void Evolution::noveltySearch(int argc, char* argv[], int encodingtype) {
 
     this->logsTime("end");
 
-   
+    return 1;
 
 }
 

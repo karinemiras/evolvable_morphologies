@@ -53,7 +53,7 @@ public:
     void selection();
     std::vector<Genome *>  * getPopulation();
     std::map<std::string, double> getParams();
-    void noveltySearch(int argc, char* argv[], int encodingtype);
+    int noveltySearch(int argc, char* argv[], int encodingtype);
     void exportGenerationMetrics(int generation,  std::vector<int> metrics);
     void exportPop(int generation);
     void addToArchive( std::vector<Genome *>  * individuals, double prob_add_archive, std::string path);

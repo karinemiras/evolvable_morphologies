@@ -996,7 +996,7 @@ int Evolution::initExperiment(int argc, char* argv[], LSystem LS, int encodingty
 *  Evolution in the search for novelty.
 **/
 
-void Evolution::noveltySearch(int argc, char* argv[], int encodingtype) {
+int Evolution::noveltySearch(int argc, char* argv[], int encodingtype) {
 
 
 
@@ -1117,7 +1117,7 @@ void Evolution::noveltySearch(int argc, char* argv[], int encodingtype) {
 
     this->logsTime("end");
 
-
+    return 1;
 
 }
 
@@ -1292,14 +1292,7 @@ std::vector<int> Evolution::calculateNicheCoverage( std::vector<Genome *>  * ind
 
     }
 
-    for(const auto& it :this->morphological_measures_accumulated){
 
-        std::cout<<it.first<<std::endl;
-        for(int j=0;j<it.second.size();j++){
-            std::cout<<" "<<it.second[j]<<std::endl;
-        }
-
-    }
 
     // logs state of the grid
     std::ofstream myfile;

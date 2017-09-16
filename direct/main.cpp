@@ -65,9 +65,8 @@ int main(int argc,  char* argv[]) {
 
 
     Evolution * e = new Evolution("direct", 1);
-    e->noveltySearch(argc, argv, 1);
-
-    delete e;
+    int aux = e->noveltySearch(argc, argv, 1);
+ 
 
 
 // for (int i = 3; i <= 3; i++) {

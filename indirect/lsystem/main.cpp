@@ -53,11 +53,11 @@ int main(int argc, char* argv[]) {
 //}
 
  
-    int niche_coverage_accumulated = 0;
-    EvolutionIndirect *e = new EvolutionIndirect("indirect", 1);
-    e->noveltySearch(argc, argv, 1);
 
-    //delete e;
+    EvolutionIndirect *e = new EvolutionIndirect("indirect2", 1);
+    int aux = e->noveltySearch(argc, argv, 1);
+
+
  
 
 
