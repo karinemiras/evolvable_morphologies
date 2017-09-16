@@ -136,7 +136,7 @@ void Measures::measurePhenotype(std::map<std::string, double> params, std::strin
                                  roundf(
                                          ((float) this->gen->getMeasures()["effective_joints"]
                                           / (float) limit_joints)
-                                         * 100) / 100);
+                                         * 1000) / 1000);
     }
 
 
@@ -147,7 +147,7 @@ void Measures::measurePhenotype(std::map<std::string, double> params, std::strin
                                  roundf (
                                          ( (float) this->gen->getMeasures()["connectivity1"]
                                            / (float) limit_limbs)
-                                         * 100) / 100);
+                                         * 1000) / 1000);
     }
 
     int limit_connectivity2 = this->gen->getMeasures()["total_components"]-2; // disccounts bothsidelimbs and head
@@ -156,7 +156,7 @@ void Measures::measurePhenotype(std::map<std::string, double> params, std::strin
                                  roundf(
                                          ((float) this->gen->getMeasures()["connectivity2"]
                                           / (float) limit_connectivity2)
-                                         * 100) / 100);
+                                         * 1000) / 1000);
     }
 
 
@@ -167,7 +167,7 @@ void Measures::measurePhenotype(std::map<std::string, double> params, std::strin
                                  roundf(
                                          (float) (this->gen->getMeasures()["connectivity4"]
                                                   / (float) limit_branching)
-                                         * 100) / 100);
+                                         * 1000) / 1000);
     }
 
 
@@ -191,11 +191,11 @@ void Measures::measurePhenotype(std::map<std::string, double> params, std::strin
     if( horizontal_length < vertical_length ) { // proportion of the shortest length for the longest
         this->gen->updateMeasure("length_ratio", roundf(
                 (horizontal_length / (float) vertical_length)
-                * 100) / 100);
+                * 1000) / 1000);
     }else{
         this->gen->updateMeasure("length_ratio", roundf(
                 (vertical_length / (float) horizontal_length)
-                * 100) / 100);
+                * 1000) / 1000);
     }
 
     /* END:  length ratio: shortest length by longest length  */
@@ -264,7 +264,7 @@ void Measures::measurePhenotype(std::map<std::string, double> params, std::strin
     if(ncomp > 0){ this->gen->updateMeasure("horizontal_symmetry" ,
                                             roundf( (
                                                             (float)this->gen->getMeasures()["horizontal_symmetry"]
-                                                            / (float) ncomp)*100)/100); }
+                                                            / (float) ncomp)*1000)/1000); }
 
 
     // vertical symmetry
@@ -287,7 +287,7 @@ void Measures::measurePhenotype(std::map<std::string, double> params, std::strin
     if(ncomp > 0){ this->gen->updateMeasure("vertical_symmetry",
                                             roundf( (
                                                             (float) this->gen->getMeasures()["vertical_symmetry"]
-                                                            / (float) ncomp)*100 )/100); }
+                                                            / (float) ncomp)*1000 )/1000); }
 
 
     // selects the maximum symmetry
@@ -308,7 +308,7 @@ void Measures::measurePhenotype(std::map<std::string, double> params, std::strin
                              roundf(
                                      (  (float) this->gen->getMeasures()["total_components"]
                                         / (float) expected_components)
-                                     *100)/100);
+                                     *1000)/1000);
 
     /* END: covered area  */
 

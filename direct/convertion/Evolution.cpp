@@ -348,12 +348,20 @@ void Evolution::createHeader(){
 
     path = "../experiments/"+this->experiment_name+"/evolution.txt";
     file.open(path);
-    file << "generation maxfitness meanfitness nichecoverage_generation nichecoverage_accumulated" << std::endl;
+    file << "generation maxfitness meanfitness nichecoverage_generation nichecoverage_accumulated";
+        for (int i=0; i<this->measures_names.size();i++) {
+            file<<" "<<this->measures_names[i];
+        }
+    file<<std::endl;
     file.close();
 
     path = "../experiments/"+this->experiment_name+"/measures.txt";
     file.open(path);
-    file << "generation idgenome branching connectivity1 connectivity2 coverage effective_joints length_ratio symmetry total_components"<<std::endl;
+    file << "generation idgenome";
+    for (int i=0; i<this->measures_names.size();i++) {
+        file<<" "<<this->measures_names[i];
+    }
+    file<<std::endl;
     file.close();
 
     path = "../experiments/"+this->experiment_name+"/measures2.txt";
@@ -611,7 +619,7 @@ void Evolution::selection() {
  *  Saves state of the generations to file.
  */
 
-void Evolution::exportGenerationMetrics(int generation, int niche_coverage_generation, int niche_coverage_accumulated){
+void Evolution::exportGenerationMetrics(int generation, std::vector<int> metrics){
 
 
     std::ofstream evolution_file;
@@ -636,7 +644,9 @@ void Evolution::exportGenerationMetrics(int generation, int niche_coverage_gener
 
     average_fitness /= this->getPopulation()->size();  // finds the average of the fitnesses
 
-    evolution_file  << maximum_fitness << " "  << average_fitness  << " " << niche_coverage_generation << " " << niche_coverage_accumulated << " " << std::endl;
+    evolution_file  << maximum_fitness << " "  << average_fitness  << " "
+    << metrics[0] << " " << metrics[1] << " " << metrics[2] << " " << metrics[3] << " " << metrics[4] << " "
+    << metrics[5] << " " << metrics[6] << " " << metrics[7] << " " << metrics[8] << " " << metrics[9]<< std::endl;
 
     evolution_file.close();
 
@@ -769,11 +779,9 @@ int Evolution::initExperiment(int argc, char* argv[], LSystem LS, int encodingty
 *  Evolution in the search for novelty.
 **/
 
-int Evolution::noveltySearch(int argc, char* argv[], int encodingtype) {
+void Evolution::noveltySearch(int argc, char* argv[], int encodingtype) {
 
-
-    int niche_coverage_generation = 0, niche_coverage_accumulated = 0;
-
+ 
 
     // loads alphabet with letters and commands
     LSystem LS;
@@ -790,12 +798,8 @@ int Evolution::noveltySearch(int argc, char* argv[], int encodingtype) {
 
         gi = this->initExperiment(argc, argv, LS, encodingtype);
 
-        // calculates quality state of the search for the generation
-        niche_coverage_generation = this->calculateNicheCoverage()[0];
-        niche_coverage_accumulated = this->calculateNicheCoverage()[1];
-
         // saves metrics of evolution to file
-        this->exportGenerationMetrics(gi, niche_coverage_generation, niche_coverage_accumulated);
+        this->exportGenerationMetrics(gi, this->calculateNicheCoverage(this->population));
 
     // if experiment is set to continue from previous experiment
     }else{
@@ -868,13 +872,9 @@ int Evolution::noveltySearch(int argc, char* argv[], int encodingtype) {
 
         // selects individuals, keeping the population with a fixed size
         this->selection();
-
-        // calculates quality state of the search for the generation
-        niche_coverage_generation  = this->calculateNicheCoverage()[0];
-        niche_coverage_accumulated  = this->calculateNicheCoverage()[1];
-
+ 
         // saves metrics of evolution to file
-        this->exportGenerationMetrics(g, niche_coverage_generation, niche_coverage_accumulated);
+        this->exportGenerationMetrics(g, this->calculateNicheCoverage(offspring));
 
         // saves phenotypes of the selected population to a separated folder (only for visualization issues)
         this->exportPop(g);
@@ -897,7 +897,7 @@ int Evolution::noveltySearch(int argc, char* argv[], int encodingtype) {
 
     this->logsTime("end");
 
-    return niche_coverage_accumulated;
+   
 
 }
 
@@ -1062,23 +1062,24 @@ std::vector<std::string> Evolution::readsEvolutionState() {
 
 
 /*
- * Calculates the quality metric for the novelty search: niche coverage
+ * Calculates the quality metric for the novelty search: niche coverage and bins of measures
  * */
-std::vector<int> Evolution::calculateNicheCoverage() {
+std::vector<int> Evolution::calculateNicheCoverage( std::vector<Genome *>  * individuals ) {
 
-    // total number of points in the grid given the dimentions and spacing
+    // total number of points in the grid given the dimensions and spacing
     //int total_points = std::pow(this->params["grid_bins"],this->population->at(0)->getMeasures().size()
 
-    this->morphological_grid_generation =  std::map<std::string, std::vector<double>>();
+    //this->morphological_grid_generation =  std::map<std::string, std::vector<double>>();
 
-    for(int i = 0; i < this->population->size(); i++ ) {
+    for(int i = 0; i < individuals->size(); i++ ) {
 
         std::string key_point = "";
         double distance = 0;
 
         // for each measure (dimension)
-        for(const auto& it : this->population->at(i)->getMeasures()){
+        for(const auto& it : individuals->at(i)->getMeasures()){
 
+            // accounts for NC
             // for each bin
             for(int b=1; b <= this->params["grid_bins"]; b++) {
 
@@ -1098,37 +1099,54 @@ std::vector<int> Evolution::calculateNicheCoverage() {
                     distance += -1 * (it.second - (b / this->params["grid_bins"]));
                 }
 
+
+            }
+
+            // accounts for occurrence of value for measure
+            if ( std::find(this->morphological_measures_accumulated[it.first].begin(),
+                           this->morphological_measures_accumulated[it.first].end(), it.second)
+                 == this->morphological_measures_accumulated[it.first].end() ){
+
+                this->morphological_measures_accumulated[it.first].push_back(it.second);
             }
         }
 
 
-        // if point already exists in the array, adds an individual and the difference between them
-        if(this->morphological_grid_generation.count(key_point)>0) {
+//        // if point already exists in the array, adds an individual and the difference between them
+//        if(this->morphological_grid_generation.count(key_point)>0) {
+//
+//            this->morphological_grid_generation[key_point].push_back(distance); // add map with key=id value=distance ?
+//
+//            // if point does not exist in the array yet, , adds new point with its first individual and the difference between them
+//        }else {
+//            std::vector<double> individual; individual.push_back(distance);
+//            this->morphological_grid_generation[key_point] = individual;
+//        }
 
-            this->morphological_grid_generation[key_point].push_back(distance); // add map with key=id value=distance ?
-
-            // if point does not exist in the array yet, , adds new point with its first individual and the difference between them
-        }else {
-            std::vector<double> individual; individual.push_back(distance);
-            this->morphological_grid_generation[key_point] = individual;
-        }
 
 
-
-        // if point already exists in the array, adds an individual and the difference between them
+        // if point already exists in the array, adds an individual and the id
         if(this->morphological_grid_accumulated.count(key_point)>0) {
 
-            this->morphological_grid_accumulated[key_point].push_back(distance); // add map with key=id value=distance ?
+            this->morphological_grid_accumulated[key_point].push_back(individuals->at(i)->getId());
 
             // if point does not exist in the array yet, , adds new point with its first individual and the difference between them
         }else {
-            std::vector<double> individual; individual.push_back(distance);
+            std::vector<std::string> individual; individual.push_back(individuals->at(i)->getId());
             this->morphological_grid_accumulated[key_point] = individual;
         }
 
 
     }
 
+    for(const auto& it :this->morphological_measures_accumulated){
+
+        std::cout<<it.first<<std::endl;
+        for(int j=0;j<it.second.size();j++){
+            std::cout<<" "<<it.second[j]<<std::endl;
+        }
+
+    }
 
     // logs state of the grid
     std::ofstream myfile;
@@ -1148,6 +1166,9 @@ std::vector<int> Evolution::calculateNicheCoverage() {
     std::vector<int> morphological_grids;
     morphological_grids.push_back((int)this->morphological_grid_generation.size());  // pos 0
     morphological_grids.push_back((int)this->morphological_grid_accumulated.size()); // pos 1
+    for( const auto& it :this->morphological_measures_accumulated){
+        morphological_grids.push_back((int)it.second.size());
+    }
 
     return morphological_grids;
 

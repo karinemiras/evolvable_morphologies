@@ -63,10 +63,10 @@ int main(int argc,  char* argv[]) {
     // END: parallel repetitions of experiments
 
 
-    int niche_coverage_accumulated = 0;
+
     Evolution * e = new Evolution("direct", 1);
-    niche_coverage_accumulated = e->noveltySearch(argc, argv, 1);
-    std::cout<<">>> experiment, accumulated niche coverage " << niche_coverage_accumulated<<std::endl;
+    e->noveltySearch(argc, argv, 1);
+
     delete e;
 
 

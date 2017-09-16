@@ -55,8 +55,8 @@ int main(int argc, char* argv[]) {
  
     int niche_coverage_accumulated = 0;
     EvolutionIndirect *e = new EvolutionIndirect("indirect", 1);
-    niche_coverage_accumulated = e->noveltySearch(argc, argv, 1);
-    std::cout << ">>> accumulated niche coverage " << niche_coverage_accumulated;
+    e->noveltySearch(argc, argv, 1);
+
     //delete e;
  
 
