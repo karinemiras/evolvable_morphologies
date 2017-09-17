@@ -330,14 +330,7 @@ void Measures::measurePhenotype(std::map<std::string, double> params, std::strin
     // normalizes total number of components by maximum possible number of components
     this->gen->updateMeasure("total_components", this->gen->getMeasures()["total_components"] / params["max_comps"]);
 
-// TEST !!!
-    this->gen->updateMeasure("coverage", 0);
-    this->gen->updateMeasure("connectivity1", 0);
-    this->gen->updateMeasure("connectivity2", 0);
-    this->gen->updateMeasure("effective_joints", 0);
-    this->gen->updateMeasure("length_ratio", 0);
-    this->gen->updateMeasure("symmetry", 0);
-// TEST !!!
+
 
     /* END:  calculating measures  */
 

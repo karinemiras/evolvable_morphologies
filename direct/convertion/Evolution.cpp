@@ -869,12 +869,14 @@ int Evolution::noveltySearch(int argc, char* argv[], int encodingtype) {
         for(int j=0; j < offspring->size(); j++){
             this->population->push_back(offspring->at(j));
         }
+        
+        std::vector<int> niche_measures = this->calculateNicheCoverage(offspring);
 
         // selects individuals, keeping the population with a fixed size
         this->selection();
  
         // saves metrics of evolution to file
-        this->exportGenerationMetrics(g, this->calculateNicheCoverage(offspring));
+        this->exportGenerationMetrics(g, niche_measures);
 
         // saves phenotypes of the selected population to a separated folder (only for visualization issues)
         this->exportPop(g);
