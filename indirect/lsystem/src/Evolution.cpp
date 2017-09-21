@@ -315,7 +315,7 @@ void Evolution::measureIndividuals(int generation, std::vector<Genome *>  * indi
 
         }
 
-        delete m;
+        //delete m;
     }
 
     differences_file.close();
@@ -554,7 +554,7 @@ int Evolution::tournament(){
     int genome2 =  dist_1(generator); // random genome 2
 
         //random selection test
-       // return dist_1(generator);
+      //  return dist_1(generator);
     
     
     // return the genome with higher fitness / novelty search
@@ -1043,6 +1043,7 @@ int Evolution::noveltySearch(int argc, char* argv[], int encodingtype) {
 
         // develops genomes of the offspring
         this->developIndividuals(argc, argv, LS, g, offspring, this->experiment_name+"/offspringpop",  encodingtype);
+
         // measures phenotypes of the offspring
         this->measureIndividuals(g, offspring, "/offspringpop");
 
@@ -1092,7 +1093,7 @@ int Evolution::noveltySearch(int argc, char* argv[], int encodingtype) {
 
         std::vector<int> niche_measures = this->calculateNicheCoverage(offspring);
 
-        // selects individuals, keeping the population with a fixed size
+      // selects individuals, keeping the population with a fixed size
         this->selection();
 
         // saves metrics of evolution to file

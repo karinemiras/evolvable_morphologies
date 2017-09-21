@@ -6,7 +6,7 @@
 
 
 #include<iostream>
-
+#include <random>
 #include "EvolutionIndirect.h"
 
 //#include "mpi.h"
@@ -24,7 +24,6 @@ int main(int argc, char* argv[]) {
 //        rc = MPI_Init( &argc, &argv);
 //
 //        if (rc != MPI_SUCCESS) {
-//            fprintf(stderr, "Unable to set up MPI");
 //            MPI_Abort(MPI_COMM_WORLD, rc);
 //        }
 //
@@ -44,17 +43,13 @@ int main(int argc, char* argv[]) {
 
     //  END: parallel repetitions of experiments
 //
-//for (int i = 9; i <= 12; i++) {
-//    int niche_coverage_accumulated = 0;
-//    EvolutionIndirect *e = new EvolutionIndirect("indirect"+std::to_string(i), 1);
-//    niche_coverage_accumulated = e->noveltySearch(argc, argv, 1);
-//    std::cout << ">>> accumulated niche coverage " << niche_coverage_accumulated;
-//    delete e;
-//}
 
- 
 
-    EvolutionIndirect *e = new EvolutionIndirect("indirect", 1);
+    std::random_device rd;
+    std::default_random_engine generator(rd());
+    std::uniform_int_distribution<int> dist_1(1, 1000000);
+
+    EvolutionIndirect *e = new EvolutionIndirect("indirect-"+std::to_string(dist_1(generator)), 1);
     int aux = e->noveltySearch(argc, argv, 1);
 
 
@@ -65,9 +60,7 @@ int main(int argc, char* argv[]) {
 //    EvolutionIndirect *e = new EvolutionIndirect("indirect6", 1);
 //    niche_coverage_accumulated = e->noveltySearch(argc, argv, 1);
 //    std::cout << ">>> accumulated niche coverage " << niche_coverage_accumulated;
-
-
-    // e->testGeneticString(argc, argv,"spider3");
+//    e->testGeneticString(argc, argv,"spider3");
 
 
     return 0;

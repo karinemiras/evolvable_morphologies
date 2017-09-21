@@ -7,7 +7,7 @@
 //
 
 #include "mpi.h"
-
+#include <random>
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -64,9 +64,12 @@ int main(int argc,  char* argv[]) {
 
 
 
-    Evolution * e = new Evolution("direct", 1);
+    std::random_device rd;
+    std::default_random_engine generator(rd());
+    std::uniform_int_distribution<int> dist_1(1, 1000000);
+    Evolution *e = new Evolution("direct-"+std::to_string(dist_1(generator)), 1);
     int aux = e->noveltySearch(argc, argv, 1);
- 
+
 
 
 // for (int i = 3; i <= 3; i++) {

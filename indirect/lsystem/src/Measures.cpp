@@ -139,9 +139,16 @@ void Measures::measurePhenotype(std::map<std::string, double> params, std::strin
                                          * 1000) / 1000);
     }
 
-
+    int limit_limbs = 0;
     // normalizes the number of limbs per total of components
-    int limit_limbs = this->gen->getMeasures()["total_components"] - 1; // disccounts the head
+    if (this->gen->getMeasures()["total_components"] <=5){
+        limit_limbs = this->gen->getMeasures()["total_components"]-1;
+    }else{
+        limit_limbs = 2 * floor( (this->gen->getMeasures()["total_components"]-6) / 3)
+                      + fmod((this->gen->getMeasures()["total_components"]-6), 3)
+                      + 4;
+    }
+
     if(limit_limbs > 0){
         this->gen->updateMeasure("connectivity1",
                              roundf (

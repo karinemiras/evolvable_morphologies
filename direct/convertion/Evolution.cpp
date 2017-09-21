@@ -318,7 +318,7 @@ void Evolution::measureIndividuals(int generation, std::vector<Genome *>  * indi
 
         }
 
-        delete m;
+        // delete m;
     }
 
     differences_file.close();
@@ -1141,14 +1141,14 @@ std::vector<int> Evolution::calculateNicheCoverage( std::vector<Genome *>  * ind
 
     }
 
-    for(const auto& it :this->morphological_measures_accumulated){
-
-        std::cout<<it.first<<std::endl;
-        for(int j=0;j<it.second.size();j++){
-            std::cout<<" "<<it.second[j]<<std::endl;
-        }
-
-    }
+//    for(const auto& it :this->morphological_measures_accumulated){
+//
+//        std::cout<<it.first<<std::endl;
+//        for(int j=0;j<it.second.size();j++){
+//            std::cout<<" "<<it.second[j]<<std::endl;
+//        }
+//
+//    }
 
     // logs state of the grid
     std::ofstream myfile;
