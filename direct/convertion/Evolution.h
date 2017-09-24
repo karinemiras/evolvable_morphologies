@@ -82,7 +82,7 @@ public:
     void initPopulation(LSystem LS);
     void crossover(LSystem LS, std::vector<Genome *> * offspring, int generation);
     void mutation(LSystem LS, std::vector<Genome *> * offspring);
-
+    void loadRealRobots(int argc, char* argv[], int encodingtype);
 
 
 protected:

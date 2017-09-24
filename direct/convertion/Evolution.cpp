@@ -699,6 +699,39 @@ void Evolution::developIndividuals(int argc, char* argv[], LSystem LS, int gener
 
 
 
+void Evolution::loadRealRobots(int argc, char* argv[], int encodingtype){
+
+  LSystem LS;
+
+  this->readParams();
+
+  for(int gi=1; gi <= this->params["num_generations"]; gi++) {
+
+
+      std::vector<Genome *> * offspring =  new std::vector<Genome *>();
+
+     for(int i=1; i <= this->params["pop_size"]; i++) {
+
+
+            // initial genomes receive personal ids, but the ids of the parents are none
+            Genome * gen = new Genome(std::to_string(this->next_id), "N", "N", -1, -1);
+
+            // adds genome to the population
+            offspring->push_back(gen);
+
+            // increments id that will be used for any next genome created
+            this->next_id++;
+
+
+        }
+
+        this->developIndividuals(argc, argv, LS, gi, offspring, this->experiment_name+"/offspringpop"+std::to_string(gi),  1);
+        this->measureIndividuals(gi, offspring, "/offspringpop"+std::to_string(gi));
+    }
+}
+
+
+
 /**
  * Initializes the population with new genomes.
  * @param LS - Lsystem structure containing the alphabet.
