@@ -77,7 +77,7 @@ void DecodedGeneticString::decode(std::string genome_file, std::map<std::string,
 
 
                 // controls the hierarchical level of the tree of components
-                if (level < previous_level) {
+                if (level <= previous_level) {
 
                     int num = (int) (previous_level - level)+1;
                     for (int j = 1; j <= num; j++) current_component = current_component->back;
