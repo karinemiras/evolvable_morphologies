@@ -65,6 +65,10 @@ void DecodedGeneticString::decode(std::string genome_file, std::map<std::string,
                 letter = tokens[1];
                 std::string mounting_command = "";
 
+
+                std::cout<<"tokens[1],"<<tokens[1];
+                std::cout<<"position,"<<position;
+
                 // adds new component to the graph
                 DecodedGeneticString::Vertex *new_component;
                 new_component = new DecodedGeneticString::Vertex;
@@ -124,7 +128,8 @@ void DecodedGeneticString::decode(std::string genome_file, std::map<std::string,
 
                     if (mounting_command == "addr") current_component->right = new_component;
 
-
+std::cout<<"mouting,"<<mounting_command;
+                    
                     new_component->back = current_component;
                     current_component = new_component;
 

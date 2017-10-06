@@ -992,6 +992,17 @@ int Evolution::initExperiment(int argc, char* argv[], LSystem LS, int encodingty
     return gi;
 }
 
+
+
+/**
+*  Evolution in the search for novelty.
+**/
+
+//int Evolution::locomotion(int argc, char* argv[]) {
+
+
+//}
+
 /**
 *  Evolution in the search for novelty.
 **/

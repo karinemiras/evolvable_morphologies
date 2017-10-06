@@ -212,7 +212,7 @@ void Genome::generate_final_string(int  replacement_iterations, int export_genom
         this->gs->replaces(this->grammar);
     }
 
-    //this->gs.display_list();
+    this->gs->display_list();
 
     if(export_genomes == 1){
         this->exportGenome(path+std::to_string(generation));
