@@ -969,6 +969,12 @@ void Evolution::crossover(LSystem LS, std::vector<Genome *>  * offspring, int ge
 
         this->aux.logs(" crossover for genome " + std::to_string(this->next_id) + " - p1: " + this->population->at(parent1)->getId() + " p2: " + this->population->at(parent2)->getId());
 
+        std::ofstream myfile;
+        std::string path = "../experiments/"+ this->experiment_name +"/test.txt";
+        myfile.open(path, std::ofstream::app);
+        myfile<<" crossover for genome " + std::to_string(this->next_id) + " - p1: " + this->population->at(parent1)->getId() + " p2: " + this->population->at(parent2)->getId();
+        myfile.close();
+
         // creates a new genome
 
         std::string v1 = "../experiments/"+this->experiment_name+"/offspringpop/genome"+this->population->at(parent1)->getId()+".txt";

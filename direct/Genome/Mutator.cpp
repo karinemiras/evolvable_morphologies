@@ -102,8 +102,18 @@ void Mutator::createChild(boost::shared_ptr<RobotRepresentation> robot1,
         boost::shared_ptr<RobotRepresentation>(new RobotRepresentation(*robot1.get()));
     boost::shared_ptr<RobotRepresentation> offspring2 =
         boost::shared_ptr<RobotRepresentation>(new RobotRepresentation(*robot2.get()));
-    
+
+
+    std::ofstream myfile;
+    std::string path = "../experiments/direct/test.txt";
+    myfile.open(path, std::ofstream::app);
+    myfile << offspring1->toString() << std::endl;
+    myfile << offspring2->toString() << std::endl;
+    myfile.close();
+
     this->crossoverSubtrees(offspring1, offspring2);
+
+
     this->mutate(offspring1);
     
     offspring1->toTextFile(name);
@@ -542,6 +552,12 @@ bool Mutator::crossoverSubtrees(boost::shared_ptr<RobotRepresentation>& robot1, 
     
     boost::shared_ptr<PartRepresentation> rootPart2 =
     rootPartIt2->second.lock();
+
+    std::ofstream myfile;
+    std::string path = "../experiments/direct/test.txt";
+    myfile.open(path, std::ofstream::app);
+    myfile<<" roots "<< rootPart1->getId()<<" "<< rootPart2->getId();
+    myfile.close();
     
     return robot1->crossoverSubTrees(robot1, robot2, rootPart1->getId(), rootPart2->getId());
 }
