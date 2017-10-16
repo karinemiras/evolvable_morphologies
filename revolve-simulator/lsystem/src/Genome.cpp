@@ -558,23 +558,6 @@ void Genome::developGenomeIndirect(int argc, char* argv[], std::map<std::string,
 
 
 
-/**
-*  Develops the initial genetic-string according to the grammar and creates phenotype.
-* @param argc - command line parameter
-* @param argv[] - command line parameter
-* @param params - list of params read from configuration file.
-* @param LS - Lsystem structure containing the alphabet.
-**/
-
-//void Genome::developGenomeDirect(int argc, char* argv[], std::map<std::string, double> params, LSystem LS, int generation, std::string path) {
-//
-//
-//    // decodes the final genetic-string into a tree of components
-//    this->decodeGeneticString(LS, params);
-//
-//    // generates robot-graphics
-//    this->constructor(argc, argv, params, path+std::to_string(generation));
-//}
 
 
 void Genome::updateFitness(double fitness){

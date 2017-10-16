@@ -37,7 +37,7 @@ find_package(Boost COMPONENTS REQUIRED
         )
 include_directories(${Boost_INCLUDE_DIRS})
 
-find_package(Qt5 COMPONENTS
+find_package(Qt COMPONENTS
         Core
         Widgets
         )
@@ -45,12 +45,12 @@ find_package(Qt5 COMPONENTS
 
 
 
-find_package(MPI)
+#find_package(MPI)
 include_directories(SYSTEM ${MPI_INCLUDE_PATH})
 
-find_package(mlpack)
+#find_package(mlpack)
 
-find_package(armadillo)
+#find_package(armadillo)
 
 # Source subdirectories
 # _____________________________________________________________________________
@@ -71,7 +71,6 @@ file(GLOB_RECURSE SOURCES
         src/Measures.cpp
         src/Aux.cpp
         src/Tests.cpp
-        src/Tuning.cpp
         )
 
 # Generate
@@ -80,7 +79,5 @@ file(GLOB_RECURSE SOURCES
 add_executable(lsystem_proto ${SOURCES})
 
 target_link_libraries(lsystem_proto
-        Qt5::Widgets
-        mlpack
-        armadillo
+        Qt4::QtGui
         ${MPI_C_LIBRARIES})
