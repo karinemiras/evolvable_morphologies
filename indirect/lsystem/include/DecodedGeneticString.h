@@ -7,10 +7,10 @@
 
 #include <string>
 
-#include <QtWidgets/QGraphicsScene>
-#include <QtWidgets/QGraphicsView>
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QGraphicsRectItem>
+#include <QtGui/QGraphicsScene>
+#include <QtGui/QGraphicsView>
+#include <QtGui/QApplication>
+#include <QtGui/QGraphicsRectItem>
 
 #include "GeneticString.h"
 #include "LSystem.h"

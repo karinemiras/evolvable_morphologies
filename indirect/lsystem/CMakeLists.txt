@@ -17,6 +17,7 @@ include_directories(
         ${PROJECT_BINARY_DIR}/include   # add the binary tree to the search path so that we will find Version.h
 )
 
+
 # MacOS X needed variables
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   # adaptable according to individual needs
@@ -37,7 +38,7 @@ find_package(Boost COMPONENTS REQUIRED
         )
 include_directories(${Boost_INCLUDE_DIRS})
 
-find_package(Qt5 COMPONENTS
+find_package(Qt4 COMPONENTS
         Core
         Widgets
         )
@@ -45,7 +46,7 @@ find_package(Qt5 COMPONENTS
 
 
 
-find_package(MPI)
+#find_package(MPI)
 include_directories(SYSTEM ${MPI_INCLUDE_PATH})
 
 find_package(mlpack)
@@ -80,7 +81,8 @@ file(GLOB_RECURSE SOURCES
 add_executable(lsystem_proto ${SOURCES})
 
 target_link_libraries(lsystem_proto
-        Qt5::Widgets
+        Qt4::QtGui
         mlpack
         armadillo
-        ${MPI_C_LIBRARIES})
+      #  ${MPI_C_LIBRARIES}
+        )
