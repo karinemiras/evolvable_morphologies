@@ -6,7 +6,7 @@
 //  Copyright (c) 2015 Berend Weel. All rights reserved.
 //
 
-#include "mpi.h"
+//#include "mpi.h"
 #include <random>
 #include <iostream>
 #include <fstream>
@@ -67,7 +67,7 @@ int main(int argc,  char* argv[]) {
     std::random_device rd;
     std::default_random_engine generator(rd());
     std::uniform_int_distribution<int> dist_1(1, 1000000);
-    Evolution *e = new Evolution("direct", 1);
+    Evolution *e = new Evolution("direct"+std::to_string(dist_1(generator)), 1);
     int aux = e->noveltySearch(argc, argv, 1);
 
    //   Evolution *e = new Evolution("task-shapes", 1);

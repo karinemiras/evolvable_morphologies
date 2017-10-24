@@ -84,5 +84,6 @@ target_link_libraries(lsystem_proto
         Qt4::QtGui
         mlpack
         armadillo
+        yaml-cpp
       #  ${MPI_C_LIBRARIES}
         )

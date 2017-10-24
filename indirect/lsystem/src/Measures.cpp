@@ -88,7 +88,7 @@ void Measures::measurePhenotype(std::map<std::string, double> params, std::strin
     // total of all types of joints
     int joints = (int) (   0 // this->gen->getMeasures()["total_fixed_joints_horizontal"]
                            //+ this->gen->getMeasures()["total_passive_joints_horizontal"]
-                           //+ this->gen->getMeasures()["total_active_joints_horizontal"]
+                           + this->gen->getMeasures()["total_active_joints_horizontal"]
                            //+ this->gen->getMeasures()["total_fixed_joints_vertical"]
                            //+ this->gen->getMeasures()["total_passive_joints_vertical"]
                            + this->gen->getMeasures()["total_active_joints_vertical"]);
@@ -429,10 +429,10 @@ void Measures::measureComponent( std::string reference, std::string direction, D
 //                                     this->gen->getMeasures()["total_passive_joints_horizontal"]+1);
 //        } // counts for each horizontal passive joint
 
-//        if (c2->item == "AJ1") {
-//            this->gen->updateMeasure("total_active_joints_horizontal",
-//                                     this->gen->getMeasures()["total_active_joints_horizontal"]+1);
-//        } // counts for each horizontal active joint
+        if (c2->item == "AJ1") {
+            this->gen->updateMeasure("total_active_joints_horizontal",
+                                     this->gen->getMeasures()["total_active_joints_horizontal"]+1);
+        } // counts for each horizontal active joint
 //
 //        if (c2->item == "J2") {
 //            this->gen->updateMeasure("total_fixed_joints_vertical",
@@ -481,7 +481,8 @@ void Measures::measureComponent( std::string reference, std::string direction, D
                                          1); // counts for: two sides are connected
             }
             // if item is a joint (apart from active/passive horizontal ones) and is connected to brick/core
-            if ((c2->item == "J1" or c2->item == "J2" or c2->item == "PJ2" or c2->item == "AJ2") and
+            if ((c2->item == "J1" or c2->item == "J2" or c2->item == "PJ2" or
+                    c2->item == "AJ2" or c2->item == "AJ1") and
                 (c2->back->item == "C" or c2->back->item == "B") and (c2->front->item == "B")) {
 
                 this->gen->updateMeasure("effective_joints",

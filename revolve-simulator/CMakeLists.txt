@@ -2286,6 +2286,32 @@ set(SOURCE_FILES
         gazebo/tools/gz_topic.cc
         gazebo/tools/gz_topic.hh
         gazebo/tools/sdf2pov.cc
+        lsystem/include/Aux.h
+        lsystem/include/DecodedGeneticString.h
+        lsystem/include/Evolution.h
+        lsystem/include/EvolutionIndirect.h
+        lsystem/include/GeneticString.h
+        lsystem/include/Genome.h
+        lsystem/include/LSystem.h
+        lsystem/include/Measures.h
+        lsystem/include/Tests.h
+        lsystem/include/Tuning.h
+        lsystem/src/Aux.cpp
+        lsystem/src/DecodedGeneticString.cpp
+        lsystem/src/Evolution.cpp
+        lsystem/src/EvolutionIndirect.cpp
+        lsystem/src/GeneticString.cpp
+        lsystem/src/Genome.cpp
+        lsystem/src/LSystem.cpp
+        lsystem/src/Measures.cpp
+        lsystem/src/Tests.cpp
+        lsystem/src/Tuning.cpp
+        lsystem/test/GenomeDirect.cpp
+        lsystem/test/GenomeDirect.h
+        lsystem/test/GenomeIndirect.cpp
+        lsystem/test/GenomeIndirect.h
+        lsystem/test/test_Genome.cpp
+        lsystem/main.cpp
         revolve/build/include/revolve/gazebo/brain/Brain.h
         revolve/build/include/revolve/gazebo/brain/NeuralNetwork.h
         revolve/build/include/revolve/gazebo/motors/JointMotor.h
@@ -2575,7 +2601,7 @@ set(SOURCE_FILES
         revolve-brain/cpp/test/test_Sensor.h
         revolve-brain/cpp/test/test_SUPGBrain.cpp
         revolve-brain/cpp/test/test_SUPGBrain.h
-        tol-revolve/build/tol/plugin/moc_InteractiveEvolutionPlugin.cxx
+        tol-revolve/build/cpp/tol/plugin/moc_InteractiveEvolutionPlugin.cxx
         tol-revolve/cpp/tol/plugin/brain/BodyParser.cpp
         tol-revolve/cpp/tol/plugin/brain/BodyParser.h
         tol-revolve/cpp/tol/plugin/brain/Evaluator.cpp

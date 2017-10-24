@@ -9,11 +9,11 @@
 #include <string>
 #include <vector>
 
-#include <QtWidgets/QGraphicsScene>
-#include <QtWidgets/QGraphicsView>
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QGraphicsRectItem>
-#include <QtWidgets/QGraphicsLineItem>
+#include <QtGui/QGraphicsScene>
+#include <QtGui/QGraphicsView>
+#include <QtGui/QApplication>
+#include <QtGui/QGraphicsRectItem>
+#include <QtGui/QGraphicsLineItem>
 
 #include "DecodedGeneticString.h"
 #include "LSystem.h"

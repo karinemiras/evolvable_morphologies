@@ -54,6 +54,8 @@ public:
     std::vector<Genome *>  * getPopulation();
     std::map<std::string, double> getParams();
     int noveltySearch(int argc, char* argv[], int encodingtype);
+    void locomotion(int argc, char* argv[]);
+    void convertYamlIndividuals(std::vector<Genome *> * individuals, std::string dirpath);
     void exportGenerationMetrics(int generation,  std::vector<int> metrics);
     void exportPop(int generation);
     void addToArchive( std::vector<Genome *>  * individuals, double prob_add_archive, std::string path);

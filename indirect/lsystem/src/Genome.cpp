@@ -7,6 +7,7 @@
 #include <iostream>
 #include <random>
 #include <string>
+#include <yaml-cpp/yaml.h>
 
 #include <math.h>
 
@@ -511,9 +512,91 @@ void Genome::draw_component( std::string reference, std::string direction, QGrap
             this->draw_component(reference,"root-back",scene,items,c1,c2->back, params);
         }
     }
+}
 
+
+/**
+ * Roams the graph, converting each component of the body into the yaml file.
+ * @param _root - pointer to the root
+ * @param _currentNode - pointer to the current item
+ */
+
+void Genome::convertComponent(
+        YAML::Node &_robot,
+        const std::string &_direction,
+        const std::string &_directoryPath,
+        DecodedGeneticString::Vertex *_root,
+        DecodedGeneticString::Vertex *_currentNode)
+{
+    // condition to stop recursive calls
+    if(_currentNode != NULL )
+    {
+        if (_currentNode->item == "C"){
+            _robot["key"] = "value";
+        }
+
+        // recursively calls this function to roam the rest of the graph
+        this->convertComponent(_robot, "left", _directoryPath, _root, _currentNode->left);
+        this->convertComponent(_robot, "front", _directoryPath, _root, _currentNode->front);
+        this->convertComponent(_robot, "right", _directoryPath, _root, _currentNode->right);
+        if(_currentNode == _root){
+            this->convertComponent(_robot, "root-back", _directoryPath, _root,_currentNode->back);
+        }
+    }
+}
+
+/*
+ * Converts a developed genome into a yaml file.
+ * */
+void Genome::convertYaml(std::string dirpath){
+
+
+//    body:
+//      id          : Core
+//      type        : Core
+//      children    :
+//          2:
+//              slot        : 0
+//              id          : Leg00Joint
+//              type        : ActiveHinge
+//              orientation : 0
+//              children    :
+
+
+    std::ofstream robot_file;
+    std::string path = "../../experiments/"+dirpath+"/robot_"+this->getId()+".txt";
+    robot_file.open(path, std::ofstream::app);
+
+    DecodedGeneticString::Vertex * c = NULL;
+    c = this->dgs.getRoot();
+
+    YAML::Node robot;
+
+    YAML::Node node;
+    node["id"] = "i";
+
+    robot["body1"] = node;
+
+    YAML::Node node2;
+    node2["id"] = "ii";
+    robot["body2"] = node2;
+
+    YAML::Node node3;
+    node3["test"] = "t";
+
+    robot["body1"]["idd"] = "tt";
+
+    std::cout<<robot["body1"][1];
+   // std::cout<<robot["body1"][1].as<std::string>();
+
+    //this->convertComponent(robot, "root", dirpath, c,c);
+
+    robot_file<<robot;
+
+    robot_file.close();
 
 }
+
 
 
 /**
@@ -556,25 +639,6 @@ void Genome::developGenomeIndirect(int argc, char* argv[], std::map<std::string,
     this->constructor(argc, argv, params, path+std::to_string(generation));
 }
 
-
-
-/**
-*  Develops the initial genetic-string according to the grammar and creates phenotype.
-* @param argc - command line parameter
-* @param argv[] - command line parameter
-* @param params - list of params read from configuration file.
-* @param LS - Lsystem structure containing the alphabet.
-**/
-
-//void Genome::developGenomeDirect(int argc, char* argv[], std::map<std::string, double> params, LSystem LS, int generation, std::string path) {
-//
-//
-//    // decodes the final genetic-string into a tree of components
-//    this->decodeGeneticString(LS, params);
-//
-//    // generates robot-graphics
-//    this->constructor(argc, argv, params, path+std::to_string(generation));
-//}
 
 
 void Genome::updateFitness(double fitness){

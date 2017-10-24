@@ -45,12 +45,13 @@ int main(int argc, char* argv[]) {
 //
 
 
-    std::random_device rd;
-    std::default_random_engine generator(rd());
-    std::uniform_int_distribution<int> dist_1(1, 1000000);
+//    std::random_device rd;
+//    std::default_random_engine generator(rd());
+//    std::uniform_int_distribution<int> dist_1(1, 1000000);
+//
 
-    EvolutionIndirect *e = new EvolutionIndirect("indirect-"+std::to_string(dist_1(generator)), 1);
-    int aux = e->noveltySearch(argc, argv, 1);
+    EvolutionIndirect *e = new EvolutionIndirect("locomotion", 1);
+    e->locomotion(argc, argv);
 
 
  

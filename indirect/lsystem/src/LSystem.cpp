@@ -42,10 +42,10 @@ void LSystem::build_alphabet(){
 //    alphabet["J2"] = "J2";       // fixed joint - vertical
 //    alphabet_index.push_back("J2");
 
-    //alphabet["AJ1"] = "AJ1";     // active joint - horizontal
-    //alphabet_index.push_back("AJ1");
+    alphabet["AJ1"] = "AJ1";     // active joint - horizontal (0 degrees)
+    alphabet_index.push_back("AJ1");
 
-    alphabet["AJ2"] = "AJ2";     // active joint - vertical
+    alphabet["AJ2"] = "AJ2";     // active joint - vertical (90 degrees)
     alphabet_index.push_back("AJ2");
 
     //alphabet["PJ1"] = "PJ1";     // passive joint - horizontal

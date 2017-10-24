@@ -8,6 +8,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <yaml-cpp/yaml.h>
 
 #include <QtGui/QGraphicsScene>
 #include <QtGui/QGraphicsView>
@@ -71,7 +72,9 @@ public:
     void removeMeasure(std::string key);
     void updateFitness(double fitness);
     void addLetterGrammar(std::string letter, GeneticString * lgs);
-
+    void convertYaml(std::string dirpath);
+    void convertComponent(YAML::Node &_robot, const std::string &_direction, const std::string &_directoryPath,
+                          DecodedGeneticString::Vertex *_root, DecodedGeneticString::Vertex *_currentNode);
     void build_grammar(LSystem LS, std::map<std::string, double> params);
     void build_genome_direct(LSystem LS, std::map<std::string, double> params);
 

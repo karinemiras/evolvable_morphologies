@@ -33,13 +33,13 @@ include_directories(${OPENSCENEGRAPH_INCLUDE_DIRS})
 
 find_package(PkgConfig)
 
-find_package(Qt5 COMPONENTS
+find_package(Qt4 COMPONENTS
         Core
         Widgets
         )
 
-find_package(MPI)
-include_directories(SYSTEM ${MPI_INCLUDE_PATH})
+#find_package(MPI)
+#include_directories(SYSTEM ${MPI_INCLUDE_PATH})
 
 find_package(mlpack)
 
@@ -105,8 +105,8 @@ set(RobotCrossover_SRCS main.cpp
 include_directories("Transceivers" "Genome" "convertion" "Genome/ODE_Check")
 
 add_executable(RobotCrossover ${RobotCrossover_SRCS})
-target_link_libraries(RobotCrossover ${Boost_LIBRARIES} ${PROTOBUF_LIBRARIES} ${ODE_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${JANSSON_LIBRARIES} ${MPI_C_LIBRARIES}
-        Qt5::Widgets
+target_link_libraries(RobotCrossover ${Boost_LIBRARIES} ${PROTOBUF_LIBRARIES} ${ODE_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${JANSSON_LIBRARIES} # ${MPI_C_LIBRARIES}
+        Qt4::QtGui
         mlpack
         armadillo
         )

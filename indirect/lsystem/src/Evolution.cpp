@@ -748,6 +748,21 @@ void Evolution::developIndividuals(int argc, char* argv[], LSystem LS, int gener
 
 }
 
+/*
+ * Converts the developed robots to yaml files.
+ * */
+void Evolution::convertYamlIndividuals(std::vector<Genome *> * individuals,std::string dirpath){
+
+    for (int i = 0; i < individuals->size(); i++) {
+
+        // converts genome
+        individuals->at(i)->convertYaml(dirpath);
+
+    }
+
+
+}
+
 
 /**
  * Loads population of genomes from files, from previous experiment.
@@ -998,10 +1013,40 @@ int Evolution::initExperiment(int argc, char* argv[], LSystem LS, int encodingty
 *  Evolution in the search for novelty.
 **/
 
-//int Evolution::locomotion(int argc, char* argv[]) {
+void Evolution::locomotion(int argc, char* argv[]) {
+
+    // loads alphabet with letters and commands
+    LSystem LS;
+    LS.build_mounting_commands();
+    LS.build_moving_commands();
+    LS.build_alphabet();
+
+    // reads parameters for new experiment and creates directories
+    this->setupEvolution();
+
+    this->logsTime("start");
+    this->createHeader();
+
+    int gi = 1; // start evolution from first generation ### read the number!
+
+    this->aux.logs("---------------- generation "+std::to_string(gi)+" ----------------");
+
+    // initializes population
+    this->initPopulation(LS);
+
+    // develops genomes of the initial population
+    this->developIndividuals(argc, argv, LS, gi, this->population, this->experiment_name+"/offspringpop",  1);
+
+    // measures phenotypes of the individuals
+    this->measureIndividuals(gi, this->population, "/offspringpop");
+
+    this->convertYamlIndividuals(this->population, this->experiment_name+"/offspringpop"+std::to_string(gi));
+
+    // saves metrics of evolution to file
+    //this->exportGenerationMetrics(gi, this->calculateNicheCoverage(this->population));
 
 
-//}
+}
 
 /**
 *  Evolution in the search for novelty.
