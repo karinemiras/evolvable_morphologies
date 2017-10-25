@@ -7,7 +7,6 @@
 #include <iostream>
 #include <random>
 #include <string>
-#include <yaml-cpp/yaml.h>
 
 #include <math.h>
 
@@ -322,10 +321,9 @@ void Genome::constructor(int argc,
     DecodedGeneticString::Vertex * c = NULL;
     c = this->dgs.getRoot();
 
-    YAML::Node robot; // convertion to YAML file
 
     // from component on the root, draws all the components in the graph
-    this->draw_component(robot, 0, path, "bottom","root",
+    this->draw_component("", 0, path, "bottom","root",
             this->scene,items,c,c, params);
 
     // exports drawn robot into image file
@@ -357,6 +355,9 @@ void Genome::constructor(int argc,
 
 /**
  * Roams the graph, drawing each component of the chart.
+ * @param parent_convertion - letter of the parent component
+ * @param convertion_level - level of hierarchy of body components for yaml
+ * @param _directoryPath - path to save yaml files
  * @param reference - reference of origin-side for the turtle
  * @param direction - direction to which to add the current component, relative to the previous component
  * @param scene - object representing the phenotype
@@ -365,7 +366,7 @@ void Genome::constructor(int argc,
  * @param c2 - pointer to the current item
  * @param params - list of params read from configuration file.
  */
-void Genome::draw_component( YAML::Node &_robot,
+void Genome::draw_component( std::string parent_convertion,
                              int convertion_level,
                              std::string _directoryPath,
                              std::string reference,
@@ -539,7 +540,8 @@ void Genome::draw_component( YAML::Node &_robot,
 
             // converts the robot into yaml file
             this->convertYaml
-                    (_directoryPath,
+                    (parent_convertion,
+                      _directoryPath,
                      convertion_level,
                      direction,
                      c2);
@@ -549,22 +551,22 @@ void Genome::draw_component( YAML::Node &_robot,
 
 
         // recursively calls this function to roam the rest of the graph
-        this->draw_component(_robot, convertion_level+1, _directoryPath,
+        this->draw_component( c2->item, convertion_level+1, _directoryPath,
                              reference,"left",
                              scene,items,c1,c2->left,
                              params);
 
-        this->draw_component(_robot, convertion_level+1, _directoryPath,
+        this->draw_component( c2->item, convertion_level+1, _directoryPath,
                              reference,"front",
                              scene,items,c1,
                              c2->front, params);
 
-        this->draw_component(_robot, convertion_level+1, _directoryPath,
+        this->draw_component( c2->item, convertion_level+1, _directoryPath,
                              reference,"right",scene,items,c1,
                              c2->right, params);
 
         if(c2 == c1){
-            this->draw_component(_robot, convertion_level+1, _directoryPath,
+            this->draw_component( c2->item, convertion_level+1, _directoryPath,
                                  reference,"root-back",scene,items,
                                  c1,c2->back, params);
         }
@@ -575,7 +577,8 @@ void Genome::draw_component( YAML::Node &_robot,
 /*
  * Converts a developed genome into a yaml file.
  * */
-void Genome::convertYaml(std::string _directoryPath,
+void Genome::convertYaml(       std::string parent_convertion,
+                                std::string _directoryPath,
                                 int convertion_level,
                                 std::string direction,
                                 DecodedGeneticString::Vertex * c2){
@@ -585,11 +588,6 @@ void Genome::convertYaml(std::string _directoryPath,
     letters_convertion["B"] = "FixedBrick";
     letters_convertion["AJ"] = "ActiveHinge";
 
-    std::map<std::string, int> letter_angle;
-    letter_angle["AJ1"] = 0;
-    letter_angle["AJ2"] = 0;
-    letter_angle["B"] = 0;
-
     // slots 0-back 1-front 2-right 3-left
 
     std::ofstream robot_file;
@@ -598,10 +596,21 @@ void Genome::convertYaml(std::string _directoryPath,
     robot_file.open(path, std::ofstream::app);
 
     std::string letter_convertion = c2->item;
-
     std::string spacing2 = "";
 
+    // sets angles
+    int angle = 0;
+    if (letter_convertion == "AJ2") {
 
+        if(parent_convertion == "AJ2")
+            angle = 0;
+        else
+            angle = 90;
+    }else{
+        if(parent_convertion == "AJ2") angle = -90;
+    }
+
+    // creates spaces for hierarchy of yaml file
     for(int s=1; s<=convertion_level; s++){
         spacing2 += "    ";
     }
@@ -631,7 +640,7 @@ void Genome::convertYaml(std::string _directoryPath,
     {
         robot_file<<spacing2<<"  slot        : 0"<<std::endl;
         robot_file<<spacing2<<"  orientation : "
-                              +std::to_string(letter_angle[letter_convertion])<<std::endl;
+                              +std::to_string(angle)<<std::endl;
     }
 
     if (letter_convertion.substr(0,2) == "AJ") letter_convertion = "AJ";
@@ -649,7 +658,7 @@ void Genome::convertYaml(std::string _directoryPath,
 
     robot_file.close();
 
- 
+
 
 }
 

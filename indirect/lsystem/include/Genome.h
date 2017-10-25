@@ -54,15 +54,18 @@ public:
                                int export_genomes,
                                int generation,
                                std::string path);
+
     void decodeGeneticString(LSystem LS,
                              std::map<std::string,
                                      double> params);
+
     void constructor(int argc,
                      char* argv[],
                      std::map<std::string,
                              double> params,
                      std::string path);
-    void draw_component(YAML::Node &_robot,
+
+    void draw_component( std::string parent_convertion,
                         int convertion_level,
                         std::string _directoryPath,
                         std::string reference,
@@ -115,7 +118,8 @@ public:
     void addLetterGrammar(std::string letter,
                           GeneticString * lgs);
 
-    void convertYaml(std::string dirpath,
+    void convertYaml(       std::string parent_convertion,
+                            std::string dirpath,
                             int convertion_level,
                             std::string direction,
                             DecodedGeneticString::Vertex * c2);
