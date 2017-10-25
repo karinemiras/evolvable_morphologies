@@ -16,11 +16,7 @@
 #include <QtGui/QGraphicsRectItem>
 #include <QtGui/QGraphicsLineItem>
 
-//#include <QtGui/QGraphicsScene>
-//#include <QtGui/QGraphicsView>
-//#include <QtGui/QApplication>
-//#include <QtGui/QGraphicsRectItem>
-//#include <QtGui/QGraphicsLineItem>
+
 
 #include "DecodedGeneticString.h"
 #include "GeneticString.h"
@@ -35,7 +31,11 @@ class Genome{
 
 public:
 
-    Genome(std::string _id, std::string _id_parent1, std::string _id_parent2, double _fit_parent1, double _fit_parent2){
+    Genome(std::string _id,
+           std::string _id_parent1,
+           std::string _id_parent2,
+           double _fit_parent1,
+           double _fit_parent2){
         id = _id;
         id_parent1 = _id_parent1;
         id_parent2 = _id_parent2;
@@ -44,38 +44,84 @@ public:
     }
 
     unsigned int getTo();
-    GeneticString * build_genetic_string(GeneticString * gs, std::vector<std::string> genetic_string_items);
+    GeneticString * build_genetic_string(GeneticString * gs,
+                                         std::vector<std::string> genetic_string_items);
     GeneticString * getGeneticString();
     void setGeneticString(GeneticString * _gs);
+
     std::vector<std::string> getAxiom();
-    void generate_final_string(int  replacement_iterations, int export_genomes, int generation, std::string path);
-    void decodeGeneticString(LSystem LS,std::map<std::string, double> params);
-    void constructor(int argc, char* argv[], std::map<std::string, double> params, std::string path);
-    void draw_component(std::string reference, std::string direction, QGraphicsScene * scene, std::vector<QGraphicsRectItem *>  items,DecodedGeneticString::Vertex * c1, DecodedGeneticString::Vertex * c2, std::map<std::string, double> params);
+    void generate_final_string(int  replacement_iterations,
+                               int export_genomes,
+                               int generation,
+                               std::string path);
+    void decodeGeneticString(LSystem LS,
+                             std::map<std::string,
+                                     double> params);
+    void constructor(int argc,
+                     char* argv[],
+                     std::map<std::string,
+                             double> params,
+                     std::string path);
+    void draw_component(YAML::Node &_robot,
+                        int convertion_level,
+                        std::string _directoryPath,
+                        std::string reference,
+                        std::string direction,
+                        QGraphicsScene * scene,
+                        std::vector<QGraphicsRectItem *>  items,
+                        DecodedGeneticString::Vertex * c1,
+                        DecodedGeneticString::Vertex * c2,
+                        std::map<std::string, double> params);
     std::string getId();
     std::string getId_parent1();
     std::string getId_parent2();
+
     double getFit_parent1();
+
     double getFit_parent2();
+
     void exportGenome(std::string path);
+
     void createEmbryo();
-    void developGenomeIndirect(int argc, char* argv[], std::map<std::string, double> params, LSystem LS, int generation, std::string path);
-    void developGenomeDirect(int argc, char* argv[], std::map<std::string, double> params, LSystem LS, int generation, std::string path);
+
+    void developGenomeIndirect(int argc,
+                               char*
+    argv[], std::map<std::string, double> params,
+                               LSystem LS,
+                               int generation,
+                               std::string path);
+    void developGenomeDirect(int argc, char* argv[],
+                             std::map<std::string, double>
+                             params, LSystem LS,
+                             int generation,
+                             std::string path);
     DecodedGeneticString getDgs();
     std::map< std::string, double > getMeasures();
     std::map< std::pair<int, int>, std::string >  getList_components();
+
     void updateMeasure(std::string key, double value);
+
     void calculateFitness(int k_neighboards);
+
     double getFitness();
+
     std::map< std::string, GeneticString * > getGrammar();
     void setGrammar(std::map< std::string, GeneticString *> grammar);
+
     void removeMeasure(std::string key);
+
     void updateFitness(double fitness);
-    void addLetterGrammar(std::string letter, GeneticString * lgs);
-    void convertYaml(std::string dirpath);
-    void convertComponent(YAML::Node &_robot, const std::string &_direction, const std::string &_directoryPath,
-                          DecodedGeneticString::Vertex *_root, DecodedGeneticString::Vertex *_currentNode);
+
+    void addLetterGrammar(std::string letter,
+                          GeneticString * lgs);
+
+    void convertYaml(std::string dirpath,
+                            int convertion_level,
+                            std::string direction,
+                            DecodedGeneticString::Vertex * c2);
+
     void build_grammar(LSystem LS, std::map<std::string, double> params);
+
     void build_genome_direct(LSystem LS, std::map<std::string, double> params);
 
 protected:

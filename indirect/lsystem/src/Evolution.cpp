@@ -749,19 +749,6 @@ void Evolution::developIndividuals(int argc, char* argv[], LSystem LS, int gener
 }
 
 /*
- * Converts the developed robots to yaml files.
- * */
-void Evolution::convertYamlIndividuals(std::vector<Genome *> * individuals,std::string dirpath){
-
-    for (int i = 0; i < individuals->size(); i++) {
-
-        // converts genome
-        individuals->at(i)->convertYaml(dirpath);
-
-    }
-
-
-}
 
 
 /**
@@ -1039,8 +1026,6 @@ void Evolution::locomotion(int argc, char* argv[]) {
 
     // measures phenotypes of the individuals
     this->measureIndividuals(gi, this->population, "/offspringpop");
-
-    this->convertYamlIndividuals(this->population, this->experiment_name+"/offspringpop"+std::to_string(gi));
 
     // saves metrics of evolution to file
     //this->exportGenerationMetrics(gi, this->calculateNicheCoverage(this->population));
