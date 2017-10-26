@@ -591,7 +591,7 @@ void Genome::convertYaml(       std::string parent_convertion,
     // slots 0-back 1-front 2-right 3-left
 
     std::ofstream robot_file;
-    std::string path = "../../experiments/"+
+    std::string path = "../../../revolve-simulator/tol-revolve/experiments/"+
                        _directoryPath+"/robot_"+this->getId()+".yaml";
     robot_file.open(path, std::ofstream::app);
 
