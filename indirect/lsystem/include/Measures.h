@@ -27,18 +27,27 @@ public:
     }
 
     void initalizeMeasures();
-    void measurePhenotype(std::map<std::string, double> params, std::string dirpath, int generation);
-    void measureComponent(std::string reference, std::string direction, DecodedGeneticString::Vertex * c1, DecodedGeneticString::Vertex * c2, std::map<std::string, double> params);
+    void measurePhenotype(std::map<std::string, double> params,
+                          std::string dirpath, int generation);
+    void measureComponent(std::string reference,
+                          std::string direction,
+                          DecodedGeneticString::Vertex * c1,
+                          DecodedGeneticString::Vertex * c2,
+                          std::map<std::string, double> params);
     std::map< std::string, double> getMeasures();
     void setGenome(Genome * gen);
     Genome * getGenome();
-    std::pair<int, int> find_points(DecodedGeneticString::Vertex * c1, DecodedGeneticString::Vertex * c2,  int x, int y);
+    std::pair<int, int> find_points(DecodedGeneticString::Vertex * c1,
+                                    DecodedGeneticString::Vertex * c2,
+                                    int x,
+                                    int y);
 
 
 private:
 
     Genome * gen; // pointer to the genome to be measured
-    std::map< std::pair<int, int> , double> points = std::map< std::pair<int, int> , double>(); // points outlining the polygon formed by the morphology through the components
+    // points outlining the polygon formed by the morphology through the components
+    std::map< std::pair<int, int> , double> points = std::map< std::pair<int, int> , double>();
     std::string experiment_name = "";
     std::map<std::string, double> params =  std::map<std::string, double>();
 

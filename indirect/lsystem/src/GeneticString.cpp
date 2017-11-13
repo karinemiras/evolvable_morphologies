@@ -57,7 +57,12 @@ void GeneticString::add(int pos, std::string genetic_string_item) {
  * @param gs_parent1 - genetic-string of parent1
  * @param gs_parent2 - genetic-string of parent2
  */
-void GeneticString::create_joined_list(int pos_parent1_ini, int pos_parent2_ini, int pos_parent1_end, int pos_parent2_end, GeneticString * gs_parent1,  GeneticString * gs_parent2)
+void GeneticString::create_joined_list(int pos_parent1_ini,
+                                       int pos_parent2_ini,
+                                       int pos_parent1_end,
+                                       int pos_parent2_end,
+                                       GeneticString * gs_parent1,
+                                       GeneticString * gs_parent2)
 {
 
     GeneticString::Node *current, *inode, *current_parent1, *current_parent2;

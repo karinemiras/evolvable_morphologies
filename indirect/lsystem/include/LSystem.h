@@ -21,6 +21,7 @@ public:
     void build_alphabet();
     std::map< std::string, std::string > getAlphabet();
     std::vector<std::string> getAlphabetIndex();
+    std::map< std::string, std::string > getAlphabetType();
     std::vector<std::string> getMovingCommands();
     std::vector<std::string> getMountingCommands();
 
@@ -33,6 +34,9 @@ private:
     std::map< std::string, std::string > alphabet = std::map<std::string, std::string >();
     // auxiliar vector for the alphabet letters
     std::vector<std::string> alphabet_index = std::vector<std::string>();
+    // auxiliar vector for type of items in the alphabet
+    std::map< std::string, std::string > alphabet_type = std::map<std::string,
+            std::string >();
 };
 
 

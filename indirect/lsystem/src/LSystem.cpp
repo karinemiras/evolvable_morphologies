@@ -35,6 +35,7 @@ void LSystem::build_alphabet(){
 
     alphabet["C"]  = "C";  // core component
     alphabet_index.push_back("C");
+    alphabet_type["C"] = "body";
 
     //alphabet["J1"] = "J";       // fixed joint - horizontal
     //alphabet_index.push_back("J1");
@@ -44,9 +45,11 @@ void LSystem::build_alphabet(){
 
     alphabet["AJ1"] = "AJ1";     // active joint - horizontal (0 degrees)
     alphabet_index.push_back("AJ1");
+    alphabet_type["AJ1"] = "body";
 
     alphabet["AJ2"] = "AJ2";     // active joint - vertical (90 degrees)
     alphabet_index.push_back("AJ2");
+    alphabet_type["AJ2"] = "body";
 
     //alphabet["PJ1"] = "PJ1";     // passive joint - horizontal
     //alphabet_index.push_back("PJ1");
@@ -56,6 +59,15 @@ void LSystem::build_alphabet(){
 
     alphabet["B"] = "B";   // brick
     alphabet_index.push_back("B");
+    alphabet_type["B"] = "body";
+
+    alphabet["SI"] = "SI";   // infra-red sensor
+    alphabet_index.push_back("SI");
+    alphabet_type["SI"] = "sensor";
+
+    alphabet["SL"] = "SL";   // light sensor
+    alphabet_index.push_back("SL");
+    alphabet_type["SL"] = "sensor";
 
 }
 
@@ -74,4 +86,8 @@ std::vector<std::string> LSystem::getMovingCommands() {
 
 std::vector< std::string > LSystem::getAlphabetIndex(){
     return this->alphabet_index;
+};
+
+std::map< std::string, std::string > LSystem::getAlphabetType(){
+    return this->alphabet_type;
 };

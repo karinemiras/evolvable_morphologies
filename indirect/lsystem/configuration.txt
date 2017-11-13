@@ -1,6 +1,6 @@
-pop_size 10
+pop_size 3
 num_generations 1
-num_initial_comp 3
+num_initial_comp 1
 replacement_iterations 3
 mutation_prob 0.1
 offspring_prop 0.5

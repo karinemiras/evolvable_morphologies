@@ -34,7 +34,14 @@ public:
         Vertex *front;
         Vertex *right;
         Vertex *back; // parent component in the tree
-        Vertex() { left=front=right=back=NULL; x=y=0;}
+        std::string sensor_left;
+        std::string sensor_front;
+        std::string sensor_right;
+        std::string sensor_back;
+
+        Vertex() { left=front=right=back=NULL;
+                   sensor_left=sensor_front=sensor_right=sensor_back="N";
+                   x=y=0;}
     };
 
     DecodedGeneticString::Vertex * getRoot();

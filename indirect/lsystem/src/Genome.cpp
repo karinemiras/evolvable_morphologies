@@ -87,24 +87,33 @@ double Genome::getFitness(){
  * @param params - parameters of the system
 */
 void Genome::build_grammar(LSystem LS,
-                           std::map<std::string,
-                                   double> params) {
+                           std::map<std::string, double> params)
+{
 
-    std::map< std::string, std::string > alp = LS.getAlphabet();
-    std::vector<std::string> alp_i = LS.getAlphabetIndex();
-    std::vector<std::string> mountingcom = LS.getMountingCommands();
-    std::vector<std::string> movingcom = LS.getMovingCommands();
+    std::map< std::string, std::string >
+            alp = LS.getAlphabet();
+    std::vector<std::string>
+            alp_i = LS.getAlphabetIndex();
+    std::vector<std::string>
+            mountingcom = LS.getMountingCommands();
+    std::vector<std::string>
+            movingcom = LS.getMovingCommands();
 
     std::random_device rd;
     std::default_random_engine generator(rd());
 
-    std::uniform_int_distribution<int> dist_1(1, (int) params["num_initial_comp"]); // distribution for the number of components
-    std::uniform_int_distribution<int> dist_2(0, (int) alp_i.size()-1); // distribution for letters of the alphabet
-    std::uniform_int_distribution<int> dist_3(0, (int) mountingcom.size()-1); // distribution for the mounting commands
-    std::uniform_int_distribution<int> dist_4(0, (int) movingcom.size()-1); // distribution for the moving commands
+    // distribution for the number of components
+    std::uniform_int_distribution<int> dist_1(1, (int) params["num_initial_comp"]);
+    // distribution for letters of the alphabet
+    std::uniform_int_distribution<int> dist_2(0, (int) alp_i.size()-1);
+    // distribution for the mounting commands
+    std::uniform_int_distribution<int> dist_3(0, (int) mountingcom.size()-1);
+    // distribution for the moving commands
+    std::uniform_int_distribution<int> dist_4(0, (int) movingcom.size()-1);
 
     // for each letter of the alphabet
-    for (std::map< std::string, std::string >::const_iterator it = alp.begin(); it != alp.end(); ++it) {
+    for (std::map< std::string, std::string >::const_iterator it = alp.begin(); it != alp.end(); ++it)
+    {
 
         std::string letter = it->first;
 
@@ -155,21 +164,27 @@ void Genome::build_grammar(LSystem LS,
  * @param params - parameters of the system
 */
 void Genome::build_genome_direct(LSystem LS,
-                                 std::map<std::string,
-                                         double> params) {
+                                 std::map<std::string, double> params)
+{
 
-    std::vector<std::string> alp_i = LS.getAlphabetIndex();
-    std::vector<std::string> mountingcom = LS.getMountingCommands();
-    std::vector<std::string> movingcom = LS.getMovingCommands();
+    std::vector<std::string>
+            alp_i = LS.getAlphabetIndex();
+    std::vector<std::string>
+            mountingcom = LS.getMountingCommands();
+    std::vector<std::string>
+            movingcom = LS.getMovingCommands();
 
     std::random_device rd;
     std::default_random_engine generator(rd());
 
-    std::uniform_int_distribution<int> dist_1(1, (int) params["max_comps"]); // distribution for the number of components
+    // distribution for the number of components
+    std::uniform_int_distribution<int> dist_1(1, (int) params["max_comps"]);
     // distribution for letters of the alphabet, excluding 0 to prevent core-component of being (re)included in the rule
     std::uniform_int_distribution<int> dist_2(1, (int) alp_i.size()-1);
-    std::uniform_int_distribution<int> dist_3(0, (int) mountingcom.size()-1); // distribution for the mounting commands
-    std::uniform_int_distribution<int> dist_4(0, (int) movingcom.size()-1); // distribution for the moving commands
+    // distribution for the mounting commands
+    std::uniform_int_distribution<int> dist_3(0, (int) mountingcom.size()-1);
+    // distribution for the moving commands
+    std::uniform_int_distribution<int> dist_4(0, (int) movingcom.size()-1);
 
     std::vector<std::string> letter_items;
 
@@ -179,7 +194,8 @@ void Genome::build_genome_direct(LSystem LS,
     // while a raffled number of components is not achieved
     // (times 3 because it must take the commands of type 'mounting' and 'moving' into account)
     int num_items = dist_1(generator);
-    while(letter_items.size()  < (num_items*3) ){
+    while(letter_items.size()  < (num_items*3) )
+    {
 
         // raffles a letter to be included
         std::string item = alp_i[dist_2(generator)];
@@ -230,7 +246,8 @@ void Genome::generate_final_string(int  replacement_iterations,
 /**
  * Exports the main-genetic string of a genome to a file.
  */
-void Genome::exportGenome(std::string dirpath) {
+void Genome::exportGenome(std::string dirpath)
+{
 
     std::ofstream genome_file;
     std::string path = "../../experiments/"+dirpath+"/genome" + this->id +".txt";
@@ -280,8 +297,8 @@ GeneticString * Genome::build_genetic_string(GeneticString * _gs,
  *  @param LS - Lsystem structure containing the alphabet.
  */
 void Genome::decodeGeneticString(LSystem LS,
-                                 std::map<std::string,
-                                         double> params){
+                                 std::map<std::string, double> params)
+{
 
     try {
         this->dgs = DecodedGeneticString();
@@ -304,8 +321,7 @@ void Genome::decodeGeneticString(LSystem LS,
  */
 void Genome::constructor(int argc,
                          char* argv[],
-                         std::map<std::string,
-                                 double> params,
+                         std::map<std::string, double> params,
                          std::string path ) {
 
 
@@ -393,6 +409,12 @@ void Genome::draw_component( std::string parent_convertion,
         scene->addItem(sign);
 
         // defines colors for the components according to type  (light color has angle in axis x / dark color around z)
+
+        std::cout<<"item "<<c2->item<<std::endl;
+        std::cout<<"sensor_left "<<c2->sensor_left<<std::endl;
+        std::cout<<"sensor_front "<<c2->sensor_front<<std::endl;
+        std::cout<<"sensor_right "<<c2->sensor_right<<std::endl;
+        std::cout<<"sensor_back"<<c2->sensor_back<<std::endl;
 
         if(c2->item == "C"){
             items[items.size()-1]->setBrush(Qt::yellow); // yellow
@@ -504,7 +526,9 @@ void Genome::draw_component( std::string parent_convertion,
                 tsign = "^";   // sign points to the direction of the parent (up)
             }
 
-            sign->setPos(items[items.size() - 1]->x()+15 , items[items.size() - 1]->y()+15); // aligns the position of the sign, relative to its component
+            // aligns the position of the sign, relative to its component
+            sign->setPos(items[items.size() - 1]->x()+15 ,
+                         items[items.size() - 1]->y()+15);
             sign->setPlainText(QString::fromStdString(tsign)); // draws sign over the component
 
         }else{
@@ -576,13 +600,19 @@ void Genome::draw_component( std::string parent_convertion,
 
 /*
  * Converts a developed genome into a yaml file.
+ * @param parent_convertion - parent component of the current component
+ * @param _directoryPath - path to save the yaml file
+ * @param convertion_level - hierarchy level in the tree of components
+ * @param direction - direction on which current component will be mounted
+ * @param c2 - current node (component) pointer
  * */
-void Genome::convertYaml(       std::string parent_convertion,
-                                std::string _directoryPath,
-                                int convertion_level,
-                                std::string direction,
-                                DecodedGeneticString::Vertex * c2){
-
+void Genome::convertYaml(
+        std::string parent_convertion,
+        std::string _directoryPath,
+        int convertion_level,
+        std::string direction,
+        DecodedGeneticString::Vertex * c2)
+{
     std::map<std::string, std::string> letters_convertion;
     letters_convertion["C"] = "Core";
     letters_convertion["B"] = "FixedBrick";
@@ -591,7 +621,7 @@ void Genome::convertYaml(       std::string parent_convertion,
     // slots 0-back 1-front 2-right 3-left
 
     std::ofstream robot_file;
-    std::string path = "../../../revolve-simulator/tol-revolve/experiments/"+
+    std::string path = "../../experiments/"+
                        _directoryPath+"/robot_"+this->getId()+".yaml";
     robot_file.open(path, std::ofstream::app);
 
@@ -600,8 +630,8 @@ void Genome::convertYaml(       std::string parent_convertion,
 
     // sets angles
     int angle = 0;
-    if (letter_convertion == "AJ2") {
-
+    if (letter_convertion == "AJ2")
+    {
         if(parent_convertion == "AJ2")
             angle = 0;
         else
@@ -611,9 +641,8 @@ void Genome::convertYaml(       std::string parent_convertion,
     }
 
     // creates spaces for hierarchy of yaml file
-    for(int s=1; s<=convertion_level; s++){
+    for(int s=1; s<=convertion_level; s++)
         spacing2 += "    ";
-    }
 
 
     if(letter_convertion == "C")
@@ -657,9 +686,6 @@ void Genome::convertYaml(       std::string parent_convertion,
         robot_file<<spacing2<<"  children    :"<<std::endl;
 
     robot_file.close();
-
-
-
 }
 
 
@@ -674,7 +700,8 @@ void Genome::createEmbryo(){
 
     // initializes the genetic-string with the axiom
     GeneticString * gs = new GeneticString();
-    this->setGeneticString(this->build_genetic_string(gs, axiom));
+    this->setGeneticString(this->build_genetic_string(gs,
+                                                      axiom));
 
 }
 
@@ -694,37 +721,43 @@ void Genome::developGenomeIndirect(int argc,
                                    std::map<std::string,
                                            double> params,
                                    LSystem LS, int generation,
-                                   std::string path) {
-
+                                   std::string path)
+{
     // creates main genetic-string for axiom (initial developmental state of the genome)
     this->createEmbryo();
 
     // enhances the genetic-string according to grammar iteratively
-    this->generate_final_string((int) params["replacement_iterations"], (int) params["export_genomes"], generation, path);
+    this->generate_final_string((int) params["replacement_iterations"],
+                                (int) params["export_genomes"],
+                                generation, path);
 
     // decodes the final genetic-string into a tree of components
-    this->decodeGeneticString(LS, params);
+    this->decodeGeneticString(LS,
+                              params);
 
     // generates robot-graphics
-    this->constructor(argc, argv, params, path+std::to_string(generation));
+    this->constructor(argc,
+                      argv,
+                      params,
+                      path+std::to_string(generation));
 }
 
 
 
-void Genome::updateFitness(double fitness){
-
+void Genome::updateFitness(double fitness)
+{
     this->fitness = fitness;
 }
 
 
 
-std::map< std::string, GeneticString *> Genome::getGrammar(){
-
+std::map< std::string, GeneticString *> Genome::getGrammar()
+{
     return this->grammar;
 }
 
 
-void Genome::addLetterGrammar(std::string letter, GeneticString * lgs){
-
+void Genome::addLetterGrammar(std::string letter, GeneticString * lgs)
+{
     this->grammar.emplace(letter, lgs);
 }

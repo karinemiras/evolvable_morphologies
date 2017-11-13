@@ -58,7 +58,8 @@ void EvolutionIndirect::initPopulation(LSystem LS){ // default arguments and Lsy
 *   Performs crossover among individuals in the population.
 **/
 
-void EvolutionIndirect::crossover(LSystem LS, std::vector<Genome *>  * offspring){
+void EvolutionIndirect::crossover(LSystem LS,
+                                  std::vector<Genome *>  * offspring){
 
 
     // creates new individuals via crossover (size of offspring is relative to the size of population)
@@ -82,7 +83,9 @@ void EvolutionIndirect::crossover(LSystem LS, std::vector<Genome *>  * offspring
                                    this->population->at(parent1)->getFitness(),
                                    this->population->at(parent2)->getFitness());
 
-        this->aux.logs(" crossover for genome " + std::to_string(this->next_id) + " - p1: " + this->population->at(parent1)->getId() + " p2: " + this->population->at(parent2)->getId());
+        this->aux.logs(" crossover for genome " + std::to_string(this->next_id)
+                       + " - p1: " + this->population->at(parent1)->getId()
+                       + " p2: " + this->population->at(parent2)->getId());
 
         this->next_id++;
 
@@ -141,16 +144,20 @@ void EvolutionIndirect::mutation(LSystem LS, std::vector<Genome *> * offspring) 
 
     // distribution for letters of the alphabet, to be possibly included
     // (does not include position 0, which is core-component, as it should be present only once)
-    std::uniform_int_distribution<int> dist_letter(1, (int) LS.getAlphabetIndex().size()-1);
+    std::uniform_int_distribution<int>
+            dist_letter(1, (int) LS.getAlphabetIndex().size()-1);
 
     // distribution for letters of the alphabet, to be the target of the mutation
-    std::uniform_int_distribution<int> dist_letter_target(0, (int) LS.getAlphabetIndex().size()-1);
+    std::uniform_int_distribution<int>
+            dist_letter_target(0, (int) LS.getAlphabetIndex().size()-1);
 
     // distribution for the mounting commands
-    std::uniform_int_distribution<int> dist_mountingcommand(0, (int) LS.getMountingCommands().size()-1);
+    std::uniform_int_distribution<int>
+            dist_mountingcommand(0, (int) LS.getMountingCommands().size()-1);
 
     // distribution for the moving commands
-    std::uniform_int_distribution<int> dist_movingcommand(0, (int) LS.getMovingCommands().size()-1);
+    std::uniform_int_distribution<int>
+            dist_movingcommand(0, (int) LS.getMovingCommands().size()-1);
 
     // distribution for 0-1 probabilities
     std::uniform_real_distribution<double> prob(0.0, 1.0);
@@ -184,7 +191,9 @@ void EvolutionIndirect::mutation(LSystem LS, std::vector<Genome *> * offspring) 
                         // std::cout<<"cant delete the the core-component from the beginning of its rule";
                     } else {
 
-                        this->aux.logs("mutation: remove in " + offspring->at(i)->getId() + " for " + mutate_letter+" at "+std::to_string(pos_deletion));
+                        this->aux.logs("mutation: remove in " + offspring->at(i)->getId()
+                                       + " for " + mutate_letter
+                                       +" at "+std::to_string(pos_deletion));
                         offspring->at(i)->getGrammar()[mutate_letter]->remove(pos_deletion); // removes item from chosen position
 
                      }
@@ -237,7 +246,10 @@ void EvolutionIndirect::mutation(LSystem LS, std::vector<Genome *> * offspring) 
                 if (type_of_adding == 1) {
 
                     int aux = dist_mountingcommand(generator);
-                    this->aux.logs("mutation: add mounting command "+LS.getMountingCommands()[aux]+" in " + offspring->at(i)->getId() + " for " + mutate_letter+" at "+std::to_string(pos_insertion));
+                    this->aux.logs("mutation: add mounting command "+LS.getMountingCommands()[aux]
+                                   +" in " + offspring->at(i)->getId()
+                                   + " for " + mutate_letter+" at "
+                                   +std::to_string(pos_insertion));
                     genetic_string_item = LS.getMountingCommands()[aux];
                 }
 
@@ -245,7 +257,10 @@ void EvolutionIndirect::mutation(LSystem LS, std::vector<Genome *> * offspring) 
                 else if (type_of_adding == 2) {
 
                     int aux = dist_letter(generator);
-                    this->aux.logs("mutation: add letter "+LS.getAlphabetIndex()[aux]+" in " + offspring->at(i)->getId() + " for " + mutate_letter+" at "+std::to_string(pos_insertion));
+                    this->aux.logs("mutation: add letter "+LS.getAlphabetIndex()[aux]
+                                   +" in " + offspring->at(i)->getId()
+                                   + " for " + mutate_letter+" at "
+                                   +std::to_string(pos_insertion));
                     genetic_string_item = LS.getAlphabetIndex()[aux];
                 }
 
@@ -254,12 +269,16 @@ void EvolutionIndirect::mutation(LSystem LS, std::vector<Genome *> * offspring) 
                 else if (type_of_adding == 3) {
 
                     int aux = dist_movingcommand(generator);
-                    this->aux.logs("mutation: add moving command"+LS.getMovingCommands()[aux]+" in " + offspring->at(i)->getId() + " for " + mutate_letter+" at "+std::to_string(pos_insertion));
+                    this->aux.logs("mutation: add moving command"+LS.getMovingCommands()[aux]
+                                   +" in " + offspring->at(i)->getId()
+                                   + " for " + mutate_letter
+                                   +" at "+std::to_string(pos_insertion));
                     genetic_string_item = LS.getMovingCommands()[aux];
                 }
 
                 //  (possibly) alters genetic-string (production rule) adding items (letters or commands)
-                offspring->at(i)->getGrammar()[mutate_letter]->add(pos_insertion, genetic_string_item);
+                offspring->at(i)->getGrammar()[mutate_letter]->add(pos_insertion,
+                                                                   genetic_string_item);
 
             }
         }

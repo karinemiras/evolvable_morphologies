@@ -734,14 +734,23 @@ void Evolution::setupEvolution(){
 *  @param LS - Lsystem structure containing the alphabet
 *  @param individuals - array with genomes
 **/
-void Evolution::developIndividuals(int argc, char* argv[], LSystem LS, int generation, std::vector<Genome *> * individuals, std::string path, int encodingtype){
+void Evolution::developIndividuals(int argc,
+                                   char* argv[],
+                                   LSystem LS, int generation,
+                                   std::vector<Genome *> * individuals,
+                                   std::string path, int encodingtype){
 
     if (encodingtype == 1) {
         // for each genome in the array
         for (int i = 0; i < individuals->size(); i++) {
 
             // develops genome
-            individuals->at(i)->developGenomeIndirect(argc, argv, this->params, LS, generation, path);
+            individuals->at(i)->developGenomeIndirect(argc,
+                                                      argv,
+                                                      this->params,
+                                                      LS,
+                                                      generation,
+                                                      path);
 
         }
     }
