@@ -61,13 +61,13 @@ void LSystem::build_alphabet(){
     alphabet_index.push_back("B");
     alphabet_type["B"] = "body";
 
-    alphabet["SI"] = "SI";   // infra-red sensor
-    alphabet_index.push_back("SI");
-    alphabet_type["SI"] = "sensor";
+    alphabet["Si"] = "Si";   // infra-red sensor
+    alphabet_index.push_back("Si");
+    alphabet_type["Si"] = "sensor";
 
-    alphabet["SL"] = "SL";   // light sensor
-    alphabet_index.push_back("SL");
-    alphabet_type["SL"] = "sensor";
+    alphabet["Sl"] = "Sl";   // light sensor
+    alphabet_index.push_back("Sl");
+    alphabet_type["Sl"] = "sensor";
 
 }
 

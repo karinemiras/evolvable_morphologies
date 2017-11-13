@@ -50,31 +50,34 @@ void DecodedGeneticString::decode(GeneticString * gs,
 
                             if (root == current_component
                                 and (current_component->left != NULL or
-                                     current_component->sensor_left != "N")
+                                     current_component->sensor_left != "Sn")
                                 and (current_component->front != NULL or
-                                     current_component->sensor_front != "N")
+                                     current_component->sensor_front != "Sn")
                                 and (current_component->right != NULL or
-                                     current_component->sensor_right != "N")
+                                     current_component->sensor_right != "Sn")
                                     )
                             {
-                                current_component->sensor_back = current_gs_item->item;
+                                if (current_component->back == NULL and
+                                  current_component->sensor_back == "Sn") {
+                                    current_component->sensor_back = current_gs_item->item;
+                                }
                             } else {
 
                                 if (mountingcommand == "l") {
                                     if (current_component->left == NULL and
-                                        current_component->sensor_left == "N")
+                                        current_component->sensor_left == "Sn")
                                         current_component->sensor_left =
                                                 current_gs_item->item;
                                 }
                                 if (mountingcommand == "f") {
                                     if (current_component->front == NULL and
-                                        current_component->sensor_front == "N")
+                                        current_component->sensor_front == "Sn")
                                         current_component->sensor_front =
                                                 current_gs_item->item;
                                 }
                                 if (mountingcommand == "r") {
                                     if (current_component->right == NULL and
-                                        current_component->sensor_right == "N")
+                                        current_component->sensor_right == "Sn")
                                         current_component->sensor_right =
                                                 current_gs_item->item;
                                 }
@@ -122,16 +125,16 @@ void DecodedGeneticString::decode(GeneticString * gs,
                                 // if all sides are occupied in the root, grows to the back
                                 if (root == current_component
                                     and  (current_component->left != NULL or
-                                         current_component->sensor_left != "N" )
+                                         current_component->sensor_left != "Sn" )
                                     and  (current_component->front != NULL or
-                                         current_component->sensor_front != "N" )
+                                         current_component->sensor_front != "Sn" )
                                     and  (current_component->right != NULL or
-                                         current_component->sensor_right != "N")
+                                         current_component->sensor_right != "Sn")
                                     )
                                 {
 
                                     if (current_component->back == NULL and
-                                            current_component->sensor_back == "N") {
+                                            current_component->sensor_back == "Sn") {
 
                                         current_component->back = new_component;
                                     } else {
@@ -143,7 +146,7 @@ void DecodedGeneticString::decode(GeneticString * gs,
 
                                     if (mountingcommand == "l") {  // mounts component on the left
                                         if (current_component->left != NULL
-                                            or current_component->sensor_left != "N")
+                                            or current_component->sensor_left != "Sn")
                                         { // if position is occupied
 
                                             goto violation;
@@ -155,7 +158,7 @@ void DecodedGeneticString::decode(GeneticString * gs,
 
                                     if (mountingcommand == "f") {  // mounts component on the front
                                         if (current_component->front != NULL
-                                            or current_component->sensor_front != "N")
+                                            or current_component->sensor_front != "Sn")
                                         { // if  position is occupied
 
                                             goto violation;
@@ -167,7 +170,8 @@ void DecodedGeneticString::decode(GeneticString * gs,
 
                                     if (mountingcommand == "r") {  // mounts component on the right
                                         if (current_component->right != NULL
-                                            or current_component->sensor_right != "N")
+                                            or
+                                                current_component->sensor_right != "Sn")
                                         {  // if  position is occupied
 
                                             goto violation;

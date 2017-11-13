@@ -414,7 +414,7 @@ void Genome::draw_component( std::string parent_convertion,
         std::cout<<"sensor_left "<<c2->sensor_left<<std::endl;
         std::cout<<"sensor_front "<<c2->sensor_front<<std::endl;
         std::cout<<"sensor_right "<<c2->sensor_right<<std::endl;
-        std::cout<<"sensor_back"<<c2->sensor_back<<std::endl;
+        std::cout<<"sensor_back "<<c2->sensor_back<<std::endl;
 
         if(c2->item == "C"){
             items[items.size()-1]->setBrush(Qt::yellow); // yellow
@@ -442,12 +442,13 @@ void Genome::draw_component( std::string parent_convertion,
         }
 
         sign->setZValue(1); // sign must be drawn over the component
+
         scene->addItem(items[items.size()-1]);  // adds new component to the scene
 
+        std::string tsign;
 
         if(c2 != c1) {  // sets the component (and sign) at the proper position in the drawing
 
-            std::string tsign;
 
             // aligns component relative to parent's position, given the direction and reference
             // direction is defined according to the mounting command
@@ -527,13 +528,24 @@ void Genome::draw_component( std::string parent_convertion,
             }
 
             // aligns the position of the sign, relative to its component
-            sign->setPos(items[items.size() - 1]->x()+15 ,
-                         items[items.size() - 1]->y()+15);
-            sign->setPlainText(QString::fromStdString(tsign)); // draws sign over the component
+            sign->setPos(items[items.size() - 1]->x()+1 ,
+                         items[items.size() - 1]->y()+10);
+
 
         }else{
             items[items.size() - 1]->setPos(0, 0); // core-compoemnt is aligned in the 0-0 position
         }
+
+
+        // add signs of sensors
+        tsign = tsign
+                +c2->sensor_left.substr(1, 1)
+                +c2->sensor_front.substr(1, 1)
+                +c2->sensor_right.substr(1, 1);
+        if(c2 == c1) tsign=tsign+c2->sensor_back.substr(1, 1);
+
+        sign->setPlainText(QString::fromStdString(tsign)); //draws sign over the component
+
 
         c2->x = (int) items[items.size()-1]->x(); // saves x coordinate in the graph for the component
         c2->y = (int) items[items.size()-1]->y(); // saves y coordinate in the graph for the component

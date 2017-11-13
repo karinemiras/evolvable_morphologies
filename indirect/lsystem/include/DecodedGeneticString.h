@@ -40,7 +40,7 @@ public:
         std::string sensor_back;
 
         Vertex() { left=front=right=back=NULL;
-                   sensor_left=sensor_front=sensor_right=sensor_back="N";
+                   sensor_left=sensor_front=sensor_right=sensor_back="Sn";
                    x=y=0;}
     };
 
