@@ -388,7 +388,8 @@ void Evolution::createHeader(){
  * @param individuals_compare - individuals representing current-population+archive
  */
 
-void Evolution::evaluateIndividuals(int generation, std::vector<Genome *>  * individuals_reference, std::vector<Genome *>  * individuals_compare){
+void Evolution::evaluateNS(int generation, std::vector<Genome *>  *
+individuals_reference, std::vector<Genome *>  * individuals_compare){
 
 
     std::ofstream history_file;
@@ -586,9 +587,7 @@ void Evolution::testGeneticString(int argc, char* argv[],std::string test_genome
     this->readParams();
 
     LSystem LS;
-    LS.build_mounting_commands();
-    LS.build_moving_commands();
-    LS.build_alphabet();
+
 
     std::string line;
     std::ifstream myfile("../../experiments/fixed/" + test_genome+ ".txt");
@@ -926,7 +925,7 @@ void Evolution::loadArchive(){
 /**
  *  Loads state of previosu experiment.
  **/
-int Evolution::loadExperiment(){
+int Evolution::loadNS(){
 
     this->logsTime("start");
 
@@ -992,7 +991,7 @@ int Evolution::initExperiment(int argc, char* argv[], LSystem LS, int encodingty
     this->measureIndividuals(gi, this->population, "/offspringpop");
 
     // updates the average measures for the population
-    this->evaluateIndividuals(gi, this->population, this->population);
+    this->evaluateNS(gi, this->population, this->population);
 
     // (possibly) adds genome to archive
     this->addToArchive(this->population, this->params["prob_add_archive"], this->experiment_name);
@@ -1013,9 +1012,6 @@ void Evolution::locomotion(int argc, char* argv[]) {
 
     // loads alphabet with letters and commands
     LSystem LS;
-    LS.build_mounting_commands();
-    LS.build_moving_commands();
-    LS.build_alphabet();
 
     // reads parameters for new experiment and creates directories
     this->setupEvolution();
@@ -1046,15 +1042,12 @@ void Evolution::locomotion(int argc, char* argv[]) {
 *  Evolution in the search for novelty.
 **/
 
-int Evolution::noveltySearch(int argc, char* argv[], int encodingtype) {
+int Evolution::NS(int argc, char* argv[], int encodingtype) {
 
 
 
     // loads alphabet with letters and commands
     LSystem LS;
-    LS.build_mounting_commands();
-    LS.build_moving_commands();
-    LS.build_alphabet();
 
 
     int gi = NULL; // initial generation
@@ -1072,7 +1065,7 @@ int Evolution::noveltySearch(int argc, char* argv[], int encodingtype) {
     // if experiment is set to continue from previous experiment
     }else{
 
-       gi = this->loadExperiment();
+       gi = this->loadNS();
 
     }
 
@@ -1126,7 +1119,7 @@ int Evolution::noveltySearch(int argc, char* argv[], int encodingtype) {
 
 
         // evaluates population (parents+offspring)
-        this->evaluateIndividuals(g, temp_pop_reference, temp_pop_compare);
+        this->evaluateNS(g, temp_pop_reference, temp_pop_compare);
 
 
         // (possibly) adds genomes to archive

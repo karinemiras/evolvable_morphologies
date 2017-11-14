@@ -13,15 +13,16 @@
 
 
 /**
- * Transforms the main genetic-string of the genome into a graph that logically represents the connections among the components.
+ * Transforms the main genetic-string of the genome into graphs that
+ * logically represent the connections among the components of body and brain.
  * @param gs - main genetic-string of the genome.
  * @param LS - Lsystem structure containing the alphabet.
+ * @param params - parameters of the system
  */
 void DecodedGeneticString::decode(GeneticString * gs,
                                   LSystem LS,
                                   std::map<std::string, double> params) {
 
-    int id = 0; // id of the component
     int num_components = 0;
     std::string mountingcommand = "";
     DecodedGeneticString::Vertex  *current_component = NULL;
@@ -34,7 +35,7 @@ void DecodedGeneticString::decode(GeneticString * gs,
     { // for each item of the main genetic-string
 
         // if limit number of components has not been reached
-        if(num_components < params["max_comps"]-1)
+        if(num_components < params["max_comps"])
         {
             // if the item is a letter (component) in the alphabet
             if (LS.getAlphabet().count(current_gs_item->item) > 0){
@@ -50,34 +51,34 @@ void DecodedGeneticString::decode(GeneticString * gs,
 
                             if (root == current_component
                                 and (current_component->left != NULL or
-                                     current_component->sensor_left != "Sn")
+                                     current_component->sensor_left != "SN")
                                 and (current_component->front != NULL or
-                                     current_component->sensor_front != "Sn")
+                                     current_component->sensor_front != "SN")
                                 and (current_component->right != NULL or
-                                     current_component->sensor_right != "Sn")
+                                     current_component->sensor_right != "SN")
                                     )
                             {
                                 if (current_component->back == NULL and
-                                  current_component->sensor_back == "Sn") {
+                                  current_component->sensor_back == "SN") {
                                     current_component->sensor_back = current_gs_item->item;
                                 }
                             } else {
 
                                 if (mountingcommand == "l") {
                                     if (current_component->left == NULL and
-                                        current_component->sensor_left == "Sn")
+                                        current_component->sensor_left == "SN")
                                         current_component->sensor_left =
                                                 current_gs_item->item;
                                 }
                                 if (mountingcommand == "f") {
                                     if (current_component->front == NULL and
-                                        current_component->sensor_front == "Sn")
+                                        current_component->sensor_front == "SN")
                                         current_component->sensor_front =
                                                 current_gs_item->item;
                                 }
                                 if (mountingcommand == "r") {
                                     if (current_component->right == NULL and
-                                        current_component->sensor_right == "Sn")
+                                        current_component->sensor_right == "SN")
                                         current_component->sensor_right =
                                                 current_gs_item->item;
                                 }
@@ -95,9 +96,8 @@ void DecodedGeneticString::decode(GeneticString * gs,
                     // creates new node in the graph with the current letter (component)
                     DecodedGeneticString::Vertex *new_component;
                     new_component = new DecodedGeneticString::Vertex;
-                    id++;
                     new_component->item = letter;
-                    new_component->id = id;
+                    new_component->id = num_components;
                     new_component->left = NULL;
                     new_component->front = NULL;
                     new_component->right = NULL;
@@ -107,6 +107,7 @@ void DecodedGeneticString::decode(GeneticString * gs,
 
                         new_component->back = NULL;
                         current_component = new_component;
+                        num_components++;
                         root = new_component;
                         mountingcommand = "";
 
@@ -125,16 +126,16 @@ void DecodedGeneticString::decode(GeneticString * gs,
                                 // if all sides are occupied in the root, grows to the back
                                 if (root == current_component
                                     and  (current_component->left != NULL or
-                                         current_component->sensor_left != "Sn" )
+                                         current_component->sensor_left != "SN" )
                                     and  (current_component->front != NULL or
-                                         current_component->sensor_front != "Sn" )
+                                         current_component->sensor_front != "SN" )
                                     and  (current_component->right != NULL or
-                                         current_component->sensor_right != "Sn")
+                                         current_component->sensor_right != "SN")
                                     )
                                 {
 
                                     if (current_component->back == NULL and
-                                            current_component->sensor_back == "Sn") {
+                                            current_component->sensor_back == "SN") {
 
                                         current_component->back = new_component;
                                     } else {
@@ -146,7 +147,7 @@ void DecodedGeneticString::decode(GeneticString * gs,
 
                                     if (mountingcommand == "l") {  // mounts component on the left
                                         if (current_component->left != NULL
-                                            or current_component->sensor_left != "Sn")
+                                            or current_component->sensor_left != "SN")
                                         { // if position is occupied
 
                                             goto violation;
@@ -158,7 +159,7 @@ void DecodedGeneticString::decode(GeneticString * gs,
 
                                     if (mountingcommand == "f") {  // mounts component on the front
                                         if (current_component->front != NULL
-                                            or current_component->sensor_front != "Sn")
+                                            or current_component->sensor_front != "SN")
                                         { // if  position is occupied
 
                                             goto violation;
@@ -171,7 +172,7 @@ void DecodedGeneticString::decode(GeneticString * gs,
                                     if (mountingcommand == "r") {  // mounts component on the right
                                         if (current_component->right != NULL
                                             or
-                                                current_component->sensor_right != "Sn")
+                                                current_component->sensor_right != "SN")
                                         {  // if  position is occupied
 
                                             goto violation;
@@ -216,10 +217,10 @@ void DecodedGeneticString::decode(GeneticString * gs,
             // the item is a command
             } else {
 
-                std::string typecommand = current_gs_item->item.substr(0, 4);
+                std::string typecommand = current_gs_item->item.substr(0, 3);
 
                 // if it is a moving command
-                if (typecommand == "move") {
+                if (typecommand == "mov") {
 
 
                     std::string movingcommand = current_gs_item->item.substr(4, 1);
@@ -256,12 +257,19 @@ void DecodedGeneticString::decode(GeneticString * gs,
                         }
                     }
 
+                }
 
                 // if it is a mounting command
-                } else {
+                if (typecommand == "add") {
 
                     // discovers the type of mounting command, to be used with the next component to be mounted later on
                     mountingcommand = current_gs_item->item.substr(3, 1);
+                }
+
+                // if it is a brain command
+                if (typecommand == "bra") {
+
+                    std::cout<<current_gs_item->item<<std::endl;
                 }
 
 
@@ -272,8 +280,15 @@ void DecodedGeneticString::decode(GeneticString * gs,
 }
 
 /**
- * @return pointer to the root of the graph of components
+ * @return pointer to the root of the body graph
  */
 DecodedGeneticString::Vertex * DecodedGeneticString::getRoot(){
     return this->root;
+}
+
+/**
+ * @return pointer to the root of the brain graph
+ */
+DecodedGeneticString::Vertex2 * DecodedGeneticString::getRootBrain(){
+    return this->root_brain;
 }

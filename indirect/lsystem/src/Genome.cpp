@@ -98,6 +98,8 @@ void Genome::build_grammar(LSystem LS,
             mountingcom = LS.getMountingCommands();
     std::vector<std::string>
             movingcom = LS.getMovingCommands();
+    std::vector<std::string>
+            braincom = LS.getBrainCommands();
 
     std::random_device rd;
     std::default_random_engine generator(rd());
@@ -110,6 +112,8 @@ void Genome::build_grammar(LSystem LS,
     std::uniform_int_distribution<int> dist_3(0, (int) mountingcom.size()-1);
     // distribution for the moving commands
     std::uniform_int_distribution<int> dist_4(0, (int) movingcom.size()-1);
+    // distribution for the brain commands
+    std::uniform_int_distribution<int> dist_5(0, (int) braincom.size()-1);
 
     // for each letter of the alphabet
     for (std::map< std::string, std::string >::const_iterator it = alp.begin(); it != alp.end(); ++it)
@@ -124,8 +128,8 @@ void Genome::build_grammar(LSystem LS,
         }
 
         // while a raffled number of components is not achieved
-        // (times 3 because it must take the commands of type 'mounting' and 'moving' into account)
-        while(letter_items.size() < (dist_1(generator)*3) ){
+        // (times 4 because it must considers the groups of commands
+        while(letter_items.size() < (dist_1(generator) * 4) ){
 
             // raffles a letter to be included
             std::string item = alp_i[dist_2(generator)];
@@ -138,8 +142,11 @@ void Genome::build_grammar(LSystem LS,
                 // adds letter
                 letter_items.push_back(item);
 
-                // a raffles a moving command to be included
+                // raffles a moving command to be included
                 letter_items.push_back(movingcom[dist_4(generator)]);
+
+                // raffles a brain command to be included
+                letter_items.push_back(braincom[dist_5(generator)]);
 
             }
         }
@@ -410,12 +417,6 @@ void Genome::draw_component( std::string parent_convertion,
 
         // defines colors for the components according to type  (light color has angle in axis x / dark color around z)
 
-        std::cout<<"item "<<c2->item<<std::endl;
-        std::cout<<"sensor_left "<<c2->sensor_left<<std::endl;
-        std::cout<<"sensor_front "<<c2->sensor_front<<std::endl;
-        std::cout<<"sensor_right "<<c2->sensor_right<<std::endl;
-        std::cout<<"sensor_back "<<c2->sensor_back<<std::endl;
-
         if(c2->item == "C"){
             items[items.size()-1]->setBrush(Qt::yellow); // yellow
         }
@@ -527,17 +528,13 @@ void Genome::draw_component( std::string parent_convertion,
                 tsign = "^";   // sign points to the direction of the parent (up)
             }
 
-            // aligns the position of the sign, relative to its component
-            sign->setPos(items[items.size() - 1]->x()+1 ,
-                         items[items.size() - 1]->y()+10);
-
 
         }else{
             items[items.size() - 1]->setPos(0, 0); // core-compoemnt is aligned in the 0-0 position
         }
 
-
-        // add signs of sensors
+        // add info to the components
+        tsign =  std::to_string(c2->id) +" "+ tsign+"\n";
         tsign = tsign
                 +c2->sensor_left.substr(1, 1)
                 +c2->sensor_front.substr(1, 1)
@@ -545,6 +542,10 @@ void Genome::draw_component( std::string parent_convertion,
         if(c2 == c1) tsign=tsign+c2->sensor_back.substr(1, 1);
 
         sign->setPlainText(QString::fromStdString(tsign)); //draws sign over the component
+
+        // aligns the position of the sign, relative to its component
+        sign->setPos(items[items.size() - 1]->x()+0.001,
+                     items[items.size() - 1]->y()+7);
 
 
         c2->x = (int) items[items.size()-1]->x(); // saves x coordinate in the graph for the component
@@ -690,7 +691,7 @@ void Genome::convertYaml(
     robot_file<<spacing2<<"  type        : "
                                   ""+letters_convertion[letter_convertion]<<std::endl;
     robot_file<<spacing2<<"  id          : "
-                                  "BodyJoint"+std::to_string
+                                  "BodyPart"+std::to_string
                                   (c2->id)<<std::endl;
 
 

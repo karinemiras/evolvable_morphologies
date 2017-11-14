@@ -46,18 +46,28 @@ public:
 
     void readParams();
     void developGenome(int argc, char* argv[], Genome * gen, LSystem LS);
-    void testGeneticString(int argc, char* argv[],std::string test_genome);
-    void measureIndividuals(int generation, std::vector<Genome *>  * individuals, std::string dirpath);
-    void evaluateIndividuals(int generation, std::vector<Genome *>  * individuals_reference, std::vector<Genome *>  * individuals_compare);
+    void testGeneticString(int argc,
+                           char* argv[],
+                           std::string test_genome);
+    void measureIndividuals(int generation,
+                            std::vector<Genome *>  * individuals,
+                            std::string dirpath);
+    void evaluateNS(int generation,
+                             std::vector<Genome *>  * individuals_reference,
+                             std::vector<Genome *>  * individuals_compare);
     int  tournament();
     void selection();
     std::vector<Genome *>  * getPopulation();
     std::map<std::string, double> getParams();
-    int noveltySearch(int argc, char* argv[], int encodingtype);
+    int NS(int argc, char* argv[],
+                      int encodingtype);
     void locomotion(int argc, char* argv[]);
-    void exportGenerationMetrics(int generation,  std::vector<int> metrics);
+    void exportGenerationMetrics(int generation,
+                                 std::vector<int> metrics);
     void exportPop(int generation);
-    void addToArchive( std::vector<Genome *>  * individuals, double prob_add_archive, std::string path);
+    void addToArchive( std::vector<Genome *>  * individuals,
+                       double prob_add_archive,
+                       std::string path);
     void saveParameters();
     void logsTime(std::string moment);
     void setupEvolution();
@@ -69,14 +79,23 @@ public:
     std::vector<int> calculateNicheCoverage(std::vector<Genome *>  * individuals);
     void createHeader();
     void updateParameter(std::string key, double value);
-    void developIndividuals(int argc, char* argv[], LSystem LS, int generation, std::vector<Genome *>  * individuals, std::string path, int encodingtype);
-    int loadExperiment();
-    int initExperiment(int argc, char* argv[], LSystem LS, int encodingtype);
+    void developIndividuals(int argc, char* argv[],
+                            LSystem LS,
+                            int generation,
+                            std::vector<Genome *>  * individuals,
+                            std::string path,
+                            int encodingtype);
+    int loadNS();
+    int initExperiment(int argc, char* argv[],
+                       LSystem LS,
+                       int encodingtype);
     void summaryNicheCoverage();
     void compareIndividuals(int generation);
     int getGeneration_genome(std::string idgenome);
-    double compareIndividual(Measures * m, std::string idgenome);
-    double compareParents(std::string idparent1, std::string idparent2);
+    double compareIndividual(Measures * m,
+                             std::string idgenome);
+    double compareParents(std::string idparent1,
+                          std::string idparent2);
 
     virtual void initPopulation(LSystem LS){};
     virtual void crossover(LSystem LS, std::vector<Genome *> * offspring){};
@@ -86,16 +105,29 @@ public:
 
 protected:
 
-    std::vector<std::string> measures_names =  std::vector<std::string>();
-    std::map<std::string, double> params =  std::map<std::string, double>(); // contains the list of parameters loaded from parameter file
-    std::map< std::string, Genome * >  * archive = new std::map< std::string , Genome * > ();
+    std::vector<std::string> measures_names =
+            std::vector<std::string>();
+    std::map<std::string, double> params =
+            std::map<std::string, double>(); // contains the list of parameters loaded from parameter file
+    std::map< std::string, Genome * >  * archive =
+            new std::map< std::string , Genome * > ();
     int next_id = 0; // id that will be given for the next genome to be created
     std::string experiment_name = ""; // name for the experiment
     int new_experiment; // if state of previous a experiment is being restored (1) or not (0)
     // points in a grid representing the morphological space
-    std::map<std::string, std::vector<double>> morphological_grid_generation =  std::map<std::string, std::vector<double>>();
-    std::map<std::string, std::vector<std::string>> morphological_grid_accumulated =  std::map<std::string, std::vector<std::string>>();
-    std::map<std::string, std::vector<double>> morphological_measures_accumulated =  std::map<std::string, std::vector<double>>();
+
+    std::map<std::string, std::vector<double>>
+            morphological_grid_generation =
+            std::map<std::string, std::vector<double>>();
+
+    std::map<std::string, std::vector<std::string>>
+            morphological_grid_accumulated =
+            std::map<std::string, std::vector<std::string>>();
+
+    std::map<std::string, std::vector<double>>
+            morphological_measures_accumulated =
+            std::map<std::string, std::vector<double>>();
+
     Aux aux = Aux(this->experiment_name, this->getParams()); // contains general auxiliar methos for the experiments
     Tests tests = Tests(this->experiment_name, this->getParams()); // contains methods with tests for the system
 

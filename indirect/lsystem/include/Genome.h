@@ -160,16 +160,20 @@ protected:
     QGraphicsScene * scene; // scene holding the phenotype
 
     // letter(s) of the alphabet to build the initial developmental state of the genetic-string
-    std::vector<std::string> axiom = std::vector<std::string>();
+    std::vector<std::string>
+            axiom = std::vector<std::string>();
 
     // genetic-strings of production rules for each letter of the alphabet
-    std::map< std::string, GeneticString * >  grammar = std::map< std::string, GeneticString * >();
+    std::map< std::string, GeneticString * >
+            grammar = std::map< std::string, GeneticString * >();
 
     // list of body metrics about the genome
-    std::map< std::string, double >  measures = std::map< std::string, double >();
+    std::map< std::string, double >
+            measures = std::map< std::string, double >();
 
     // list of all components of the body, keys are coordinates, value is a letter
-    std::map< std::pair<int, int>, std::string >  list_components = std::map< std::pair<int, int>, std::string >();
+    std::map< std::pair<int, int>, std::string >
+            list_components = std::map< std::pair<int, int>, std::string >();
 
 
 };

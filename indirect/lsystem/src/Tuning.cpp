@@ -63,7 +63,7 @@ void Tuning::optimize(int argc, char* argv[]){
         this->setupEvolution(e, genome);
 
         // tests fitness of the genome running evolution given the parameters
-        int fitness = e->noveltySearch(argc, argv,1);
+        int fitness = e->NS(argc, argv,1);
         delete e;
 
         genome.push_back((double)fitness); // 5 - fitness
@@ -142,7 +142,7 @@ void Tuning::optimize(int argc, char* argv[]){
             this->setupEvolution(e, genome);
 
             // tests fitness of the genome running evolution given the parameters
-            int fitness = e->noveltySearch(argc, argv,1);
+            int fitness = e->NS(argc, argv,1);
             delete e;
 
 
