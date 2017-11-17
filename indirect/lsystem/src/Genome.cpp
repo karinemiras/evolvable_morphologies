@@ -151,7 +151,7 @@ void Genome::build_grammar(LSystem LS,
 
                 // raffles a brain move command to be included
                 auto braincommand = this->buildBrainCommand(brainmovecom[dist_5(generator)]);
-                letter_items.push_back(braincommand);
+                //letter_items.push_back(braincommand);
 
                 // raffles a brain change command to be included
                 braincommand = this->buildBrainCommand(brainchangecom[dist_6(generator)]);

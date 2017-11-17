@@ -73,7 +73,6 @@ public:
 
     DecodedGeneticString(){
         root = NULL;
-        root_brain = NULL;
         toNode = NULL;
         ids=0;
 
@@ -84,10 +83,13 @@ public:
     }
 
     DecodedGeneticString::Vertex * getRoot();
-    DecodedGeneticString::Vertex2 * getRootBrain();
+
     void decodeBrainNode(std::string item,
                          int id_comp,
                          std::string path);
+
+    void decodeBrainCommand(std::string item,
+                            std::string path);
 
     // builds graphs
     void decode(GeneticString * gs,
@@ -99,13 +101,17 @@ public:
 private:
 
     Vertex *root;         // root of the body graph
-    Vertex2 *root_brain;  // root of the brain graph
 
-    //  'from' node(s) in current-edge
-    std::vector<Vertex2 *> fromNode;
-    //  'to' node in current-edge
-    Vertex2 * toNode;
-    int ids; // count of ids so far
+    std::map< std::pair<int, int>, double >
+            brain_graph = std::map< std::pair<int, int>, double >();//summary of brain graph
+
+    // pointers to current edge of brain graph:
+
+        //  'from' node(s) in current-edge
+        std::vector<Vertex2 *> fromNode;
+        //  'to' node in current-edge
+        Vertex2 * toNode;
+        int ids; // count of ids so far
 };
 
 #endif //LSYSTEM_PROTO_DECODEDGENOME_H

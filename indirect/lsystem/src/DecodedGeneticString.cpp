@@ -9,6 +9,9 @@
 #include <random>
 #include <stdlib.h>
 
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/algorithm/string/split.hpp>
+
 #include "DecodedGeneticString.h"
 #include "GeneticString.h"
 #include "LSystem.h"
@@ -29,7 +32,7 @@ void DecodedGeneticString::decode(GeneticString * gs,
 
 
     std::ofstream file;
-    file.open("../../experiments/"+ path +"/tempbrain.dot", std::ofstream::app);
+    file.open("../../experiments/"+ path +"/tempbrain.dot");
     file<<" digraph g{"<<std::endl;
     file.close();
 
@@ -44,18 +47,21 @@ void DecodedGeneticString::decode(GeneticString * gs,
     for (int i = 0; i < gs->count(); i++)
     { // for each item of the main genetic-string
 
-        // if limit number of components has not been reached
-        if(num_components < params["max_comps"])
-        {
-            // if the item is a letter (component) in the alphabet
-            if (LS.getAlphabet().count(current_gs_item->item) > 0){
+        std::cout<<"current_gs_item "<<current_gs_item->item<<std::endl;
+
+
+        // if the item is a letter (component) in the alphabet
+        if (LS.getAlphabet().count(current_gs_item->item) > 0){
+
+            // if limit number of components has not been reached
+            if(num_components < params["max_comps"])
+            {
 
                 // if item is a sensor
-                if (LS.getAlphabetType()[current_gs_item->item] == "sensor")
-                {
+                if (LS.getAlphabetType()[current_gs_item->item] == "sensor") {
                     if (root != NULL // if previous component is core or brick
-                        and (current_component->item=="C" or current_component->item=="B" ))
-                    {
+                        and (current_component->item == "C" or
+                             current_component->item == "B")) {
                         // if there's a mounting command
                         if (!mountingcommand.empty()) {
 
@@ -66,45 +72,44 @@ void DecodedGeneticString::decode(GeneticString * gs,
                                      current_component->sensor_front != "Sn")
                                 and (current_component->right != NULL or
                                      current_component->sensor_right != "Sn")
-                                    )
-                            {
+                                    ) {
                                 if (current_component->back == NULL and
-                                  current_component->sensor_back == "Sn")
-                                {
+                                    current_component->sensor_back == "Sn") {
                                     current_component->sensor_back = current_gs_item->item;
                                     this->decodeBrainNode
-                                            (current_gs_item->item,current_component->id,path);
+                                            (current_gs_item->item,
+                                             current_component->id, path);
                                 }
                             } else {
 
-                                if (mountingcommand == "l")
-                                {
+                                if (mountingcommand == "l") {
                                     if (current_component->left == NULL and
-                                        current_component->sensor_left == "Sn")
-                                    {
+                                        current_component->sensor_left ==
+                                        "Sn") {
                                         current_component->sensor_left = current_gs_item->item;
                                         this->decodeBrainNode
-                                                (current_gs_item->item,current_component->id,path);
+                                                (current_gs_item->item,
+                                                 current_component->id, path);
                                     }
                                 }
-                                if (mountingcommand == "f")
-                                {
+                                if (mountingcommand == "f") {
                                     if (current_component->front == NULL and
-                                        current_component->sensor_front == "Sn")
-                                    {
+                                        current_component->sensor_front ==
+                                        "Sn") {
                                         current_component->sensor_front = current_gs_item->item;
                                         this->decodeBrainNode
-                                                (current_gs_item->item,current_component->id,path);
+                                                (current_gs_item->item,
+                                                 current_component->id, path);
                                     }
                                 }
-                                if (mountingcommand == "r")
-                                {
+                                if (mountingcommand == "r") {
                                     if (current_component->right == NULL and
-                                        current_component->sensor_right == "Sn")
-                                    {
+                                        current_component->sensor_right ==
+                                        "Sn") {
                                         current_component->sensor_right = current_gs_item->item;
                                         this->decodeBrainNode
-                                                (current_gs_item->item,current_component->id,path);
+                                                (current_gs_item->item,
+                                                 current_component->id, path);
                                     }
                                 }
                             }
@@ -153,13 +158,16 @@ void DecodedGeneticString::decode(GeneticString * gs,
                                     and (current_component->left != NULL or
                                          current_component->sensor_left != "Sn")
                                     and (current_component->front != NULL or
-                                         current_component->sensor_front != "Sn")
+                                         current_component->sensor_front !=
+                                         "Sn")
                                     and (current_component->right != NULL or
-                                         current_component->sensor_right != "Sn")
+                                         current_component->sensor_right !=
+                                         "Sn")
                                         ) {
 
                                     if (current_component->back == NULL and
-                                        current_component->sensor_back == "Sn") {
+                                        current_component->sensor_back ==
+                                        "Sn") {
 
                                         current_component->back = new_component;
                                     } else {
@@ -172,8 +180,8 @@ void DecodedGeneticString::decode(GeneticString * gs,
                                     if (mountingcommand ==
                                         "l") {  // mounts component on the left
                                         if (current_component->left != NULL
-                                            or current_component->sensor_left != "Sn")
-                                        { // if position is occupied
+                                            or current_component->sensor_left !=
+                                               "Sn") { // if position is occupied
 
                                             goto violation;
                                         } else {
@@ -182,11 +190,12 @@ void DecodedGeneticString::decode(GeneticString * gs,
                                         }
                                     }
 
-                                    if (mountingcommand == "f") {  // mounts component on the front
+                                    if (mountingcommand ==
+                                        "f") {  // mounts component on the front
                                         if (current_component->front != NULL
                                             or
-                                            current_component->sensor_front != "Sn")
-                                        { // if  position is occupied
+                                            current_component->sensor_front !=
+                                            "Sn") { // if  position is occupied
 
                                             goto violation;
                                         } else {
@@ -195,11 +204,12 @@ void DecodedGeneticString::decode(GeneticString * gs,
                                         }
                                     }
 
-                                    if (mountingcommand == "r") {  // mounts component on the right
+                                    if (mountingcommand ==
+                                        "r") {  // mounts component on the right
                                         if (current_component->right != NULL
                                             or
-                                            current_component->sensor_right != "Sn")
-                                        {  // if  position is occupied
+                                            current_component->sensor_right !=
+                                            "Sn") {  // if  position is occupied
 
                                             goto violation;
                                         } else {
@@ -234,8 +244,9 @@ void DecodedGeneticString::decode(GeneticString * gs,
                             num_components++;
                             mountingcommand = "";
 
-                            if(new_component->item.substr(0,1) == "A"){
-                                this->decodeBrainNode(current_gs_item->item, new_component->id,path);
+                            if (new_component->item.substr(0, 1) == "A") {
+                                this->decodeBrainNode(current_gs_item->item,
+                                                      new_component->id, path);
                             }
 
                             violation:
@@ -245,9 +256,10 @@ void DecodedGeneticString::decode(GeneticString * gs,
                         }
                     }
                 }
+            }
 
             // the item is a command
-            } else {
+        } else {
 
                 std::string typecommand = current_gs_item->item.substr(0, 3);
 
@@ -309,33 +321,94 @@ void DecodedGeneticString::decode(GeneticString * gs,
                 }
 
                 // if it is a mounting command
-                if (typecommand == "add") {
-
+                if (typecommand == "add")
+                {
                     // discovers the type of mounting command, to be used with the next component to be mounted later on
                     mountingcommand = current_gs_item->item.substr(3, 1);
                 }
 
                 // if it is a brain command
-                if (typecommand == "bra") {
-
-                    std::cout<<current_gs_item->item<<std::endl;
+                if (typecommand == "bra")
+                {
+                    this->decodeBrainCommand(current_gs_item->item, path);
                 }
 
 
             }
             current_gs_item = current_gs_item->next;
-        }
     }
 
+
     file.open("../../experiments/"+ path +"/tempbrain.dot", std::ofstream::app);
+    for (const auto &c : this->brain_graph){
+        file<<c.first.first<<" -> "<<c.first.second<<";"<<std::endl;
+    }
     file<<" }"<<std::endl;
     file.close();
 
 }
 
+/** Decodes commands of the alphabet to alter the brain graph.
+ * @param item - item of the alphabet
+ * @path - directory to salve files
+ * */
+void DecodedGeneticString::decodeBrainCommand(std::string item,
+                                              std::string path)
+{
+    // if there is a current-edge
+    if(this->toNode != NULL) {
+
+        std::vector<std::string> tokens;
+        boost::split(tokens, item,  boost::is_any_of("_"));
+        auto command = tokens[0];
+        auto param = std::stod(tokens[1]);
+
+        auto edge = std::make_pair(
+                this->fromNode[0]->id,
+                this->toNode->id);
+
+        std::cout<<" ----------before---------- "<<std::endl;
+        for (const auto &c : this->brain_graph){
+            auto from = c.first.first;
+            auto to = c.first.second;
+            auto weight = c.second;
+            std::cout<<from<<" "<<to<<" "<<weight<<std::endl;
+        }
+
+        // pertubs weight of current-edge
+        if(command == "brainperturb")
+        {
+                this->brain_graph[edge] = this->brain_graph[edge]
+                                          + param;
+                if(this->brain_graph[edge]>1) this->brain_graph[edge] = 1;
+                if(this->brain_graph[edge]<-1) this->brain_graph[edge] = -1;
+        }
+
+        // creates self-connection
+        if(command == "brainloop")
+        {
+            auto self_edge = std::make_pair(
+                    this->toNode->id,
+                    this->toNode->id);
+            // if self-connection does not exist already
+            if(this->brain_graph.count(self_edge) == 0)
+            {
+                this->brain_graph[self_edge] = param;
+            }
+        }
+
+        std::cout<<" ----------after---------- "<<std::endl;
+        for (const auto &nothing : this->brain_graph){
+            std::cout<<nothing.first.first<<" "<<nothing.first.second<<" "<<nothing.second<<std::endl;
+        }
+    }
+}
+
 /** Decodes letters (sensors and joints) of the alphabet into part of the brain
  * graph.
  * @param item - item of the alphabet
+ * @param id_comp - if of the body component to which this node is related to
+ * @path - directory to salve files
  * */
 void DecodedGeneticString::decodeBrainNode(std::string item,
                                            int id_comp,
@@ -353,7 +426,6 @@ void DecodedGeneticString::decodeBrainNode(std::string item,
     std::random_device rd;
     std::default_random_engine generator(rd());
     std::uniform_real_distribution<double> weight_uni(-1, 1);
-    double w = weight_uni(generator);
 
     // the item is a sensor
     if(item == "SI" or item == "SL")
@@ -373,15 +445,17 @@ void DecodedGeneticString::decodeBrainNode(std::string item,
             this->toNode->from_nodes.push_back(this->fromNode[0]);
             this->fromNode[0]->to_nodes.push_back(this->toNode);
 
-            file <<this->fromNode[0]->id<< " -> " <<this->toNode->id<<";"<<std::endl;
+            std::pair<int, int> edge = std::make_pair(this->fromNode[0]->id,
+                                                     this->toNode->id);
+            this->brain_graph[edge] = weight_uni(generator);
 
         }
 
         if (item == "SL") {
-            file << v->id << "[shape=invtriangle,color=\"lightgrey\",style=filled];"<<std::endl;
+            file << v->id << "[color=\"lightgrey\",style=filled];"<<std::endl;
         }
         if (item == "SI") {
-            file << v->id << "[shape=invtriangle,color=\"grey\",style=filled];"<<std::endl;
+            file << v->id << "[color=\"grey\",style=filled];"<<std::endl;
         }
     }
 
@@ -399,7 +473,10 @@ void DecodedGeneticString::decodeBrainNode(std::string item,
             this->toNode->from_nodes.push_back(this->fromNode[i]);
             this->fromNode[i]->to_nodes.push_back(this->toNode);
 
-            file <<this->fromNode[i]->id<< "->" <<this->toNode->id<<";"<<std::endl;
+
+            std::pair<int, int> edge = std::make_pair(this->fromNode[i]->id,
+                                                     this->toNode->id);
+            this->brain_graph[edge] = weight_uni(generator);
         }
 
         file << this->toNode->id << " [shape=box,color=\"red\",style=filled];"<<std::endl;
@@ -412,6 +489,10 @@ void DecodedGeneticString::decodeBrainNode(std::string item,
 
 
     std::cout<<" -------------------- "<<item<<" "<<id_comp<<std::endl;
+
+    for (const auto &c : this->brain_graph){
+        std::cout<<c.first.first<<" "<<c.first.second<<" "<<c.second<<std::endl;
+    }
 
     std::cout<<"> from list: "<<std::endl;
     for(int i=0;i<this->fromNode.size();i++){
@@ -454,9 +535,3 @@ DecodedGeneticString::Vertex * DecodedGeneticString::getRoot(){
     return this->root;
 }
 
-/**
- * @return pointer to the root of the brain graph
- */
-DecodedGeneticString::Vertex2 * DecodedGeneticString::getRootBrain(){
-    return this->root_brain;
-}

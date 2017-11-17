@@ -47,7 +47,7 @@ void LSystem::build_brainchange_commands(){
 
     // add link between nodes idfrom and idto with w: brainedge_w
     // if link already exists, add edge-node inbetween
-    brainchange_commands.push_back("brainedge");
+    //brainchange_commands.push_back("brainedge");
     // perturb weight of connection between fromid and toid with: brainperturb_w
     brainchange_commands.push_back("brainperturb");
     // add new node between current fromid and toid with w from new to toid,
