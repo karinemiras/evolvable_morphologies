@@ -47,7 +47,7 @@ public:
         Vertex()
         {
             left=front=right=back=NULL;
-            sensor_left=sensor_front=sensor_right=sensor_back="SN";
+            sensor_left=sensor_front=sensor_right=sensor_back="Sn";
             x=y=id=0; item="";
         }
     };
@@ -57,15 +57,15 @@ public:
     {
         std::string type;
         int id;
-        // identifies component to which the node is relative
-        // if it is a joint: BodyPart_id, if it is a sensor BodySensor_id
+        // identifies component (joint or sensor) to which the node is relative
         int id_comp;
+        //std::map< int, std::pair<Vertex2 *, double> > from_nodes;
         std::vector<Vertex2 *> from_nodes;
         std::vector<Vertex2 *> to_nodes;
 
         Vertex2()
         {
-            type=""; id_comp=id=0;
+            type=""; id_comp=id=-1;
             from_nodes = std::vector<Vertex2 *>();
             to_nodes = std::vector<Vertex2 *>();
         }
@@ -74,15 +74,26 @@ public:
     DecodedGeneticString(){
         root = NULL;
         root_brain = NULL;
+        toNode = NULL;
+        ids=0;
+
+        // add defualt bias as node
+        fromNode.push_back(new Vertex2());
+        fromNode[0]->id = 0;
+        fromNode[0]->type = "bias";
     }
 
     DecodedGeneticString::Vertex * getRoot();
     DecodedGeneticString::Vertex2 * getRootBrain();
+    void decodeBrainNode(std::string item,
+                         int id_comp,
+                         std::string path);
 
     // builds graphs
     void decode(GeneticString * gs,
                 LSystem LS,
-                std::map<std::string, double> params);
+                std::map<std::string, double> params,
+                std::string path);
 
 
 private:
@@ -90,6 +101,11 @@ private:
     Vertex *root;         // root of the body graph
     Vertex2 *root_brain;  // root of the brain graph
 
+    //  'from' node(s) in current-edge
+    std::vector<Vertex2 *> fromNode;
+    //  'to' node in current-edge
+    Vertex2 * toNode;
+    int ids; // count of ids so far
 };
 
 #endif //LSYSTEM_PROTO_DECODEDGENOME_H

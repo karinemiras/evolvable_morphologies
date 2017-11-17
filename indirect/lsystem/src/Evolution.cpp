@@ -610,7 +610,8 @@ void Evolution::testGeneticString(int argc, char* argv[],std::string test_genome
 
         // decodes the final genetic-string into a tree of components
         //std::cout << " >> decoding ... " << std::endl;
-        gen->decodeGeneticString(LS, params);
+        std::string path=""; // CHANGE!
+        gen->decodeGeneticString(LS, params,path);
 
         // generates robot-graphics
         //std::cout << " >> constructing ... " << std::endl;

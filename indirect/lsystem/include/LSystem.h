@@ -18,19 +18,22 @@ class LSystem{
 public:
     void build_moving_commands();
     void build_mounting_commands();
-    void build_brain_commands();
+    void build_brainmove_commands();
+    void build_brainchange_commands();
     void build_alphabet();
     std::map< std::string, std::string > getAlphabet();
     std::vector<std::string> getAlphabetIndex();
     std::map< std::string, std::string > getAlphabetType();
     std::vector<std::string> getMovingCommands();
     std::vector<std::string> getMountingCommands();
-    std::vector<std::string> getBrainCommands();
+    std::vector<std::string> getBrainMoveCommands();
+    std::vector<std::string> getBrainChangeCommands();
 
     LSystem(){
          build_moving_commands();
          build_mounting_commands();
-         build_brain_commands();
+         build_brainmove_commands();
+         build_brainchange_commands();
          build_alphabet();
     };
 
@@ -39,8 +42,10 @@ private:
     std::vector<std::string> moving_commands = std::vector<std::string>();
     // vector with the commands to mount components in the turtle
     std::vector<std::string> mounting_commands = std::vector<std::string>();
-    // vector with the commands to construct the brain
-    std::vector<std::string> brain_commands = std::vector<std::string>();
+    // vector with the commands to move in the brain
+    std::vector<std::string> brainmove_commands = std::vector<std::string>();
+    // vector with the commands to change the brain
+    std::vector<std::string> brainchange_commands = std::vector<std::string>();
     // alphabet with the letters
     std::map< std::string, std::string > alphabet = std::map<std::string, std::string >();
     // auxiliar vector for the alphabet letters

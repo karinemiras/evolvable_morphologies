@@ -99,7 +99,9 @@ void Genome::build_grammar(LSystem LS,
     std::vector<std::string>
             movingcom = LS.getMovingCommands();
     std::vector<std::string>
-            braincom = LS.getBrainCommands();
+            brainmovecom = LS.getBrainMoveCommands();
+    std::vector<std::string>
+            brainchangecom = LS.getBrainChangeCommands();
 
     std::random_device rd;
     std::default_random_engine generator(rd());
@@ -112,14 +114,16 @@ void Genome::build_grammar(LSystem LS,
     std::uniform_int_distribution<int> dist_3(0, (int) mountingcom.size()-1);
     // distribution for the moving commands
     std::uniform_int_distribution<int> dist_4(0, (int) movingcom.size()-1);
-    // distribution for the brain commands
-    std::uniform_int_distribution<int> dist_5(0, (int) braincom.size()-1);
+    // distribution for the brain moving commands
+    std::uniform_int_distribution<int> dist_5(0, (int) brainmovecom.size()-1);
+    // distribution for the brain change commands
+    std::uniform_int_distribution<int> dist_6(0, (int) brainchangecom.size()-1);
 
     // for each letter of the alphabet
-    for (std::map< std::string, std::string >::const_iterator it = alp.begin(); it != alp.end(); ++it)
+    for (const auto &letterPair : alp)
     {
 
-        std::string letter = it->first;
+        auto letter = letterPair.first;
 
         std::vector<std::string> letter_items;
 
@@ -132,7 +136,7 @@ void Genome::build_grammar(LSystem LS,
         while(letter_items.size() < (dist_1(generator) * 4) ){
 
             // raffles a letter to be included
-            std::string item = alp_i[dist_2(generator)];
+            auto item = alp_i[dist_2(generator)];
 
             // prevents core component of being (re)included in the rule
             if (item != "C") {
@@ -145,8 +149,13 @@ void Genome::build_grammar(LSystem LS,
                 // raffles a moving command to be included
                 letter_items.push_back(movingcom[dist_4(generator)]);
 
-                // raffles a brain command to be included
-                letter_items.push_back(braincom[dist_5(generator)]);
+                // raffles a brain move command to be included
+                auto braincommand = this->buildBrainCommand(brainmovecom[dist_5(generator)]);
+                letter_items.push_back(braincommand);
+
+                // raffles a brain change command to be included
+                braincommand = this->buildBrainCommand(brainchangecom[dist_6(generator)]);
+                letter_items.push_back(braincommand);
 
             }
         }
@@ -162,6 +171,36 @@ void Genome::build_grammar(LSystem LS,
 
 }
 
+/**
+ * Enhances brain commands with a parameter.
+ **/
+std::string Genome::buildBrainCommand(std::string braincommand){
+
+    std::random_device rd;
+    std::default_random_engine generator(rd());
+    std::uniform_real_distribution<double> weight_uni(-1, 1);
+    std::normal_distribution<double> weight_nor(0, 1);
+
+    if(   braincommand == "brainedge"
+       or braincommand == "brainloop"
+     ) braincommand += "_"+std::to_string(weight_uni(generator));
+
+    if(braincommand == "brainperturb")
+        braincommand += "_"+std::to_string(weight_nor(generator));
+
+    // its more likely that a node has a number of conn close to 1
+    if(   braincommand == "brainmovep"
+          or braincommand == "brainmovec"
+    ){
+        double n = weight_nor(generator);
+        n = ceil(sqrt(n*n));
+
+        braincommand += "_"+std::to_string(n);
+    }
+
+    return braincommand;
+
+}
 
 
 
@@ -304,12 +343,13 @@ GeneticString * Genome::build_genetic_string(GeneticString * _gs,
  *  @param LS - Lsystem structure containing the alphabet.
  */
 void Genome::decodeGeneticString(LSystem LS,
-                                 std::map<std::string, double> params)
+                                 std::map<std::string, double> params,
+                                 std::string path)
 {
 
     try {
         this->dgs = DecodedGeneticString();
-        this->dgs.decode(this->gs, LS,  params);
+        this->dgs.decode(this->gs, LS,  params, path);
 
     } catch (const std::exception& e) {
         std::cout <<"ERROR decoding genetic-string: " << e.what() << std::endl;
@@ -367,6 +407,11 @@ void Genome::constructor(int argc,
                                                       this->id_parent1 + "_p2_" +
                                                       this->id_parent2+ ".png");
         image.save(qstr);
+
+        std::string auxcom=  "dot -Tpng ../../experiments/"+path+"/tempbrain"
+                ".dot "
+                "-o ../../experiments/"+ path+"/brain_"+ this->id+".png";
+        std::system(auxcom.c_str());
     }
 
     // show drawn robot on the screen
@@ -731,8 +776,7 @@ void Genome::createEmbryo(){
 
 void Genome::developGenomeIndirect(int argc,
                                    char* argv[],
-                                   std::map<std::string,
-                                           double> params,
+                                   std::map<std::string, double> params,
                                    LSystem LS, int generation,
                                    std::string path)
 {
@@ -746,7 +790,8 @@ void Genome::developGenomeIndirect(int argc,
 
     // decodes the final genetic-string into a tree of components
     this->decodeGeneticString(LS,
-                              params);
+                              params,
+                              path+std::to_string(generation));
 
     // generates robot-graphics
     this->constructor(argc,

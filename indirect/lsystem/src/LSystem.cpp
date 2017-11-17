@@ -29,22 +29,31 @@ void LSystem::build_moving_commands(){
 
 
 /**
- * Builds a vector with the body moving commands for the l-system.
+ * Builds a vector with the body moving commands for the brain in the l-system.
  */
-void LSystem::build_brain_commands(){
+void LSystem::build_brainmove_commands(){
 
-    // add link between nodes idfrom and idto: braiedge_idfrom_idto
-    brain_commands.push_back("brainedge");
-    // perturb weight of connection between fromid and toid with: brainperturb_w
-    brain_commands.push_back("brainperturb");
-    // add new node between current fromid and toid
-    brain_commands.push_back("brainsplit");
-    // add self connection to fromid node: brainloop
-    brain_commands.push_back("brainloop");
+
     // move fromid to parent N of fromid: brainmovep_N
-    brain_commands.push_back("brainmovep");
+    brainmove_commands.push_back("brainmovep");
     // move toid to child N of toid: brainmovec_N
-    brain_commands.push_back("brainmovec");
+    brainmove_commands.push_back("brainmovec");
+}
+
+/**
+ * Builds a vector with commands for the l-system thatn change the brain.
+ */
+void LSystem::build_brainchange_commands(){
+
+    // add link between nodes idfrom and idto with w: brainedge_w
+    // if link already exists, add edge-node inbetween
+    brainchange_commands.push_back("brainedge");
+    // perturb weight of connection between fromid and toid with: brainperturb_w
+    brainchange_commands.push_back("brainperturb");
+    // add new node between current fromid and toid with w from new to toid,
+    // add self connection to fromid node with w: brainloop_w
+    brainchange_commands.push_back("brainloop");
+
 }
 
 /**
@@ -92,8 +101,12 @@ std::vector<std::string> LSystem::getMovingCommands() {
     return this->moving_commands;
 };
 
-std::vector<std::string> LSystem::getBrainCommands() {
-    return this->brain_commands;
+std::vector<std::string> LSystem::getBrainMoveCommands() {
+    return this->brainmove_commands;
+};
+
+std::vector<std::string> LSystem::getBrainChangeCommands() {
+    return this->brainchange_commands;
 };
 
 std::vector< std::string > LSystem::getAlphabetIndex(){

@@ -59,8 +59,8 @@ public:
                                std::string path);
 
     void decodeGeneticString(LSystem LS,
-                             std::map<std::string,
-                                     double> params);
+                             std::map<std::string, double> params,
+                             std::string path);
 
     void constructor(int argc,
                      char* argv[],
@@ -138,6 +138,8 @@ public:
     void build_grammar(LSystem LS, std::map<std::string, double> params);
 
     void build_genome_direct(LSystem LS, std::map<std::string, double> params);
+
+    std::string buildBrainCommand(std::string braincommand);
 
 protected:
 
