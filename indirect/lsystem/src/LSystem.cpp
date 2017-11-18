@@ -1,6 +1,7 @@
 //
 // Created by Karine Miras on 07/03/2017.
 //
+#include <random>
 
 #include "LSystem.h"
 
@@ -46,8 +47,10 @@ void LSystem::build_brainmove_commands(){
 void LSystem::build_brainchange_commands(){
 
     // add link between nodes idfrom and idto with w: brainedge_w
-    // if link already exists, add edge-node inbetween
-    //brainchange_commands.push_back("brainedge");
+    // add node between nodes
+    brainchange_commands.push_back("brainnode");
+    // add edge between nodes
+    brainchange_commands.push_back("brainedge");
     // perturb weight of connection between fromid and toid with: brainperturb_w
     brainchange_commands.push_back("brainperturb");
     // add new node between current fromid and toid with w from new to toid,
@@ -85,6 +88,39 @@ void LSystem::build_alphabet(){
     alphabet["SL"] = "SL";   // light sensor
     alphabet_index.push_back("SL");
     alphabet_type["SL"] = "sensor";
+
+}
+
+
+/**
+ * Enhances brain commands with a parameter.
+ **/
+std::string LSystem::buildBrainCommand(std::string braincommand){
+
+    std::random_device rd;
+    std::default_random_engine generator(rd());
+    std::uniform_real_distribution<double> weight_uni(-1, 1);
+    std::normal_distribution<double> weight_nor(0, 1);
+
+    if(   braincommand == "brainedge"
+          or braincommand == "brainloop"
+          or braincommand == "brainnode"
+            ) braincommand += "_"+std::to_string(weight_uni(generator));
+
+    if(braincommand == "brainperturb")
+        braincommand += "_"+std::to_string(weight_nor(generator));
+
+    // its more likely that a node has a number of conn close to 1
+    if(   braincommand == "brainmovep"
+          or braincommand == "brainmovec"
+            ){
+        double n = weight_nor(generator);
+        n = ceil(sqrt(n*n));
+
+        braincommand += "_"+std::to_string(n);
+    }
+
+    return braincommand;
 
 }
 

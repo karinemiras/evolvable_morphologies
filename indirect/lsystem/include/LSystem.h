@@ -28,6 +28,7 @@ public:
     std::vector<std::string> getMountingCommands();
     std::vector<std::string> getBrainMoveCommands();
     std::vector<std::string> getBrainChangeCommands();
+    std::string buildBrainCommand(std::string braincommand);
 
     LSystem(){
          build_moving_commands();

@@ -55,10 +55,10 @@ public:
     // brain structure
     struct Vertex2
     {
-        std::string type;
+        std::string type; // EXCLUDE !
         int id;
         // identifies component (joint or sensor) to which the node is relative
-        int id_comp;
+        int id_comp; // EXCLUDE !
         //std::map< int, std::pair<Vertex2 *, double> > from_nodes;
         std::vector<Vertex2 *> from_nodes;
         std::vector<Vertex2 *> to_nodes;
@@ -100,12 +100,18 @@ public:
 
 private:
 
-    Vertex *root;         // root of the body graph
+    Vertex *root;  // root of the body graph
 
-    std::map< std::pair<int, int>, double >
-            brain_graph = std::map< std::pair<int, int>, double >();//summary of brain graph
+    // edges of brain graph
+    std::map< std::pair<int, int>, double > // <<origin, destination>, weight>
+            brain_edges = std::map< std::pair<int, int>, double >();
 
-    // pointers to current edge of brain graph:
+    // nodes of brain graph
+    std::map< std::pair<int, std::string>, std::pair<int, std::string> >
+            // <<id,type>,<id_comp,function>>
+            brain_nodes = std::map< std::pair<int, std::string>, std::pair<int, std::string> >();
+
+    // pointers to current-edge of brain graph:
 
         //  'from' node(s) in current-edge
         std::vector<Vertex2 *> fromNode;

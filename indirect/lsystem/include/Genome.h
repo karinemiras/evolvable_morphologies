@@ -139,7 +139,6 @@ public:
 
     void build_genome_direct(LSystem LS, std::map<std::string, double> params);
 
-    std::string buildBrainCommand(std::string braincommand);
 
 protected:
 

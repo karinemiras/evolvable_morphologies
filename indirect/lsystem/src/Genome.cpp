@@ -150,11 +150,11 @@ void Genome::build_grammar(LSystem LS,
                 letter_items.push_back(movingcom[dist_4(generator)]);
 
                 // raffles a brain move command to be included
-                auto braincommand = this->buildBrainCommand(brainmovecom[dist_5(generator)]);
+                auto braincommand = LS.buildBrainCommand(brainmovecom[dist_5(generator)]);
                 //letter_items.push_back(braincommand);
 
                 // raffles a brain change command to be included
-                braincommand = this->buildBrainCommand(brainchangecom[dist_6(generator)]);
+                braincommand = LS.buildBrainCommand(brainchangecom[dist_6(generator)]);
                 letter_items.push_back(braincommand);
 
             }
@@ -168,37 +168,6 @@ void Genome::build_grammar(LSystem LS,
         this->grammar.emplace(letter, lgs);
 
     }
-
-}
-
-/**
- * Enhances brain commands with a parameter.
- **/
-std::string Genome::buildBrainCommand(std::string braincommand){
-
-    std::random_device rd;
-    std::default_random_engine generator(rd());
-    std::uniform_real_distribution<double> weight_uni(-1, 1);
-    std::normal_distribution<double> weight_nor(0, 1);
-
-    if(   braincommand == "brainedge"
-       or braincommand == "brainloop"
-     ) braincommand += "_"+std::to_string(weight_uni(generator));
-
-    if(braincommand == "brainperturb")
-        braincommand += "_"+std::to_string(weight_nor(generator));
-
-    // its more likely that a node has a number of conn close to 1
-    if(   braincommand == "brainmovep"
-          or braincommand == "brainmovec"
-    ){
-        double n = weight_nor(generator);
-        n = ceil(sqrt(n*n));
-
-        braincommand += "_"+std::to_string(n);
-    }
-
-    return braincommand;
 
 }
 
