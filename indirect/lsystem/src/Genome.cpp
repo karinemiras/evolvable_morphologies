@@ -133,13 +133,17 @@ void Genome::build_grammar(LSystem LS,
 
         // while a raffled number of components is not achieved
         // (times 4 because it must considers the groups of commands
-        while(letter_items.size() < (dist_1(generator) * 4) ){
+        while(letter_items.size() < (dist_1(generator) * 5) ){
 
             // raffles a letter to be included
             auto item = alp_i[dist_2(generator)];
 
             // prevents core component of being (re)included in the rule
             if (item != "C") {
+
+                // raffles a brain move command to be included
+                auto braincommand = LS.buildBrainCommand(brainmovecom[dist_5(generator)]);
+                letter_items.push_back(braincommand);
 
                 // raffles a mounting command to be included
                 letter_items.push_back(mountingcom[dist_3(generator)]);
@@ -149,9 +153,9 @@ void Genome::build_grammar(LSystem LS,
                 // raffles a moving command to be included
                 letter_items.push_back(movingcom[dist_4(generator)]);
 
-                // raffles a brain move command to be included
-                auto braincommand = LS.buildBrainCommand(brainmovecom[dist_5(generator)]);
-                //letter_items.push_back(braincommand);
+                // raffles another brain move command to be included
+                braincommand = LS.buildBrainCommand(brainmovecom[dist_5(generator)]);
+                letter_items.push_back(braincommand);
 
                 // raffles a brain change command to be included
                 braincommand = LS.buildBrainCommand(brainchangecom[dist_6(generator)]);

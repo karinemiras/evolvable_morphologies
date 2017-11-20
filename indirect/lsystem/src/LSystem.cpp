@@ -35,10 +35,18 @@ void LSystem::build_moving_commands(){
 void LSystem::build_brainmove_commands(){
 
 
-    // move fromid to parent N of fromid: brainmovep_N
-    brainmove_commands.push_back("brainmovep");
-    // move toid to child N of toid: brainmovec_N
-    brainmove_commands.push_back("brainmovec");
+    // change 'from' of current-edge to child of current-from
+    brainmove_commands.push_back("brainmoveFTC");
+    // change 'from' of current-edge to parent of current-from
+    brainmove_commands.push_back("brainmoveFTP");
+    // change 'from' of current-edge to sibling of current-from
+    brainmove_commands.push_back("brainmoveFTS");
+    // change 'to' of current-edge to child of current-to
+    brainmove_commands.push_back("brainmoveTTC");
+    // change 'to' of current-edge to child of current-to
+    brainmove_commands.push_back("brainmoveTTP");
+    // change 'to' of current-edge to sibling of current-to
+    brainmove_commands.push_back("brainmoveTTS");
 }
 
 /**
@@ -104,20 +112,34 @@ std::string LSystem::buildBrainCommand(std::string braincommand){
 
     if(   braincommand == "brainedge"
           or braincommand == "brainloop"
-          or braincommand == "brainnode"
-            ) braincommand += "_"+std::to_string(weight_uni(generator));
+          or braincommand == "brainnode")
+        braincommand += "_"+std::to_string(weight_uni(generator));
 
     if(braincommand == "brainperturb")
         braincommand += "_"+std::to_string(weight_nor(generator));
 
     // its more likely that a node has a number of conn close to 1
-    if(   braincommand == "brainmovep"
-          or braincommand == "brainmovec"
-            ){
-        double n = weight_nor(generator);
-        n = ceil(sqrt(n*n));
 
-        braincommand += "_"+std::to_string(n);
+    if(   braincommand == "brainmoveFTC"
+          or  braincommand == "brainmoveFTP"
+          or braincommand == "brainmoveTTC"
+          or  braincommand == "brainmoveTTP")
+    {
+        double child = weight_nor(generator);
+        child = ceil(sqrt(child*child));
+        braincommand += "_"+std::to_string(child);
+    }
+
+    if(   braincommand == "brainmoveTTS"
+          or  braincommand == "brainmoveFTS")
+    {
+        double intermediate = weight_nor(generator);
+        intermediate = ceil(sqrt(intermediate*intermediate));
+        double sibling = weight_nor(generator);
+        sibling = ceil(sqrt(sibling*sibling));
+
+        braincommand += "_"+std::to_string(intermediate)
+                       +"|"+std::to_string(sibling);
     }
 
     return braincommand;

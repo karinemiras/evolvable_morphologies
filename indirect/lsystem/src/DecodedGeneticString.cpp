@@ -374,10 +374,13 @@ void DecodedGeneticString::decodeBrainCommand(std::string item,
         // pertubs weight of current-edge
         if(command == "brainperturb")
         {
+            if(this->brain_edges.count(edge) > 0)
+            {
                 this->brain_edges[edge] = this->brain_edges[edge]
                                           + param;
-                if(this->brain_edges[edge]>1) this->brain_edges[edge] = 1;
-                if(this->brain_edges[edge]<-1) this->brain_edges[edge] = -1;
+                if (this->brain_edges[edge] > 1) this->brain_edges[edge] = 1;
+                if (this->brain_edges[edge] < -1) this->brain_edges[edge] = -1;
+            }
         }
 
         // creates self-connection
@@ -387,7 +390,9 @@ void DecodedGeneticString::decodeBrainCommand(std::string item,
                     this->toNode->id,
                     this->toNode->id);
             // if self-connection does not exist already
-            if(this->brain_edges.count(self_edge) == 0)
+            // and node is output
+            if(this->brain_edges.count(self_edge) == 0
+               and this->toNode->type != "hidden")
             {
                 this->brain_edges[self_edge] = param;
             }
@@ -407,8 +412,8 @@ void DecodedGeneticString::decodeBrainCommand(std::string item,
 
                 file << v->id << " [shape=box];"<<std::endl;
 
-                this->brain_nodes[std::make_pair(this->ids, "hidden")]
-                                = std::make_pair(-1, "function");
+                this->brain_nodes[std::make_pair(v->id, v->type)]
+                                = std::make_pair(v->id_comp, "function");
 
                 // removes old link
                 double old_w = this->brain_edges[edge];
@@ -427,11 +432,13 @@ void DecodedGeneticString::decodeBrainCommand(std::string item,
                 this->brain_edges[edge] = param;
 
                 // updates pointers of current-edge brain graph
+
                 for (int i=0; i<this->fromNode[0]->to_nodes.size(); i++)
                 {
                     if (this->fromNode[0]->to_nodes[i] == this->toNode)
                     {
                         this->fromNode[0]->to_nodes[i] = v;
+                        v->from_nodes.push_back(this->fromNode[0]);
                     }
                 }
                 for (int i=0; i<this->toNode->from_nodes.size(); i++)
@@ -439,6 +446,7 @@ void DecodedGeneticString::decodeBrainCommand(std::string item,
                     if (this->toNode->from_nodes[i] == this->fromNode[0])
                     {
                         this->toNode->from_nodes[i] = v;
+                        v->to_nodes.push_back(this->toNode);
                     }
                 }
 
@@ -461,6 +469,105 @@ void DecodedGeneticString::decodeBrainCommand(std::string item,
 
 
             }
+        }
+
+        // moves 'from' to parent
+        if(command == "brainmoveFTP")
+        {
+            // if it is not input layer
+            if (this->fromNode[0]->from_nodes.size() != NULL) {
+                // arranges to which parent to go
+                if (this->fromNode[0]->from_nodes.size() < param) {
+                    param = this->fromNode[0]->from_nodes.size() - 1;
+                } else param = param - 1;
+                this->fromNode[0] = this->fromNode[0]->from_nodes[param];
+            }
+        }
+
+        // moves 'from' to child
+        if(command == "brainmoveFTC")
+        {
+            // arranges to which child to go
+            if(this->fromNode[0]->to_nodes.size() < param){
+                param = this->fromNode[0]->to_nodes.size()-1;
+            } else param = param-1;
+            // if child is hidden node (not output)
+            // and is not the current 'to'
+            if(this->fromNode[0]->to_nodes[param]->type == "hidden"
+                and this->fromNode[0]->to_nodes[param] != this->toNode)
+            {
+                this->fromNode[0] = this->fromNode[0]->to_nodes[param];
+            }
+        }
+
+        // moves 'from' to sibling
+        if(command == "brainmoveFTS")
+        {
+            tokens = boost::split(tokens, tokens[1],  boost::is_any_of("|"));
+            auto intermediate = std::stod(tokens[0]);
+            auto sibling = std::stod(tokens[1]);
+
+            // arranges to which intermediate to go
+            if (this->fromNode[0]->to_nodes.size() < intermediate){
+                intermediate = this->fromNode[0]->to_nodes.size() - 1;
+            } else intermediate = intermediate - 1;
+
+            // arranges to which sibling to go
+            if (this->fromNode[0]->to_nodes[intermediate]->from_nodes.size() < sibling){
+                sibling = this->fromNode[0]->to_nodes[intermediate]->from_nodes.size() - 1;
+            } else sibling = sibling - 1;
+
+            this->fromNode[0] =
+                    this->fromNode[0]->to_nodes[intermediate]->from_nodes[sibling];
+        }
+
+        // moves 'to' to parent
+        if(command == "brainmoveTTP")
+        {
+            // arranges to which parent to go
+            if(this->toNode->from_nodes.size() < param){
+                param = this->toNode->from_nodes.size()-1;
+            } else param = param-1;
+            // if parent is hidden node (not input)
+            // or is the current 'to'
+            if(this->toNode->from_nodes[param]->type == "hidden"
+               and this->toNode->from_nodes[param] != this->fromNode[0]){
+                this->toNode = this->toNode->from_nodes[param];
+            }
+        }
+
+        // moves 'to' to child
+        if(command == "brainmoveTTC")
+        {
+            // if it is not output layer
+            if (this->toNode->to_nodes.size() != NULL) {
+                // arranges to which child to go
+                if (this->toNode->to_nodes.size() < param) {
+                    param = this->toNode->to_nodes.size() - 1;
+                } else param = param - 1;
+                this->toNode = this->toNode->to_nodes[param];
+            }
+        }
+
+        // moves 'to' to sibling
+        if(command == "brainmoveTTS")
+        {
+            tokens = boost::split(tokens, tokens[1],  boost::is_any_of("|"));
+            auto intermediate = std::stod(tokens[0]);
+            auto sibling = std::stod(tokens[1]);
+
+            // arranges to which intermediate to go
+            if (this->toNode->from_nodes.size() < intermediate){
+                intermediate = this->toNode->from_nodes.size() - 1;
+            } else intermediate = intermediate - 1;
+
+            // arranges to which sibling to go
+            if (this->toNode->from_nodes[intermediate]->to_nodes.size() < sibling){
+                sibling = this->toNode->from_nodes[intermediate]->to_nodes.size() - 1;
+            } else sibling = sibling - 1;
+
+            this->toNode =
+                    this->toNode->from_nodes[intermediate]->to_nodes[sibling];
         }
 
 
