@@ -33,7 +33,7 @@ void DecodedGeneticString::decode(GeneticString * gs,
 
     std::ofstream file;
     file.open("../../experiments/"+ path +"/tempbrain.dot");
-    file<<" digraph g{"<<std::endl;
+    file<<" digraph g{ forcelabels=true;"<<std::endl;
     file.close();
 
     int num_components = 0;
@@ -261,88 +261,93 @@ void DecodedGeneticString::decode(GeneticString * gs,
             // the item is a command
         } else {
 
-                std::string typecommand = current_gs_item->item.substr(0, 3);
+            std::string typecommand = current_gs_item->item.substr(0, 3);
 
-                // if it is a moving command
-                if (typecommand == "mov") {
+            // if it is a moving command
+            if (typecommand == "mov") {
 
 
-                    std::string movingcommand = current_gs_item->item.substr(4, 1);
+                std::string movingcommand = current_gs_item->item.substr(4, 1);
 
-                    // if new component is a joint
-                    // left/front/right move to the front
-                    if(current_component->item.substr(0, 1) == "A"){
+                // if new component is a joint
+                // left/front/right move to the front
+                if(current_component->item.substr(0, 1) == "A"){
 
-                        if (movingcommand == "b") {
-                                current_component = current_component->back;
-                        }else {
-
-                            if (current_component->front != NULL) {
-
-                                current_component = current_component->front;
-                            }
-                        }
-
+                    if (movingcommand == "b") {
+                        current_component = current_component->back;
                     }else {
 
-                        if (movingcommand == "b") {
-                            // if it is not root, moves back to parent component in the graph
-                            if (current_component != root) {
+                        if (current_component->front != NULL) {
 
-                                current_component = current_component->back;
-                            }
-                        }
-
-                        if (movingcommand == "l") {
-                            // if there is a component to the left, moves to it in the graph
-                            if (current_component->left != NULL) {
-
-                                current_component = current_component->left;
-                            }
-                        }
-
-                        if (movingcommand == "f") {
-                            // if there is a component to the front, moves to it in the graph
-                            if (current_component->front != NULL) {
-
-                                current_component = current_component->front;
-                            }
-                        }
-
-                        if (movingcommand == "r") {
-                            // if there is a component to the left, moves to it in the graph
-                            if (current_component->right != NULL) {
-
-                                current_component = current_component->right;
-                            }
+                            current_component = current_component->front;
                         }
                     }
 
-                }
+                }else {
 
-                // if it is a mounting command
-                if (typecommand == "add")
-                {
-                    // discovers the type of mounting command, to be used with the next component to be mounted later on
-                    mountingcommand = current_gs_item->item.substr(3, 1);
-                }
+                    if (movingcommand == "b") {
+                        // if it is not root, moves back to parent component in the graph
+                        if (current_component != root) {
 
-                // if it is a brain command
-                if (typecommand == "bra")
-                {
-                    this->decodeBrainCommand(current_gs_item->item, path);
-                }
+                            current_component = current_component->back;
+                        }
+                    }
 
+                    if (movingcommand == "l") {
+                        // if there is a component to the left, moves to it in the graph
+                        if (current_component->left != NULL) {
+
+                            current_component = current_component->left;
+                        }
+                    }
+
+                    if (movingcommand == "f") {
+                        // if there is a component to the front, moves to it in the graph
+                        if (current_component->front != NULL) {
+
+                            current_component = current_component->front;
+                        }
+                    }
+
+                    if (movingcommand == "r") {
+                        // if there is a component to the left, moves to it in the graph
+                        if (current_component->right != NULL) {
+
+                            current_component = current_component->right;
+                        }
+                    }
+                }
 
             }
-            current_gs_item = current_gs_item->next;
+
+            // if it is a mounting command
+            if (typecommand == "add")
+            {
+                // discovers the type of mounting command, to be used with the next component to be mounted later on
+                mountingcommand = current_gs_item->item.substr(3, 1);
+            }
+
+            // if it is a brain command
+            if (typecommand == "bra")
+            {
+                this->decodeBrainCommand(current_gs_item->item, path);
+            }
+
+
+        }
+        current_gs_item = current_gs_item->next;
     }
 
 
+    // writes edges to visualization
     file.open("../../experiments/"+ path +"/tempbrain.dot", std::ofstream::app);
-    for (const auto &c : this->brain_edges){
-        file<<c.first.first<<" -> "<<c.first.second
-            <<"[label=\""<<c.second<<" \",fontsize=\"10\"];"<<std::endl;
+    for (const auto &c : this->brain_edges)
+    {
+        auto origin = c.first.first;
+        auto destination = c.first.second;
+        auto weight = c.second;
+        file<<origin<<" -> "<< destination
+            <<"[label=\""<<weight<<" \",fontsize=\"10\"];"<<std::endl;
     }
     file<<" }"<<std::endl;
     file.close();
@@ -364,8 +369,10 @@ void DecodedGeneticString::decodeBrainCommand(std::string item,
 
         std::vector<std::string> tokens;
         boost::split(tokens, item,  boost::is_any_of("_"));
+
         auto command = tokens[0];
-        auto param = std::stod(tokens[1]);
+        auto param = tokens[1];
+        std::cout<<"TESTE "<<tokens[0]<<" "<< param;
 
         auto edge = std::make_pair(
                 this->fromNode[0]->id,
@@ -377,7 +384,7 @@ void DecodedGeneticString::decodeBrainCommand(std::string item,
             if(this->brain_edges.count(edge) > 0)
             {
                 this->brain_edges[edge] = this->brain_edges[edge]
-                                          + param;
+                                          + std::stod(param);
                 if (this->brain_edges[edge] > 1) this->brain_edges[edge] = 1;
                 if (this->brain_edges[edge] < -1) this->brain_edges[edge] = -1;
             }
@@ -394,7 +401,7 @@ void DecodedGeneticString::decodeBrainCommand(std::string item,
             if(this->brain_edges.count(self_edge) == 0
                and this->toNode->type != "hidden")
             {
-                this->brain_edges[self_edge] = param;
+                this->brain_edges[self_edge] = std::stod(param);
             }
         }
 
@@ -410,10 +417,16 @@ void DecodedGeneticString::decodeBrainCommand(std::string item,
                 v->id_comp = -1;
                 v->type = "hidden";
 
-                file << v->id << " [shape=box];"<<std::endl;
+                tokens = boost::split(tokens, param, boost::is_any_of("|"));
+                auto weight = std::stod(tokens[0]);
+                auto function = tokens[1];
+
+                file << v->id << " [label=<"<<v->id<<"<BR/>"<<function<<">,"
+                        "shape=box];"
+                        ""<<std::endl;
 
                 this->brain_nodes[std::make_pair(v->id, v->type)]
-                                = std::make_pair(v->id_comp, "function");
+                        = std::make_pair(v->id_comp, function);
 
                 // removes old link
                 double old_w = this->brain_edges[edge];
@@ -429,7 +442,7 @@ void DecodedGeneticString::decodeBrainCommand(std::string item,
                 edge = std::make_pair(
                         v->id,
                         this->toNode->id);
-                this->brain_edges[edge] = param;
+                this->brain_edges[edge] = weight;
 
                 // updates pointers of current-edge brain graph
 
@@ -465,7 +478,7 @@ void DecodedGeneticString::decodeBrainCommand(std::string item,
                 edge = std::make_pair(
                         this->fromNode[0]->id,
                         this->toNode->id);
-                this->brain_edges[edge] = param;
+                this->brain_edges[edge] = std::stod(param);
 
 
             }
@@ -474,29 +487,31 @@ void DecodedGeneticString::decodeBrainCommand(std::string item,
         // moves 'from' to parent
         if(command == "brainmoveFTP")
         {
+            auto node = std::stod(param);
             // if it is not input layer
-            if (this->fromNode[0]->from_nodes.size() != NULL) {
+            if (this->fromNode[0]->from_nodes.size() != 0) {
                 // arranges to which parent to go
-                if (this->fromNode[0]->from_nodes.size() < param) {
-                    param = this->fromNode[0]->from_nodes.size() - 1;
-                } else param = param - 1;
-                this->fromNode[0] = this->fromNode[0]->from_nodes[param];
+                if (this->fromNode[0]->from_nodes.size() < node) {
+                    node = this->fromNode[0]->from_nodes.size() - 1;
+                } else node = node - 1;
+                this->fromNode[0] = this->fromNode[0]->from_nodes[node];
             }
         }
 
         // moves 'from' to child
         if(command == "brainmoveFTC")
         {
+            auto node = std::stod(param);
             // arranges to which child to go
-            if(this->fromNode[0]->to_nodes.size() < param){
-                param = this->fromNode[0]->to_nodes.size()-1;
-            } else param = param-1;
+            if(this->fromNode[0]->to_nodes.size() < node){
+                node = this->fromNode[0]->to_nodes.size()-1;
+            } else node = node-1;
             // if child is hidden node (not output)
             // and is not the current 'to'
-            if(this->fromNode[0]->to_nodes[param]->type == "hidden"
-                and this->fromNode[0]->to_nodes[param] != this->toNode)
+            if(this->fromNode[0]->to_nodes[node]->type == "hidden"
+               and this->fromNode[0]->to_nodes[node] != this->toNode)
             {
-                this->fromNode[0] = this->fromNode[0]->to_nodes[param];
+                this->fromNode[0] = this->fromNode[0]->to_nodes[node];
             }
         }
 
@@ -524,28 +539,30 @@ void DecodedGeneticString::decodeBrainCommand(std::string item,
         // moves 'to' to parent
         if(command == "brainmoveTTP")
         {
+            auto node = std::stod(param);
             // arranges to which parent to go
-            if(this->toNode->from_nodes.size() < param){
-                param = this->toNode->from_nodes.size()-1;
-            } else param = param-1;
+            if(this->toNode->from_nodes.size() < node){
+                node = this->toNode->from_nodes.size()-1;
+            } else node = node-1;
             // if parent is hidden node (not input)
             // or is the current 'to'
-            if(this->toNode->from_nodes[param]->type == "hidden"
-               and this->toNode->from_nodes[param] != this->fromNode[0]){
-                this->toNode = this->toNode->from_nodes[param];
+            if(this->toNode->from_nodes[node]->type == "hidden"
+               and this->toNode->from_nodes[node] != this->fromNode[0]){
+                this->toNode = this->toNode->from_nodes[node];
             }
         }
 
         // moves 'to' to child
         if(command == "brainmoveTTC")
         {
+            auto node = std::stod(param);
             // if it is not output layer
-            if (this->toNode->to_nodes.size() != NULL) {
+            if (this->toNode->to_nodes.size() != 0) {
                 // arranges to which child to go
-                if (this->toNode->to_nodes.size() < param) {
-                    param = this->toNode->to_nodes.size() - 1;
-                } else param = param - 1;
-                this->toNode = this->toNode->to_nodes[param];
+                if (this->toNode->to_nodes.size() < node) {
+                    node = this->toNode->to_nodes.size() - 1;
+                } else node = node - 1;
+                this->toNode = this->toNode->to_nodes[node];
             }
         }
 
@@ -573,7 +590,7 @@ void DecodedGeneticString::decodeBrainCommand(std::string item,
 
         for (const auto &nothing : this->brain_nodes){
             std::cout<<nothing.first.first<<" "<<nothing.first.second<<" "
-                    <<nothing.second.first<<" " <<nothing.second.second<<std::endl;
+                     <<nothing.second.first<<" " <<nothing.second.second<<std::endl;
         }
         for (const auto &nothing : this->brain_edges){
             std::cout<<nothing.first.first<<" "<<nothing.first.second<<" "<<nothing.second<<std::endl;
@@ -633,10 +650,6 @@ void DecodedGeneticString::decodeBrainNode(std::string item,
     v->id_comp = id_comp;
     v->type = item;
 
-    this->brain_nodes[std::make_pair(this->ids, item)]
-                    = std::make_pair(id_comp, "function");
-
-
     std::random_device rd;
     std::default_random_engine generator(rd());
     std::uniform_real_distribution<double> weight_uni(-1, 1);
@@ -665,12 +678,22 @@ void DecodedGeneticString::decodeBrainNode(std::string item,
 
         }
 
+        // sets node in the visualization
         if (item == "SL") {
-            file << v->id << "[color=\"lightgrey\",style=filled];"<<std::endl;
+            file << v->id << "[label=<"<<v->id<<"<BR/>M"<<id_comp<<">"
+                    ",color=\"lightgrey\",style=filled];"
+                    ""<<std::endl;
         }
         if (item == "SI") {
-            file << v->id << "[color=\"grey\",style=filled];"<<std::endl;
+            file << v->id << "[label=<"<<v->id<<"<BR/>M"<<id_comp<<">"
+                    ",color=\"grey\",style=filled];"
+                    ""<<std::endl;
         }
+
+        // updates list of nodes
+        this->brain_nodes[std::make_pair(this->ids, "input")]
+                = std::make_pair(id_comp, "Simple");
+
     }
 
     // the item is an active joint
@@ -693,11 +716,28 @@ void DecodedGeneticString::decodeBrainNode(std::string item,
             this->brain_edges[edge] = weight_uni(generator);
         }
 
-        file << this->toNode->id << " [shape=box,color=\"red\",style=filled];"<<std::endl;
-
         // remove from list after connection, except for the last
         this->fromNode.erase(this->fromNode.begin(),
                              this->fromNode.begin()+this->fromNode.size()-1);
+
+
+        // sets tranfer function for node
+        std::random_device rd;
+        std::default_random_engine generator(rd());
+        LSystem LS;
+        std::uniform_int_distribution<int> func(0, LS.getBrainFunctions().size()-1);
+        auto function = LS.getBrainFunctions()[func(generator)];
+
+        // updates list of nodes
+        this->brain_nodes[std::make_pair(this->ids, "output")]
+                = std::make_pair(id_comp, function);
+
+        // sets node in the visualization
+        file << v->id <<
+             " [label=<"<< v->id <<"<BR />"
+             <<function<<" "
+                     "M"<<id_comp<<">, shape=box,color=red,"
+                     "style=filled];"<<std::endl;
     }
 
 
@@ -734,7 +774,7 @@ void DecodedGeneticString::decodeBrainNode(std::string item,
         if (this->toNode->from_nodes.size() > 0) {
             for (int j = 0; j < this->toNode->from_nodes.size(); j++) {
                 std::cout  << "   id "
-                          << this->toNode->from_nodes[j]->id;
+                           << this->toNode->from_nodes[j]->id;
                 std::cout << " type " << this->toNode->from_nodes[j]->type;
                 std::cout << " idcomp "
                           << this->toNode->from_nodes[j]->id_comp << std::endl;
@@ -752,4 +792,3 @@ void DecodedGeneticString::decodeBrainNode(std::string item,
 DecodedGeneticString::Vertex * DecodedGeneticString::getRoot(){
     return this->root;
 }
-

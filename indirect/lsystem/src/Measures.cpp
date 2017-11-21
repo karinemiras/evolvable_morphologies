@@ -298,8 +298,8 @@ void Measures::measurePhenotype(std::map<std::string, double> params,
                              this->gen->getMeasures()["total_components"] /
                              params["max_comps"]);
 
-    std::cout<<this->gen->getMeasures()["sensors"]<<std::endl;
-    std::cout<<this->gen->getMeasures()["sensors_slots"]<<std::endl;
+//    std::cout<<this->gen->getMeasures()["sensors"]<<std::endl;
+//    std::cout<<this->gen->getMeasures()["sensors_slots"]<<std::endl;
 
     this->gen->updateMeasure("sensors",
                                  this->gen->getMeasures()["sensors"]
@@ -433,6 +433,12 @@ void Measures::measureComponent(std::string reference,
             this->gen->updateMeasure("sensors",
                                      this->gen->getMeasures()["sensors"] + 1);
 
+
+        if (connected_sides == 0) {
+            this->gen->updateMeasure("sensors_slots",
+                                     this->gen->getMeasures()["sensors_slots"] +
+                                     4);
+        }
 
         if (connected_sides == 1) {
             // not the head

@@ -108,16 +108,16 @@ private:
 
     // nodes of brain graph
     std::map< std::pair<int, std::string>, std::pair<int, std::string> >
-            // <<id,type>,<id_comp,function>>
+    // <<id,type>,<id_comp,function>>
             brain_nodes = std::map< std::pair<int, std::string>, std::pair<int, std::string> >();
 
     // pointers to current-edge of brain graph:
 
-        //  'from' node(s) in current-edge
-        std::vector<Vertex2 *> fromNode;
-        //  'to' node in current-edge
-        Vertex2 * toNode;
-        int ids; // count of ids so far
+    //  'from' node(s) in current-edge
+    std::vector<Vertex2 *> fromNode;
+    //  'to' node in current-edge
+    Vertex2 * toNode;
+    int ids; // count of ids so far
 };
 
 #endif //LSYSTEM_PROTO_DECODEDGENOME_H

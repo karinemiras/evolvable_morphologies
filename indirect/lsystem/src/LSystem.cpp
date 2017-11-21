@@ -5,6 +5,13 @@
 
 #include "LSystem.h"
 
+/**
+ * Transfer functions for the brain.
+ */
+void LSystem::build_brain_functions(){
+    brainfunctions.push_back("linear");
+    brainfunctions.push_back("sigmoid");
+}
 
 /**
  * Builds a vector with the body mounting commands for the l-system.
@@ -109,11 +116,16 @@ std::string LSystem::buildBrainCommand(std::string braincommand){
     std::default_random_engine generator(rd());
     std::uniform_real_distribution<double> weight_uni(-1, 1);
     std::normal_distribution<double> weight_nor(0, 1);
+    std::uniform_int_distribution<int> func(0, this->brainfunctions.size()-1);
 
     if(   braincommand == "brainedge"
-          or braincommand == "brainloop"
-          or braincommand == "brainnode")
+          or braincommand == "brainloop")
         braincommand += "_"+std::to_string(weight_uni(generator));
+
+    if(  braincommand == "brainnode") {
+        braincommand += "_" + std::to_string(weight_uni(generator));
+        braincommand += "|" + this->brainfunctions[func(generator)];
+    }
 
     if(braincommand == "brainperturb")
         braincommand += "_"+std::to_string(weight_nor(generator));
@@ -139,7 +151,7 @@ std::string LSystem::buildBrainCommand(std::string braincommand){
         sibling = ceil(sqrt(sibling*sibling));
 
         braincommand += "_"+std::to_string(intermediate)
-                       +"|"+std::to_string(sibling);
+                        +"|"+std::to_string(sibling);
     }
 
     return braincommand;
@@ -147,9 +159,7 @@ std::string LSystem::buildBrainCommand(std::string braincommand){
 }
 
 
-std::map< std::string, std::string > LSystem::getAlphabet(){
-    return this->alphabet;
-};
+
 
 std::vector<std::string> LSystem::getMountingCommands() {
     return this->mounting_commands;
@@ -167,6 +177,10 @@ std::vector<std::string> LSystem::getBrainChangeCommands() {
     return this->brainchange_commands;
 };
 
+std::vector<std::string> LSystem::getBrainFunctions() {
+    return this->brainfunctions;
+};
+
 std::vector< std::string > LSystem::getAlphabetIndex(){
     return this->alphabet_index;
 };
@@ -174,3 +188,8 @@ std::vector< std::string > LSystem::getAlphabetIndex(){
 std::map< std::string, std::string > LSystem::getAlphabetType(){
     return this->alphabet_type;
 };
+
+std::map< std::string, std::string > LSystem::getAlphabet(){
+    return this->alphabet;
+};
+

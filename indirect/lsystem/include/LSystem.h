@@ -20,6 +20,7 @@ public:
     void build_mounting_commands();
     void build_brainmove_commands();
     void build_brainchange_commands();
+    void build_brain_functions();
     void build_alphabet();
     std::map< std::string, std::string > getAlphabet();
     std::vector<std::string> getAlphabetIndex();
@@ -27,15 +28,17 @@ public:
     std::vector<std::string> getMovingCommands();
     std::vector<std::string> getMountingCommands();
     std::vector<std::string> getBrainMoveCommands();
+    std::vector<std::string> getBrainFunctions();
     std::vector<std::string> getBrainChangeCommands();
     std::string buildBrainCommand(std::string braincommand);
 
     LSystem(){
-         build_moving_commands();
-         build_mounting_commands();
-         build_brainmove_commands();
-         build_brainchange_commands();
-         build_alphabet();
+        build_moving_commands();
+        build_mounting_commands();
+        build_brainmove_commands();
+        build_brainchange_commands();
+        build_brain_functions();
+        build_alphabet();
     };
 
 private:
@@ -49,6 +52,8 @@ private:
     std::vector<std::string> brainchange_commands = std::vector<std::string>();
     // alphabet with the letters
     std::map< std::string, std::string > alphabet = std::map<std::string, std::string >();
+    // vector with functions for the brain
+    std::vector<std::string> brainfunctions = std::vector<std::string>();
     // auxiliar vector for the alphabet letters
     std::vector<std::string> alphabet_index = std::vector<std::string>();
     // auxiliar vector for type of items in the alphabet
