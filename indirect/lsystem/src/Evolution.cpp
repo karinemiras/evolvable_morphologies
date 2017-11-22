@@ -873,7 +873,7 @@ void Evolution::loadPopulation(int generation){
             std::vector<std::string> items_rule(items.begin()+1, items.begin()+items.size()-1);
 
             // build a genetic-string with the production rule for the letter
-            GeneticString * lgs;
+            GeneticString * lgs = new GeneticString();
             lgs = gen->build_genetic_string(lgs, items_rule );
 
             // adds letter and its production rule (made a genetic-string) to the grammar of the genome
@@ -980,7 +980,7 @@ void Evolution::loadArchive(){
 
 
 /**
- *  Loads state of previosu experiment.
+ *  Loads state of previous experiment.
  **/
 int Evolution::loadExperiment(){
 
@@ -1004,11 +1004,11 @@ int Evolution::loadExperiment(){
         boost::split( tokens, line, boost::is_any_of("-") );
         boost::split( tokens2, tokens[1], boost::is_any_of(" ") );
         std::vector<std::string> tokens3(tokens2.begin(), tokens2.begin()+tokens2.size()-1);
-        std::vector<double> distances;
+        std::vector<std::string> points;
         for(int i=0; i<tokens3.size(); i++){
-            distances.push_back(std::stod(tokens3[i]));
+            points.push_back(tokens3[i]);
         }
-       // this->morphological_grid_accumulated[tokens[0]] = distances;
+        this->morphological_grid_accumulated[tokens[0]] = points;
     }
     myfile.close();
 
@@ -1080,7 +1080,7 @@ double Evolution::runExperiment(int argc, char* argv[]) {
     LSystem LS;
 
 
-    int gi = NULL; // initial generation
+    int gi = 0; // initial generation
 
     // if experiment is set to start from the beginning
     if(this->new_experiment == 1) {
@@ -1097,7 +1097,6 @@ double Evolution::runExperiment(int argc, char* argv[]) {
         gi = this->loadExperiment();
 
     }
-
 
     // evolves population through out generations
     for(int g = gi+1; g <= params["num_generations"]; g++) {
@@ -1121,8 +1120,8 @@ double Evolution::runExperiment(int argc, char* argv[]) {
 
         if(this->type_experiment == "locomotion")
         {
-            // evaluates population (parents+offspring)
-            this->evaluateLocomotion(g, this->population);
+            // evaluates offspring
+            this->evaluateLocomotion(g, offspring);
         }
         if(this->type_experiment == "novelty")
         {

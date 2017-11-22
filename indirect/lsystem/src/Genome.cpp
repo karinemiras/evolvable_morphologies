@@ -646,7 +646,7 @@ void Genome::convertYamlBrain(std::string _directoryPath){
         robot_file << "    " <<id<< ":" << std::endl;
         robot_file << "      id: " <<id << std::endl;
         robot_file << "      layer: " <<type << std::endl;
-        robot_file << "      part_id: " <<id_comp << std::endl;
+        robot_file << "      part_id: BodyPart" <<id_comp << std::endl;
         robot_file << "      type: " <<function << std::endl;
     }
 

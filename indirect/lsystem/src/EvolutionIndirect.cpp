@@ -276,7 +276,8 @@ void EvolutionIndirect::mutation(LSystem LS, std::vector<Genome *> * offspring) 
                 else if (type_of_adding == 3) {
 
                     int aux = dist_movingcommand(generator);
-                    this->aux.logs("mutation: add moving command"+LS.getMovingCommands()[aux]
+                    this->aux.logs("mutation: add moving command "+LS
+                            .getMovingCommands()[aux]
                                    +" in " + offspring->at(i)->getId()
                                    + " for " + mutate_letter
                                    +" at "+std::to_string(pos_insertion));
@@ -288,7 +289,8 @@ void EvolutionIndirect::mutation(LSystem LS, std::vector<Genome *> * offspring) 
 
                     auto genetic_string_item = LS.buildBrainCommand(
                                LS.getBrainMoveCommands()[dist_brainmovecommand(generator)]);
-                    this->aux.logs("mutation: add brain move command"+ genetic_string_item
+                    this->aux.logs("mutation: add brain move command "+
+                                           genetic_string_item
                                    +" in " + offspring->at(i)->getId()
                                    + " for " + mutate_letter
                                    +" at "+std::to_string(pos_insertion));
@@ -299,7 +301,8 @@ void EvolutionIndirect::mutation(LSystem LS, std::vector<Genome *> * offspring) 
 
                     auto genetic_string_item = LS.buildBrainCommand(
                             LS.getBrainChangeCommands()[dist_brainchangecommand(generator)]);
-                    this->aux.logs("mutation: add brain change command"+ genetic_string_item
+                    this->aux.logs("mutation: add brain change command "+
+                                           genetic_string_item
                                    +" in " + offspring->at(i)->getId()
                                    + " for " + mutate_letter
                                    +" at "+std::to_string(pos_insertion));

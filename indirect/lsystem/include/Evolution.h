@@ -37,6 +37,7 @@ public:
         this->measures_names.push_back("coverage");
         this->measures_names.push_back("effective_joints");
         this->measures_names.push_back("length_ratio");
+        this->measures_names.push_back("sensors");
         this->measures_names.push_back("symmetry");
         this->measures_names.push_back("total_components");
 
