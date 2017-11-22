@@ -372,7 +372,6 @@ void DecodedGeneticString::decodeBrainCommand(std::string item,
 
         auto command = tokens[0];
         auto param = tokens[1];
-        std::cout<<"TESTE "<<tokens[0]<<" "<< param;
 
         auto edge = std::make_pair(
                 this->fromNode[0]->id,
@@ -421,10 +420,12 @@ void DecodedGeneticString::decodeBrainCommand(std::string item,
                 auto weight = std::stod(tokens[0]);
                 auto function = tokens[1];
 
+                // sets node in the visualization
                 file << v->id << " [label=<"<<v->id<<"<BR/>"<<function<<">,"
                         "shape=box];"
                         ""<<std::endl;
 
+                // updates list of nodes
                 this->brain_nodes[std::make_pair(v->id, v->type)]
                         = std::make_pair(v->id_comp, function);
 
@@ -587,47 +588,47 @@ void DecodedGeneticString::decodeBrainCommand(std::string item,
                     this->toNode->from_nodes[intermediate]->to_nodes[sibling];
         }
 
+//
+//        for (const auto &nothing : this->brain_nodes){
+//            std::cout<<nothing.first.first<<" "<<nothing.first.second<<" "
+//                     <<nothing.second.first<<" " <<nothing.second.second<<std::endl;
+//        }
+//        for (const auto &nothing : this->brain_edges){
+//            std::cout<<nothing.first.first<<" "<<nothing.first.second<<" "<<nothing.second<<std::endl;
+//        }
+//
+//        std::cout<<"> from list: "<<std::endl;
+//        for(int i=0;i<this->fromNode.size();i++){
+//            std::cout<<std::endl<<" id "<<this->fromNode[i]->id;
+//            std::cout<<" type "<<this->fromNode[i]->type;
+//            std::cout<<" idcomp "<<this->fromNode[i]->id_comp<<std::endl;
+//            if(this->fromNode[i]->to_nodes.size()>0){
+//                for(int j=0;j<this->fromNode[i]->to_nodes.size();j++){
+//                    std::cout<<"   id "<<this->fromNode[i]->to_nodes[j]->id;
+//                    std::cout<<" type "<<this->fromNode[i]->to_nodes[j]->type;
+//                    std::cout<<" idcomp "<<this->fromNode[i]->to_nodes[j]->id_comp<<std::endl;
+//                }
+//            }
+//        }
+//
+//        std::cout<<"> to  : "<<std::endl;
+//        if (this->toNode != NULL) {
+//            std::cout << std::endl << " id " << this->toNode->id;
+//            std::cout << " type " << this->toNode->type;
+//            std::cout << " idcomp " << this->toNode->id_comp << std::endl;
+//            if (this->toNode->from_nodes.size() > 0) {
+//                for (int j = 0; j < this->toNode->from_nodes.size(); j++) {
+//                    std::cout  << "   id "
+//                               << this->toNode->from_nodes[j]->id;
+//                    std::cout << " type " << this->toNode->from_nodes[j]->type;
+//                    std::cout << " idcomp "
+//                              << this->toNode->from_nodes[j]->id_comp << std::endl;
+//                }
+//            }
+//        }
 
-        for (const auto &nothing : this->brain_nodes){
-            std::cout<<nothing.first.first<<" "<<nothing.first.second<<" "
-                     <<nothing.second.first<<" " <<nothing.second.second<<std::endl;
-        }
-        for (const auto &nothing : this->brain_edges){
-            std::cout<<nothing.first.first<<" "<<nothing.first.second<<" "<<nothing.second<<std::endl;
-        }
+        file.close();
 
-        std::cout<<"> from list: "<<std::endl;
-        for(int i=0;i<this->fromNode.size();i++){
-            std::cout<<std::endl<<" id "<<this->fromNode[i]->id;
-            std::cout<<" type "<<this->fromNode[i]->type;
-            std::cout<<" idcomp "<<this->fromNode[i]->id_comp<<std::endl;
-            if(this->fromNode[i]->to_nodes.size()>0){
-                for(int j=0;j<this->fromNode[i]->to_nodes.size();j++){
-                    std::cout<<"   id "<<this->fromNode[i]->to_nodes[j]->id;
-                    std::cout<<" type "<<this->fromNode[i]->to_nodes[j]->type;
-                    std::cout<<" idcomp "<<this->fromNode[i]->to_nodes[j]->id_comp<<std::endl;
-                }
-            }
-        }
-
-        std::cout<<"> to  : "<<std::endl;
-        if (this->toNode != NULL) {
-            std::cout << std::endl << " id " << this->toNode->id;
-            std::cout << " type " << this->toNode->type;
-            std::cout << " idcomp " << this->toNode->id_comp << std::endl;
-            if (this->toNode->from_nodes.size() > 0) {
-                for (int j = 0; j < this->toNode->from_nodes.size(); j++) {
-                    std::cout  << "   id "
-                               << this->toNode->from_nodes[j]->id;
-                    std::cout << " type " << this->toNode->from_nodes[j]->type;
-                    std::cout << " idcomp "
-                              << this->toNode->from_nodes[j]->id_comp << std::endl;
-                }
-            }
-
-            file.close();
-
-        }
     }
 }
 
@@ -741,47 +742,47 @@ void DecodedGeneticString::decodeBrainNode(std::string item,
     }
 
 
-
-    std::cout<<" -------------------- "<<item<<" "<<id_comp<<std::endl;
-
-    for (const auto &nothing : this->brain_nodes){
-        std::cout<<nothing.first.first<<" "<<nothing.first.second<<" "
-                 <<nothing.second.first<<" " <<nothing.second.second<<std::endl;
-    }
-    for (const auto &nothing : this->brain_edges){
-        std::cout<<nothing.first.first<<" "<<nothing.first.second<<" "<<nothing.second<<std::endl;
-    }
-
-    std::cout<<"> from list: "<<std::endl;
-    for(int i=0;i<this->fromNode.size();i++){
-        std::cout<<std::endl<<" id "<<this->fromNode[i]->id;
-        std::cout<<" type "<<this->fromNode[i]->type;
-        std::cout<<" idcomp "<<this->fromNode[i]->id_comp<<std::endl;
-        if(this->fromNode[i]->to_nodes.size()>0){
-            for(int j=0;j<this->fromNode[i]->to_nodes.size();j++){
-                std::cout<<"   id "<<this->fromNode[i]->to_nodes[j]->id;
-                std::cout<<" type "<<this->fromNode[i]->to_nodes[j]->type;
-                std::cout<<" idcomp "<<this->fromNode[i]->to_nodes[j]->id_comp<<std::endl;
-            }
-        }
-    }
-
-    std::cout<<"> to  : "<<std::endl;
-    if (this->toNode != NULL) {
-        std::cout << std::endl << " id " << this->toNode->id;
-        std::cout << " type " << this->toNode->type;
-        std::cout << " idcomp " << this->toNode->id_comp << std::endl;
-        if (this->toNode->from_nodes.size() > 0) {
-            for (int j = 0; j < this->toNode->from_nodes.size(); j++) {
-                std::cout  << "   id "
-                           << this->toNode->from_nodes[j]->id;
-                std::cout << " type " << this->toNode->from_nodes[j]->type;
-                std::cout << " idcomp "
-                          << this->toNode->from_nodes[j]->id_comp << std::endl;
-            }
-        }
-
-    }
+//
+//    std::cout<<" -------------------- "<<item<<" "<<id_comp<<std::endl;
+//
+//    for (const auto &nothing : this->brain_nodes){
+//        std::cout<<nothing.first.first<<" "<<nothing.first.second<<" "
+//                 <<nothing.second.first<<" " <<nothing.second.second<<std::endl;
+//    }
+//    for (const auto &nothing : this->brain_edges){
+//        std::cout<<nothing.first.first<<" "<<nothing.first.second<<" "<<nothing.second<<std::endl;
+//    }
+//
+//    std::cout<<"> from list: "<<std::endl;
+//    for(int i=0;i<this->fromNode.size();i++){
+//        std::cout<<std::endl<<" id "<<this->fromNode[i]->id;
+//        std::cout<<" type "<<this->fromNode[i]->type;
+//        std::cout<<" idcomp "<<this->fromNode[i]->id_comp<<std::endl;
+//        if(this->fromNode[i]->to_nodes.size()>0){
+//            for(int j=0;j<this->fromNode[i]->to_nodes.size();j++){
+//                std::cout<<"   id "<<this->fromNode[i]->to_nodes[j]->id;
+//                std::cout<<" type "<<this->fromNode[i]->to_nodes[j]->type;
+//                std::cout<<" idcomp "<<this->fromNode[i]->to_nodes[j]->id_comp<<std::endl;
+//            }
+//        }
+//    }
+//
+//    std::cout<<"> to  : "<<std::endl;
+//    if (this->toNode != NULL) {
+//        std::cout << std::endl << " id " << this->toNode->id;
+//        std::cout << " type " << this->toNode->type;
+//        std::cout << " idcomp " << this->toNode->id_comp << std::endl;
+//        if (this->toNode->from_nodes.size() > 0) {
+//            for (int j = 0; j < this->toNode->from_nodes.size(); j++) {
+//                std::cout  << "   id "
+//                           << this->toNode->from_nodes[j]->id;
+//                std::cout << " type " << this->toNode->from_nodes[j]->type;
+//                std::cout << " idcomp "
+//                          << this->toNode->from_nodes[j]->id_comp << std::endl;
+//            }
+//        }
+//
+//    }
 
     file.close();
 }

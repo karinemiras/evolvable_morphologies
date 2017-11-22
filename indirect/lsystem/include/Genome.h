@@ -88,6 +88,8 @@ public:
 
     double getFit_parent2();
 
+    int getValid();
+
     void exportGenome(std::string path);
 
     void createEmbryo();
@@ -139,6 +141,8 @@ public:
 
     void build_genome_direct(LSystem LS, std::map<std::string, double> params);
 
+    void setValid(int valid);
+
 
 protected:
 
@@ -153,6 +157,8 @@ protected:
     double fit_parent2;  // fit of parent2 of genome
 
     double fitness = 0; // fitness of the genome
+
+    int valid = 1; // valid 1=yes, 0=no
 
     GeneticString * gs; // main genetic-string of the genome
 

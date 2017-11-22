@@ -298,15 +298,21 @@ void Measures::measurePhenotype(std::map<std::string, double> params,
                              this->gen->getMeasures()["total_components"] /
                              params["max_comps"]);
 
-//    std::cout<<this->gen->getMeasures()["sensors"]<<std::endl;
-//    std::cout<<this->gen->getMeasures()["sensors_slots"]<<std::endl;
-
     this->gen->updateMeasure("sensors",
                                  this->gen->getMeasures()["sensors"]
                                  / this->gen->getMeasures()["sensors_slots"]);
 
 
     /* END:  calculating measures  */
+
+
+    // checks validity of morphology
+    if ( (this->gen->getMeasures()["total_active_joints_horizontal"] == 0
+          and this->gen->getMeasures()["total_active_joints_vertical"] == 0)
+        or this->gen->getMeasures()["sensors"] == 0)
+    { // if there is no sensor or no joint, morphology is invalid
+        this->gen->setValid(0);
+    }
 
 
     // removes temporary measures

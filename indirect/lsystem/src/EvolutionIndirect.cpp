@@ -159,6 +159,14 @@ void EvolutionIndirect::mutation(LSystem LS, std::vector<Genome *> * offspring) 
     std::uniform_int_distribution<int>
             dist_movingcommand(0, (int) LS.getMovingCommands().size()-1);
 
+    // distribution for the brain move commands
+    std::uniform_int_distribution<int>
+            dist_brainmovecommand(0, (int) LS.getBrainMoveCommands().size()-1);
+
+    // distribution for the brain change commands
+    std::uniform_int_distribution<int>
+            dist_brainchangecommand(0, (int) LS.getBrainChangeCommands().size() -1);
+
     // distribution for 0-1 probabilities
     std::uniform_real_distribution<double> prob(0.0, 1.0);
 
@@ -199,7 +207,7 @@ void EvolutionIndirect::mutation(LSystem LS, std::vector<Genome *> * offspring) 
                      }
                 }
 
-                // # swapping
+              // # swapping
             } else if (type_of_mutation == 2) {
 
 
@@ -227,8 +235,8 @@ void EvolutionIndirect::mutation(LSystem LS, std::vector<Genome *> * offspring) 
             // # adding
             } else if (type_of_mutation == 3) {
 
-
-                std::uniform_int_distribution<int> type_adding(1, 3);
+                // type of item t oadd
+                std::uniform_int_distribution<int> type_adding(1, 5);
                 int type_of_adding = type_adding(generator);
 
                 std::string genetic_string_item = "";
@@ -264,7 +272,6 @@ void EvolutionIndirect::mutation(LSystem LS, std::vector<Genome *> * offspring) 
                     genetic_string_item = LS.getAlphabetIndex()[aux];
                 }
 
-
                 // # adding moving command
                 else if (type_of_adding == 3) {
 
@@ -274,6 +281,28 @@ void EvolutionIndirect::mutation(LSystem LS, std::vector<Genome *> * offspring) 
                                    + " for " + mutate_letter
                                    +" at "+std::to_string(pos_insertion));
                     genetic_string_item = LS.getMovingCommands()[aux];
+                }
+
+                // # adding brain move command
+                else if (type_of_adding == 4) {
+
+                    int aux = dist_brainmovecommand(generator);
+                    this->aux.logs("mutation: add brain move command"+LS.getBrainMoveCommands()[aux]
+                                   +" in " + offspring->at(i)->getId()
+                                   + " for " + mutate_letter
+                                   +" at "+std::to_string(pos_insertion));
+                    genetic_string_item = LS.getBrainMoveCommands()[aux];
+                }
+
+                // # adding brain change command
+                else if (type_of_adding == 5) {
+
+                    int aux = dist_brainchangecommand(generator);
+                    this->aux.logs("mutation: add brain change command"+LS.getBrainChangeCommands()[aux]
+                                   +" in " + offspring->at(i)->getId()
+                                   + " for " + mutate_letter
+                                   +" at "+std::to_string(pos_insertion));
+                    genetic_string_item = LS.getBrainChangeCommands()[aux];
                 }
 
                 //  (possibly) alters genetic-string (production rule) adding items (letters or commands)

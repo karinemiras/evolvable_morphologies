@@ -23,10 +23,13 @@ class  Evolution{
 
 public:
     // name of the experiment / if the experiment should be started from scratch (1) or not (0)
-    explicit Evolution(std::string experiment_name, int new_experiment){
+    explicit Evolution(std::string experiment_name,
+                       int new_experiment,
+                       std::string type_experiment){
 
         this->experiment_name = experiment_name;
         this->new_experiment = new_experiment;
+        this->type_experiment = type_experiment;
 
         this->measures_names.push_back("branching");
         this->measures_names.push_back("connectivity1");
@@ -43,6 +46,7 @@ public:
 
     }
 
+    void saveHistory(int generation, Genome individual);
 
     void readParams();
     void developGenome(int argc, char* argv[], Genome * gen, LSystem LS);
@@ -53,15 +57,16 @@ public:
                             std::vector<Genome *>  * individuals,
                             std::string dirpath);
     void evaluateNS(int generation,
-                             std::vector<Genome *>  * individuals_reference,
-                             std::vector<Genome *>  * individuals_compare);
+                             std::vector<Genome *>  * offspring);
+
+    void evaluateLocomotion(int generation,
+                     std::vector<Genome *>  * individuals);
+
     int  tournament();
     void selection();
     std::vector<Genome *>  * getPopulation();
     std::map<std::string, double> getParams();
-    int NS(int argc, char* argv[],
-                      int encodingtype);
-    void locomotion(int argc, char* argv[]);
+    double runExperiment(int argc, char* argv[]);
     void exportGenerationMetrics(int generation,
                                  std::vector<int> metrics);
     void exportPop(int generation);
@@ -83,12 +88,10 @@ public:
                             LSystem LS,
                             int generation,
                             std::vector<Genome *>  * individuals,
-                            std::string path,
-                            int encodingtype);
-    int loadNS();
+                            std::string path);
+    int loadExperiment();
     int initExperiment(int argc, char* argv[],
-                       LSystem LS,
-                       int encodingtype);
+                       LSystem LS);
     void summaryNicheCoverage();
     void compareIndividuals(int generation);
     int getGeneration_genome(std::string idgenome);
@@ -107,15 +110,23 @@ protected:
 
     std::vector<std::string> measures_names =
             std::vector<std::string>();
+
     std::map<std::string, double> params =
             std::map<std::string, double>(); // contains the list of parameters loaded from parameter file
+
     std::map< std::string, Genome * >  * archive =
             new std::map< std::string , Genome * > ();
-    int next_id = 0; // id that will be given for the next genome to be created
-    std::string experiment_name = ""; // name for the experiment
-    int new_experiment; // if state of previous a experiment is being restored (1) or not (0)
-    // points in a grid representing the morphological space
 
+    int next_id = 0; // id that will be given for the next genome to be created
+
+    std::string experiment_name = ""; // name for the experiment
+
+    int new_experiment=1; // if state of previous a experiment is being
+    // restored (1) or not (0)
+
+    std::string type_experiment = ""; // name of the type: novelty, locomotion etc
+
+    // points in a grid representing the morphological space
     std::map<std::string, std::vector<double>>
             morphological_grid_generation =
             std::map<std::string, std::vector<double>>();

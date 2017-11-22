@@ -572,7 +572,10 @@ void Genome::draw_component( std::string parent_convertion,
         QList < QGraphicsItem * > coll;
         coll =  items[items.size()-1]->collidingItems();
 
-        if(coll.size() > 1) { // if the new component is overlapping another component, it is deleted from the graphic
+        // if the new component is overlapping another component
+        if(coll.size() > 1) {
+
+            this->valid = 0;
 
             scene->removeItem(items[items.size()-1]);
             scene->removeItem(sign);
@@ -791,4 +794,15 @@ std::map< std::string, GeneticString *> Genome::getGrammar()
 void Genome::addLetterGrammar(std::string letter, GeneticString * lgs)
 {
     this->grammar.emplace(letter, lgs);
+}
+
+
+void Genome::setValid(int valid)
+{
+    this->valid = valid;
+}
+
+int Genome::getValid()
+{
+    return this->valid;
 }

@@ -24,7 +24,12 @@ class EvolutionIndirect: public Evolution{
 public:
 
 
-    EvolutionIndirect(std::string experiment_name, int new_experiment) : Evolution(experiment_name, new_experiment){ }
+    EvolutionIndirect(std::string experiment_name,
+                      int new_experiment,
+                      std::string type_experiment) :
+            Evolution(experiment_name,
+                      new_experiment,
+                      type_experiment){ }
 
 
     void initPopulation(LSystem LS);

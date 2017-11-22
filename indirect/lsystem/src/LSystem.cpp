@@ -9,8 +9,9 @@
  * Transfer functions for the brain.
  */
 void LSystem::build_brain_functions(){
-    brainfunctions.push_back("linear");
-    brainfunctions.push_back("sigmoid");
+    brainfunctions.push_back("Simple");
+    brainfunctions.push_back("Sigmoid");
+    brainfunctions.push_back("Oscillator");
 }
 
 /**
