@@ -413,7 +413,7 @@ void DecodedGeneticString::decodeBrainCommand(std::string item,
                 DecodedGeneticString::Vertex2 * v = new Vertex2();
                 this->ids++;
                 v->id = this->ids;
-                v->id_comp = -1;
+                v->id_comp = 0;
                 v->type = "hidden";
 
                 tokens = boost::split(tokens, param, boost::is_any_of("|"));
@@ -693,7 +693,7 @@ void DecodedGeneticString::decodeBrainNode(std::string item,
 
         // updates list of nodes
         this->brain_nodes[std::make_pair(this->ids, "input")]
-                = std::make_pair(id_comp, "Simple");
+                            = std::make_pair(id_comp, "Input");
 
     }
 
@@ -793,3 +793,15 @@ void DecodedGeneticString::decodeBrainNode(std::string item,
 DecodedGeneticString::Vertex * DecodedGeneticString::getRoot(){
     return this->root;
 }
+
+
+std::map< std::pair<int, int>, double > DecodedGeneticString::getBrain_edges(){
+    return this->brain_edges;
+}
+
+std::map< std::pair<int, std::string>, std::pair<int, std::string> > DecodedGeneticString::getBrain_nodes(){
+    return this->brain_nodes;
+}
+
+
+

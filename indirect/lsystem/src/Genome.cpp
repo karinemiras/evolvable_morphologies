@@ -90,37 +90,24 @@ void Genome::build_grammar(LSystem LS,
                            std::map<std::string, double> params)
 {
 
-    std::map< std::string, std::string >
-            alp = LS.getAlphabet();
-    std::vector<std::string>
-            alp_i = LS.getAlphabetIndex();
-    std::vector<std::string>
-            mountingcom = LS.getMountingCommands();
-    std::vector<std::string>
-            movingcom = LS.getMovingCommands();
-    std::vector<std::string>
-            brainmovecom = LS.getBrainMoveCommands();
-    std::vector<std::string>
-            brainchangecom = LS.getBrainChangeCommands();
-
     std::random_device rd;
     std::default_random_engine generator(rd());
 
     // distribution for the number of components
     std::uniform_int_distribution<int> dist_1(1, (int) params["num_initial_comp"]);
     // distribution for letters of the alphabet
-    std::uniform_int_distribution<int> dist_2(0, (int) alp_i.size()-1);
+    std::uniform_int_distribution<int> dist_2(0, (int) LS.getAlphabetIndex().size()-1);
     // distribution for the mounting commands
-    std::uniform_int_distribution<int> dist_3(0, (int) mountingcom.size()-1);
+    std::uniform_int_distribution<int> dist_3(0, (int) LS.getMountingCommands().size()-1);
     // distribution for the moving commands
-    std::uniform_int_distribution<int> dist_4(0, (int) movingcom.size()-1);
+    std::uniform_int_distribution<int> dist_4(0, (int) LS.getMovingCommands().size()-1);
     // distribution for the brain moving commands
-    std::uniform_int_distribution<int> dist_5(0, (int) brainmovecom.size()-1);
+    std::uniform_int_distribution<int> dist_5(0, (int) LS.getBrainMoveCommands().size()-1);
     // distribution for the brain change commands
-    std::uniform_int_distribution<int> dist_6(0, (int) brainchangecom.size()-1);
+    std::uniform_int_distribution<int> dist_6(0, (int) LS.getBrainChangeCommands().size()-1);
 
     // for each letter of the alphabet
-    for (const auto &letterPair : alp)
+    for (const auto &letterPair : LS.getAlphabet())
     {
 
         auto letter = letterPair.first;
@@ -136,29 +123,29 @@ void Genome::build_grammar(LSystem LS,
         while(letter_items.size() < (dist_1(generator) * 5) ){
 
             // raffles a letter to be included
-            auto item = alp_i[dist_2(generator)];
+            auto item = LS.getAlphabetIndex()[dist_2(generator)];
 
             // prevents core component of being (re)included in the rule
             if (item != "C") {
 
                 // raffles a brain move command to be included
-                auto braincommand = LS.buildBrainCommand(brainmovecom[dist_5(generator)]);
+                auto braincommand = LS.buildBrainCommand(LS.getBrainMoveCommands()[dist_5(generator)]);
                 letter_items.push_back(braincommand);
 
                 // raffles a mounting command to be included
-                letter_items.push_back(mountingcom[dist_3(generator)]);
+                letter_items.push_back(LS.getMountingCommands()[dist_3(generator)]);
                 // adds letter
                 letter_items.push_back(item);
 
                 // raffles a moving command to be included
-                letter_items.push_back(movingcom[dist_4(generator)]);
+                letter_items.push_back(LS.getMovingCommands()[dist_4(generator)]);
 
                 // raffles another brain move command to be included
-                braincommand = LS.buildBrainCommand(brainmovecom[dist_5(generator)]);
+                braincommand = LS.buildBrainCommand(LS.getBrainMoveCommands()[dist_5(generator)]);
                 letter_items.push_back(braincommand);
 
                 // raffles a brain change command to be included
-                braincommand = LS.buildBrainCommand(brainchangecom[dist_6(generator)]);
+                braincommand = LS.buildBrainCommand(LS.getBrainChangeCommands()[dist_6(generator)]);
                 letter_items.push_back(braincommand);
 
             }
@@ -358,9 +345,11 @@ void Genome::constructor(int argc,
     c = this->dgs.getRoot();
 
 
-    // from component on the root, draws all the components in the graph
+    // from component on the root, draws all the components in the body graph
     this->draw_component("", 0, path, "bottom","root",
             this->scene,items,c,c, params);
+
+    this->convertYamlBrain(path);
 
     // exports drawn robot into image file
     if (params["export_phenotypes"] == 1) {
@@ -381,6 +370,7 @@ void Genome::constructor(int argc,
                                                       this->id_parent2+ ".png");
         image.save(qstr);
 
+        // draw brain graph
         std::string auxcom=  "dot -Tpng ../../experiments/"+path+"/tempbrain"
                 ".dot "
                 "-o ../../experiments/"+ path+"/brain_"+ this->id+".png";
@@ -597,7 +587,7 @@ void Genome::draw_component( std::string parent_convertion,
 
 
             // converts the robot into yaml file
-            this->convertYaml
+            this->convertYamlBody
                     (parent_convertion,
                       _directoryPath,
                      convertion_level,
@@ -632,6 +622,52 @@ void Genome::draw_component( std::string parent_convertion,
 }
 
 
+
+void Genome::convertYamlBrain(std::string _directoryPath){
+
+    std::ofstream robot_file;
+    std::string path = "../../experiments/"+
+                       _directoryPath+"/robot_"+this->getId()+".yaml";
+    robot_file.open(path, std::ofstream::app);
+
+    robot_file<<"brain:"<<std::endl;
+
+    robot_file<<"  neurons:"<<std::endl;
+
+
+    for (const auto &node : this->dgs.getBrain_nodes())
+    {
+
+        auto id = node.first.first;
+        auto type = node.first.second;
+        auto id_comp = node.second.first;
+        auto function = node.second.second;
+
+        robot_file << "    " <<id<< ":" << std::endl;
+        robot_file << "      id: " <<id << std::endl;
+        robot_file << "      layer: " <<type << std::endl;
+        robot_file << "      part_id: " <<id_comp << std::endl;
+        robot_file << "      type: " <<function << std::endl;
+    }
+
+    robot_file<<"  connections:"<<std::endl;
+
+    for (const auto &edge : this->dgs.getBrain_edges())
+    {
+        auto origin = edge.first.first;
+        auto destination = edge.first.second;
+        auto weight = edge.second;
+
+        robot_file<<"  - dst: "<<destination<<std::endl;
+        robot_file<<"    src: "<<origin<<std::endl;
+        robot_file<<"    weight: "<<weight<<std::endl;
+    }
+
+    robot_file.close();
+
+}
+
+
 /*
  * Converts a developed genome into a yaml file.
  * @param parent_convertion - parent component of the current component
@@ -640,7 +676,7 @@ void Genome::draw_component( std::string parent_convertion,
  * @param direction - direction on which current component will be mounted
  * @param c2 - current node (component) pointer
  * */
-void Genome::convertYaml(
+void Genome::convertYamlBody(
         std::string parent_convertion,
         std::string _directoryPath,
         int convertion_level,
@@ -681,7 +717,7 @@ void Genome::convertYaml(
 
     if(letter_convertion == "C")
     {
-        robot_file<<"---"<<std::endl<<"body:"<<std::endl;
+        robot_file<<"body:"<<std::endl;
     }
 
     if(direction=="left")

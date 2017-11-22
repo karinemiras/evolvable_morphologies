@@ -97,6 +97,12 @@ public:
                 std::map<std::string, double> params,
                 std::string path);
 
+    std::map< std::pair<int, int>, double >
+                        getBrain_edges();
+
+    std::map< std::pair<int, std::string>, std::pair<int, std::string> >
+                        getBrain_nodes();
+
 
 private:
 

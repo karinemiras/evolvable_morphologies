@@ -286,23 +286,23 @@ void EvolutionIndirect::mutation(LSystem LS, std::vector<Genome *> * offspring) 
                 // # adding brain move command
                 else if (type_of_adding == 4) {
 
-                    int aux = dist_brainmovecommand(generator);
-                    this->aux.logs("mutation: add brain move command"+LS.getBrainMoveCommands()[aux]
+                    auto genetic_string_item = LS.buildBrainCommand(
+                               LS.getBrainMoveCommands()[dist_brainmovecommand(generator)]);
+                    this->aux.logs("mutation: add brain move command"+ genetic_string_item
                                    +" in " + offspring->at(i)->getId()
                                    + " for " + mutate_letter
                                    +" at "+std::to_string(pos_insertion));
-                    genetic_string_item = LS.getBrainMoveCommands()[aux];
                 }
 
                 // # adding brain change command
                 else if (type_of_adding == 5) {
 
-                    int aux = dist_brainchangecommand(generator);
-                    this->aux.logs("mutation: add brain change command"+LS.getBrainChangeCommands()[aux]
+                    auto genetic_string_item = LS.buildBrainCommand(
+                            LS.getBrainChangeCommands()[dist_brainchangecommand(generator)]);
+                    this->aux.logs("mutation: add brain change command"+ genetic_string_item
                                    +" in " + offspring->at(i)->getId()
                                    + " for " + mutate_letter
                                    +" at "+std::to_string(pos_insertion));
-                    genetic_string_item = LS.getBrainChangeCommands()[aux];
                 }
 
                 //  (possibly) alters genetic-string (production rule) adding items (letters or commands)

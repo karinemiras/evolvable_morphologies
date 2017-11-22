@@ -131,11 +131,13 @@ public:
     void addLetterGrammar(std::string letter,
                           GeneticString * lgs);
 
-    void convertYaml(       std::string parent_convertion,
+    void convertYamlBody(   std::string parent_convertion,
                             std::string dirpath,
                             int convertion_level,
                             std::string direction,
                             DecodedGeneticString::Vertex * c2);
+
+    void convertYamlBrain(std::string _directoryPath);
 
     void build_grammar(LSystem LS, std::map<std::string, double> params);
 
