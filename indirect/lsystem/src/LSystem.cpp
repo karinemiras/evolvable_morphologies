@@ -97,7 +97,7 @@ void LSystem::build_alphabet(){
     alphabet_index.push_back("B");
     alphabet_type["B"] = "body";
 
-    alphabet["SI"] = "SI";   // infra-red sensor
+    alphabet["SI"] = "SI";   // infra-red (touch) sensor
     alphabet_index.push_back("SI");
     alphabet_type["SI"] = "sensor";
 

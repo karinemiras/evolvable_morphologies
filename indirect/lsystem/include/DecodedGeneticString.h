@@ -84,7 +84,8 @@ public:
 
     DecodedGeneticString::Vertex * getRoot();
 
-    void decodeBrainNode(std::string item,
+    void decodeBrainNode(std::string direction,
+                         std::string item,
                          int id_comp,
                          std::string path);
 
@@ -100,7 +101,7 @@ public:
     std::map< std::pair<int, int>, double >
                         getBrain_edges();
 
-    std::map< std::pair<int, std::string>, std::pair<int, std::string> >
+    std::map< int, std::pair<std::pair<std::string, std::string>, std::pair<int, std::string> > >
                         getBrain_nodes();
 
 
@@ -113,9 +114,11 @@ private:
             brain_edges = std::map< std::pair<int, int>, double >();
 
     // nodes of brain graph
-    std::map< std::pair<int, std::string>, std::pair<int, std::string> >
-    // <<id,type>,<id_comp,function>>
-            brain_nodes = std::map< std::pair<int, std::string>, std::pair<int, std::string> >();
+    std::map< int, std::pair<
+            std::pair<std::string, std::string>,
+            std::pair<int, std::string> > >
+    // <id, < <type,function>, <id_comp,direction> > >
+            brain_nodes =      std::map< int, std::pair<std::pair<std::string, std::string>, std::pair<int, std::string> > > ();
 
     // pointers to current-edge of brain graph:
 

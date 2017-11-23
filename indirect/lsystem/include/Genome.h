@@ -135,7 +135,8 @@ public:
                             std::string dirpath,
                             int convertion_level,
                             std::string direction,
-                            DecodedGeneticString::Vertex * c2);
+                            DecodedGeneticString::Vertex * c2,
+                            std::string sensor);
 
     void convertYamlBrain(std::string _directoryPath);
 

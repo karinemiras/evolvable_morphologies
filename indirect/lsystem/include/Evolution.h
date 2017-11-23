@@ -13,6 +13,7 @@
 #include "Genome.h"
 #include "Measures.h"
 #include "Tests.h"
+#include "Types.h"
 
 /**
  * Evolutionary algorithm.
@@ -143,7 +144,9 @@ protected:
     Aux aux = Aux(this->experiment_name, this->getParams()); // contains general auxiliar methos for the experiments
     Tests tests = Tests(this->experiment_name, this->getParams()); // contains methods with tests for the system
 
-    std::vector<Genome *>  * population = new std::vector<Genome *>(); // contains the genomes of all the individuals of the population
+    //GenomesPtr population = new GenomesPtr(); //
+    std::vector<Genome *>  * population = new std::vector<Genome *>();
+    // contains the genomes of all the individuals of the population
 
 
 };

@@ -65,6 +65,7 @@ void DecodedGeneticString::decode(GeneticString * gs,
                         // if there's a mounting command
                         if (!mountingcommand.empty()) {
 
+                            // if all sides but back are occupied
                             if (root == current_component
                                 and (current_component->left != NULL or
                                      current_component->sensor_left != "Sn")
@@ -77,7 +78,8 @@ void DecodedGeneticString::decode(GeneticString * gs,
                                     current_component->sensor_back == "Sn") {
                                     current_component->sensor_back = current_gs_item->item;
                                     this->decodeBrainNode
-                                            (current_gs_item->item,
+                                            ("b",
+                                             current_gs_item->item,
                                              current_component->id, path);
                                 }
                             } else {
@@ -88,7 +90,8 @@ void DecodedGeneticString::decode(GeneticString * gs,
                                         "Sn") {
                                         current_component->sensor_left = current_gs_item->item;
                                         this->decodeBrainNode
-                                                (current_gs_item->item,
+                                                (mountingcommand,
+                                                 current_gs_item->item,
                                                  current_component->id, path);
                                     }
                                 }
@@ -98,7 +101,8 @@ void DecodedGeneticString::decode(GeneticString * gs,
                                         "Sn") {
                                         current_component->sensor_front = current_gs_item->item;
                                         this->decodeBrainNode
-                                                (current_gs_item->item,
+                                                (mountingcommand,
+                                                 current_gs_item->item,
                                                  current_component->id, path);
                                     }
                                 }
@@ -108,7 +112,8 @@ void DecodedGeneticString::decode(GeneticString * gs,
                                         "Sn") {
                                         current_component->sensor_right = current_gs_item->item;
                                         this->decodeBrainNode
-                                                (current_gs_item->item,
+                                                (mountingcommand,
+                                                 current_gs_item->item,
                                                  current_component->id, path);
                                     }
                                 }
@@ -146,8 +151,7 @@ void DecodedGeneticString::decode(GeneticString * gs,
                         // commands of previous violations remain to pair with a possible new letter, unless a new command be added
                         if (!mountingcommand.empty()) {
 
-                            std::string component = current_component->item.substr(
-                                    0, 1);
+                            std::string component = current_component->item.substr(0, 1);
 
                             // if component is core or brick, having multilateral connection
                             if (component == "C" or component == "B") {
@@ -245,7 +249,7 @@ void DecodedGeneticString::decode(GeneticString * gs,
                             mountingcommand = "";
 
                             if (new_component->item.substr(0, 1) == "A") {
-                                this->decodeBrainNode(current_gs_item->item,
+                                this->decodeBrainNode("",current_gs_item->item,
                                                       new_component->id, path);
                             }
 
@@ -426,8 +430,10 @@ void DecodedGeneticString::decodeBrainCommand(std::string item,
                         ""<<std::endl;
 
                 // updates list of nodes
-                this->brain_nodes[std::make_pair(v->id, v->type)]
-                        = std::make_pair(v->id_comp, function);
+                this->brain_nodes[v->id] =
+                        { {v->type, function},
+                          {v->id_comp, ""}
+                        };
 
                 // removes old link
                 double old_w = this->brain_edges[edge];
@@ -638,7 +644,8 @@ void DecodedGeneticString::decodeBrainCommand(std::string item,
  * @param id_comp - if of the body component to which this node is related to
  * @path - directory to salve files
  * */
-void DecodedGeneticString::decodeBrainNode(std::string item,
+void DecodedGeneticString::decodeBrainNode(std::string direction,
+                                           std::string item,
                                            int id_comp,
                                            std::string path){
 
@@ -692,9 +699,11 @@ void DecodedGeneticString::decodeBrainNode(std::string item,
         }
 
         // updates list of nodes
-        this->brain_nodes[std::make_pair(this->ids, "input")]
-                            = std::make_pair(id_comp, "Input");
-
+        // <id, < <type,function>, <id_comp,direction> > >
+        this->brain_nodes[this->ids] =
+            { {"input", "Input"},
+              {id_comp, direction}
+            };
     }
 
     // the item is an active joint
@@ -730,8 +739,11 @@ void DecodedGeneticString::decodeBrainNode(std::string item,
         auto function = LS.getBrainFunctions()[func(generator)];
 
         // updates list of nodes
-        this->brain_nodes[std::make_pair(this->ids, "output")]
-                = std::make_pair(id_comp, function);
+        // <id, < <type,function>, <id_comp,direction> > >
+        this->brain_nodes[this->ids] =
+                { {"output", function},
+                  {id_comp, ""}
+                };
 
         // sets node in the visualization
         file << v->id <<
@@ -799,8 +811,9 @@ std::map< std::pair<int, int>, double > DecodedGeneticString::getBrain_edges(){
     return this->brain_edges;
 }
 
-std::map< std::pair<int, std::string>, std::pair<int, std::string> > DecodedGeneticString::getBrain_nodes(){
-    return this->brain_nodes;
+std::map< int, std::pair<std::pair<std::string, std::string>, std::pair<int, std::string> > >
+    DecodedGeneticString::getBrain_nodes(){
+        return this->brain_nodes;
 }
 
 
