@@ -20,11 +20,11 @@
  * Sets a variable with the genome for which the measures will be calculated.
  * @param gen - genome
  */
-void Measures::setGenome(Genome *gen) {
-    this->gen = gen;
+void Measures::setGenome(Genome &gen) {
+    this->gen = &gen;
 }
 
-Genome *Measures::getGenome() {
+Genome * Measures::getGenome() {
     return this->gen;
 }
 
@@ -178,7 +178,8 @@ void Measures::measurePhenotype(std::map<std::string, double> params,
 
     int max_x = 0, max_y = 0, min_x = 0, min_y = 0;
 
-    for (const auto &iter : this->gen->getList_components()) { // for each component of the morphology
+    for (const auto &iter : this->gen->getList_components()) { // for each component of the
+        // morphology
 
         // finds out the values for its extreme x/y coordinates
         if (iter.first.first > max_x) { max_x = iter.first.first; }
@@ -231,7 +232,8 @@ void Measures::measurePhenotype(std::map<std::string, double> params,
     if (ncomp > 0) {
         this->gen->updateMeasure("horizontal_symmetry",
                                  roundf((
-                                                (float) this->gen->getMeasures()["horizontal_symmetry"]
+                                                (float) this->gen->getMeasures()
+                                                ["horizontal_symmetry"]
                                                 / (float) ncomp) * 1000) /
                                  1000);
     }

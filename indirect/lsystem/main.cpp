@@ -21,10 +21,10 @@ int main(int argc, char* argv[]) {
 //    std::uniform_int_distribution<int> dist_1(1, 1000000);
 //
 
-    EvolutionIndirect *e = new EvolutionIndirect("locomotion1", 1,
+    EvolutionIndirect e = EvolutionIndirect("locomotion1", 1,
                                                  "locomotion");
-    double result = e->runExperiment(argc, argv);
-    std::cout<<result;
+    double result = e.runExperiment(argc, argv);
+    //std::cout<<result;
 
 
 //    int niche_coverage_accumulated = 0;

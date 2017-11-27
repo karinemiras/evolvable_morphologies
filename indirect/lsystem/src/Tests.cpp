@@ -46,10 +46,10 @@ void Tests::testParents(int parent1, int parent2) {
 /**
  * Tests if population size remains correct.
  **/
-void Tests::testPopsize(std::vector<Genome *> * population, int pop_size){
+void Tests::testPopsize(std::vector<Genome> population, int pop_size){
 
-    if(population->size() > pop_size){
-        std::cout << " population size is unappropriate with value " <<population->size()<<std::endl;
+    if(population.size() > pop_size){
+        std::cout << " population size is unappropriate with value " <<population.size()<<std::endl;
         exit(EXIT_FAILURE);
     }
 }

@@ -63,6 +63,7 @@ add_subdirectory(src)
 
 file(GLOB_RECURSE SOURCES
         main.cpp
+        include/Types.h
         src/GeneticString.cpp
         src/Genome.cpp
         src/LSystem.cpp

@@ -23,6 +23,7 @@
 #include "LSystem.h"
 
 
+
 /**
  * Genome of an individual.
  */
@@ -45,12 +46,12 @@ public:
 
     unsigned int getTo();
 
-    GeneticString * build_genetic_string(GeneticString * gs,
+    GeneticString *  build_genetic_string(GeneticString *  gs,
                                          std::vector<std::string> genetic_string_items);
 
-    GeneticString * getGeneticString();
+    GeneticString *  getGeneticString();
 
-    void setGeneticString(GeneticString * _gs);
+    void setGeneticString(GeneticString *  _gs);
 
     std::vector<std::string> getAxiom();
     void generate_final_string(int  replacement_iterations,
@@ -120,16 +121,16 @@ public:
 
     double getFitness();
 
-    std::map< std::string, GeneticString * > getGrammar();
+    std::map< std::string, GeneticString *  > getGrammar();
 
-    void setGrammar(std::map< std::string, GeneticString *> grammar);
+    void setGrammar(std::map< std::string, GeneticString * > grammar);
 
     void removeMeasure(std::string key);
 
     void updateFitness(double fitness);
 
     void addLetterGrammar(std::string letter,
-                          GeneticString * lgs);
+                          GeneticString *  lgs);
 
     void convertYamlBody(   std::string parent_convertion,
                             std::string dirpath,
@@ -163,7 +164,7 @@ protected:
 
     int valid = 1; // valid 1=yes, 0=no
 
-    GeneticString * gs; // main genetic-string of the genome
+    GeneticString *  gs =  new GeneticString(); //
 
     DecodedGeneticString dgs; // graph that logically represents the connections among the components forming the body
 
@@ -174,8 +175,7 @@ protected:
             axiom = std::vector<std::string>();
 
     // genetic-strings of production rules for each letter of the alphabet
-    std::map< std::string, GeneticString * >
-            grammar = std::map< std::string, GeneticString * >();
+    std::map< std::string, GeneticString *  > grammar;
 
     // list of body metrics about the genome
     std::map< std::string, double >

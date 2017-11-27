@@ -15,6 +15,7 @@
 #include "DecodedGeneticString.h"
 #include "GeneticString.h"
 #include "LSystem.h"
+#include "Types.h"
 
 
 /**
@@ -47,7 +48,7 @@ void DecodedGeneticString::decode(GeneticString * gs,
     for (int i = 0; i < gs->count(); i++)
     { // for each item of the main genetic-string
 
-        std::cout<<" ------ current_gs_item "<<current_gs_item->item<<std::endl;
+        //std::cout<<" ------ current_gs_item "<<current_gs_item->item<<std::endl;
 
 
         // if the item is a letter (component) in the alphabet

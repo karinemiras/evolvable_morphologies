@@ -15,6 +15,7 @@
 #include "GeneticString.h"
 #include "LSystem.h"
 
+
 /**
  * Structure of the items composing the second (late) developmental stage a
  * genome. This structure represents the phenotype.
@@ -27,6 +28,19 @@ class DecodedGeneticString{
 
 
 public:
+
+  DecodedGeneticString(){
+      root = NULL;
+      toNode = NULL;
+      ids=0;
+
+      // add defualt bias as node
+      fromNode.push_back(new Vertex2());
+      fromNode[0]->id = 0;
+      fromNode[0]->type = "bias";
+  }
+
+  ~DecodedGeneticString(){}
 
     // body structure
     struct Vertex
@@ -71,16 +85,7 @@ public:
         }
     };
 
-    DecodedGeneticString(){
-        root = NULL;
-        toNode = NULL;
-        ids=0;
 
-        // add defualt bias as node
-        fromNode.push_back(new Vertex2());
-        fromNode[0]->id = 0;
-        fromNode[0]->type = "bias";
-    }
 
     DecodedGeneticString::Vertex * getRoot();
 
