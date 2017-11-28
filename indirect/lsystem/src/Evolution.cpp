@@ -818,7 +818,7 @@ int Evolution::tournament()
   std::uniform_int_distribution< int > dist_1(
       0,
       (int) this->population.size() -
-      1);
+      1); // size of current pop (parents+offspring)
 
   int genome1 = dist_1(generator); // random genome 1
   int genome2 = dist_1(generator); // random genome 2
@@ -858,80 +858,81 @@ Evolution::testGeneticString(
     std::string test_genome)
 {
 
-  this->readParams();
-
-  LSystem LS;
-
-
-  std::string line;
-  std::ifstream myfile("../../experiments/fixed/" + test_genome + ".txt");
-  if (myfile.is_open())
-  {
-    getline(
-        myfile,
-        line);
-    std::vector< std::string > tokens;
-    // items of the genetic-string separated by space
-    boost::split(
-        tokens,
-        line,
-        boost::is_any_of(" "));
-    std::vector< std::string > gs;
-
-    // adds each item in the genetic-string in the array of items
-    for (int j = 0;
-         j < tokens.size();
-         j++)
-    {
-      if (tokens[j] != "")
-      { gs.push_back(tokens[j]); }
-    }
-
-    // creates new genome with id equal 1, using the just read genetic-string
-    Genome gen = Genome(
-        test_genome,
-        test_genome,
-        test_genome,
-        -1,
-        -1);
-    gen.setGeneticString(
-        gen.build_genetic_string(
-            gen.getGeneticString(),
-            gs));
-    gen.getGeneticString()->display_list();
-
-    // decodes the final genetic-string into a tree of components
-    //std::cout << " >> decoding ... " << std::endl;
-    std::string path = ""; // CHANGE!
-    gen.decodeGeneticString(
-        LS,
-        params,
-        path);
-
-    // generates robot-graphics
-    //std::cout << " >> constructing ... " << std::endl;
-    gen.constructor(
-        argc,
-        argv,
-        this->params,
-        "fixed");
-
-    // measures all metrics od the genome
-    Measures m(
-        this->experiment_name,
-        this->params);
-    m.setGenome(gen);
-    m.measurePhenotype(
-        this->params,
-        "fixed",
-        1);
-
-    myfile.close();
-  }
-  else
-  {
-    this->aux.logs("Cant open genome.");
-  }
+//  this->readParams();
+//
+//  LSystem LS;
+//
+//
+//  std::string line;
+//  std::ifstream myfile("../../experiments/fixed/" + test_genome + ".txt");
+//  if (myfile.is_open())
+//  {
+//    getline(
+//        myfile,
+//        line);
+//    std::vector< std::string > tokens;
+//    // items of the genetic-string separated by space
+//    boost::split(
+//        tokens,
+//        line,
+//        boost::is_any_of(" "));
+//    std::vector< std::string > gs;
+//
+//    // adds each item in the genetic-string in the array of items
+//    for (int j = 0;
+//         j < tokens.size();
+//         j++)
+//    {
+//      if (tokens[j] != "")
+//      { gs.push_back(tokens[j]); }
+//    }
+//
+//    // creates new genome with id equal 1, using the just read genetic-string
+//    Genome gen = Genome(
+//        test_genome,
+//        test_genome,
+//        test_genome,
+//        -1,
+//        -1);
+//
+//    gen.setGeneticString(
+//        gen.build_genetic_string(
+//            gen.getGeneticString(),
+//            gs));
+//    gen.getGeneticString().display_list();
+//
+//    // decodes the final genetic-string into a tree of components
+//    //std::cout << " >> decoding ... " << std::endl;
+//    std::string path = ""; // CHANGE!
+//    gen.decodeGeneticString(
+//        LS,
+//        params,
+//        path);
+//
+//    // generates robot-graphics
+//    //std::cout << " >> constructing ... " << std::endl;
+//    gen.constructor(
+//        argc,
+//        argv,
+//        this->params,
+//        "fixed");
+//
+//    // measures all metrics od the genome
+//    Measures m(
+//        this->experiment_name,
+//        this->params);
+//    m.setGenome(gen);
+//    m.measurePhenotype(
+//        this->params,
+//        "fixed",
+//        1);
+//
+//    myfile.close();
+//  }
+//  else
+//  {
+//    this->aux.logs("Cant open genome.");
+//  }
 }
 
 /**
@@ -962,16 +963,7 @@ void Evolution::selection()
     index_selected.push_back(genome);
   }
 
-//  for(auto &ind: this->population)
-//  {
-//      auto item = ind.getGeneticString()->getStart();
-//      while(item not_eq NULL)
-//      {
-//        auto item2 = item->next;
-//        delete item;
-//        item = item2;
-//      }
-//  }
+  this->cleanMemory(index_selected);
 
   this->population = selected; // substitutes current population for the selected subset
 
@@ -981,6 +973,75 @@ void Evolution::selection()
       (int) this->params["pop_size"]);
 }
 
+/*
+ * Deallocate memory used by the non-selected individuals.
+ * */
+
+void Evolution::cleanMemory(std::vector< int > index_selected)
+{
+  // cleaning memory
+  std::cout<<"START cleaning memory for non-selected individuals"<<std::endl;
+  for (int i = 0;
+       i < this->population.size();
+       i++)
+  {
+    // for non-selected individuals
+    if(std::find(
+        index_selected.begin(),
+        index_selected.end(),
+        i) == index_selected.end())
+    {
+      std::cout<<"developed genetic-string"<<std::endl;
+      auto item = this->population[i].getGeneticString().getStart();
+      while (item not_eq NULL)
+      {
+        auto item2 = item->next;
+        delete item;
+        item = item2;
+      }
+
+//      std::cout<<"grammar genetic-strings"<<std::endl;
+//      for( auto &g: this->population[i].getGrammar())
+//      {
+//        item = g.second.getStart();
+//        while (item not_eq NULL)
+//        {
+//          auto item2 = item->next;
+//          delete item;
+//          item = item2;
+//        }
+//      }
+
+      std::cout<<"decoded genetic-strings"<<std::endl;
+      this->cleanVertex(this->population[i].getDgs().getRoot());
+
+      std::cout<<"scene"<<std::endl;
+      QList<QGraphicsItem*> all = this->population[i].getScene()->items();
+      for (int i = 0; i < all.size(); i++)
+      {
+        QGraphicsItem *gi = all[i];
+        if(gi->parentItem()==NULL) delete gi;
+      }
+      delete this->population[i].getScene();
+
+
+    }
+  }
+  std::cout<<"FINISH cleaning memory for non-selected individuals"<<std::endl;
+}
+
+void Evolution::cleanVertex(DecodedGeneticString::Vertex * v){
+
+  if(v != NULL)
+  {
+    this->cleanVertex(v->left);
+    this->cleanVertex(v->front);
+    this->cleanVertex(v->right);
+    if(v->item == "C")
+      this->cleanVertex(v->back);
+    delete v;
+  }
+}
 
 /**
  *  Saves state of the generations to file.
@@ -1182,7 +1243,7 @@ void Evolution::loadPopulation(int generation)
           1);
 
       // build a genetic-string with the production rule for the letter
-      auto lgs = new GeneticString();
+      auto lgs =  GeneticString();
       lgs = gen.build_genetic_string(
           lgs,
           items_rule);
@@ -1307,7 +1368,7 @@ void Evolution::loadArchive()
           1);
 
       // build a genetic-string with the production rule for the letter
-      GeneticString *  lgs;
+      GeneticString   lgs;
       lgs = gen.build_genetic_string(
           lgs,
           items_rule);

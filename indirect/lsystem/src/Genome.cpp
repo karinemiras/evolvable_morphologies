@@ -16,12 +16,12 @@ unsigned int Genome::getTo()
   //return 4; //test of testing
 }
 
-void Genome::setGeneticString(GeneticString *  _gs)
+void Genome::setGeneticString(GeneticString  _gs)
 {
   this->gs = _gs;
 }
 
-GeneticString *  Genome::getGeneticString()
+GeneticString  Genome::getGeneticString()
 {
   return this->gs;
 }
@@ -83,9 +83,13 @@ void Genome::removeMeasure(std::string key)
 
 }
 
+QGraphicsScene * Genome::getScene(){
+  return this->scene;
+}
+
 
 void Genome::setGrammar(
-    std::map< std::string, GeneticString *  > grammar)
+    std::map< std::string, GeneticString  > grammar)
 {
   this->grammar = grammar;
 }
@@ -151,8 +155,10 @@ void Genome::build_grammar(
     }
 
     // while a raffled number of components is not achieved
-    // (times 4 because it must considers the groups of commands
-    while (letter_items.size() < (dist_1(generator) * 5))
+    // (times group size (6):
+    // brainmove, mountcom, letter, movecom, brainmove, brainchange
+    int groups = dist_1(generator);
+    while (letter_items.size() < (groups * 6))
     {
       // raffles a letter to be included
       auto item = LS.getAlphabetIndex()[
@@ -162,13 +168,13 @@ void Genome::build_grammar(
       if (item != "C")
       {
         // raffles a brain move command to be included
-        auto braincommand = LS.buildBrainCommand(
-            LS.getBrainMoveCommands()[dist_5(generator)]);
+        auto braincommand = LS.buildBrainCommand(LS.getBrainMoveCommands()[dist_5(generator)]);
         letter_items.push_back(braincommand);
 
         // raffles a mounting command to be included
         letter_items.push_back(LS.getMountingCommands()[dist_3(generator)]);
-        // adds letter
+
+        // raffles a letter to be included
         letter_items.push_back(item);
 
         // raffles a moving command to be included
@@ -186,9 +192,9 @@ void Genome::build_grammar(
     }
 
     // build a genetic-string with the the production rule for the letter
-    GeneticString *  lgs = new GeneticString(); // add nullptr!
+    GeneticString lgs =  GeneticString();
 
-    lgs = this->build_genetic_string(
+    this->build_genetic_string(
         lgs,
         letter_items);
 
@@ -259,11 +265,11 @@ void Genome::build_genome_direct(
   }
 
   // build the genetic-string
-  GeneticString *  gs;
-  this->gs = this->build_genetic_string(
+  GeneticString  gs = GeneticString();
+  this->build_genetic_string(
       gs,
       letter_items);
-  this->gs->display_list();
+  this->gs.display_list();
 
 }
 
@@ -285,10 +291,10 @@ void Genome::generate_final_string(
   {
 
     // replacement is made given the grammar
-    this->gs->replaces(this->grammar);
+    this->gs.replaces(this->grammar);
   }
 
-  this->gs->display_list();
+  this->gs.display_list();
 
   if (export_genomes == 1)
   {
@@ -316,7 +322,7 @@ void Genome::exportGenome(std::string dirpath)
     genome_file << it.first << " "; // writes letter to line
 
     GeneticString::Node *current;
-    current = this->getGrammar()[it.first]->getStart();
+    current = this->getGrammar()[it.first].getStart();
     while (current != NULL)
     {
 
@@ -334,13 +340,13 @@ void Genome::exportGenome(std::string dirpath)
  * @param _gs - new genetic-string to be populated with the vector of items.
  * @param genetic_string_items - vector of items that will compose teh genetic-string.
  */
-GeneticString *  Genome::build_genetic_string(
-    GeneticString *  _gs,
+GeneticString  Genome::build_genetic_string(
+    GeneticString  &_gs,
     std::vector< std::string > genetic_string_items)
 {
   try
   {
-    _gs->create_list(genetic_string_items);
+    _gs.create_list(genetic_string_items);
     return _gs;
 
   } catch (const std::exception &e)
@@ -705,20 +711,12 @@ void Genome::draw_component(
     // add info to the components
     tsign = std::to_string(c2->id) + " " + tsign + "\n";
     tsign = tsign
-            + c2->sensor_left.substr(
-        1,
-        1)
-            + c2->sensor_front.substr(
-        1,
-        1)
-            + c2->sensor_right.substr(
-        1,
-        1);
+            + c2->sensor_left.substr(1, 1)
+            + c2->sensor_front.substr(1, 1)
+            + c2->sensor_right.substr(1, 1);
     if (c2 == c1)
     {
-      tsign = tsign + c2->sensor_back.substr(
-          1,
-          1);
+      tsign = tsign + c2->sensor_back.substr(1, 1);
     }
 
     sign->setPlainText(QString::fromStdString(tsign)); //draws sign over the component
@@ -1099,7 +1097,7 @@ void Genome::createEmbryo()
   axiom.push_back("C");
 
   // initializes the genetic-string with the axiom
-  GeneticString *  gs = new GeneticString();
+  GeneticString  gs =  GeneticString();
   this->setGeneticString(
       this->build_genetic_string(
           gs,
@@ -1154,7 +1152,7 @@ void Genome::updateFitness(double fitness)
 }
 
 
-std::map< std::string, GeneticString *  > Genome::getGrammar()
+std::map< std::string, GeneticString  > Genome::getGrammar()
 {
   return this->grammar;
 }
@@ -1162,7 +1160,7 @@ std::map< std::string, GeneticString *  > Genome::getGrammar()
 
 void Genome::addLetterGrammar(
     std::string letter,
-    GeneticString *  lgs)
+    GeneticString  lgs)
 {
   this->grammar.emplace(
       letter,

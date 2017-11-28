@@ -1,4 +1,4 @@
-pop_size 10
+pop_size 30
 num_generations 10
 num_initial_comp 3
 replacement_iterations 3

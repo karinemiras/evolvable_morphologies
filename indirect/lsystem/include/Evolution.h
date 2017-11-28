@@ -50,7 +50,6 @@ public:
     void saveHistory(int generation, Genome individual);
 
     void readParams();
-    void developGenome(int argc, char* argv[], Genome * gen, LSystem LS);
     void testGeneticString(int argc,
                            char* argv[],
                            std::string test_genome);
@@ -100,6 +99,9 @@ public:
                              std::string idgenome);
     double compareParents(std::string idparent1,
                           std::string idparent2);
+
+    void cleanMemory(std::vector< int > index_selected);
+    void cleanVertex(DecodedGeneticString::Vertex * v);
 
     virtual void initPopulation(LSystem LS){};
     virtual void crossover(LSystem LS, std::vector<Genome> &offspring){};

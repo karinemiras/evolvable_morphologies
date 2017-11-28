@@ -48,7 +48,7 @@ public:
 
   int count();
 
-  void replaces(std::map< std::string, GeneticString *  > grammar);
+  void replaces(std::map< std::string, GeneticString  > grammar);
 
   GeneticString::Node *getStart();
 
@@ -63,8 +63,8 @@ public:
       int pos_parent2_ini,
       int pos_parent1_end,
       int pos_parent2_end,
-      GeneticString *  gs_parent1,
-      GeneticString *  gs_parent2);
+      GeneticString  gs_parent1,
+      GeneticString  gs_parent2);
 
   void swap(
       int pos_swap1,

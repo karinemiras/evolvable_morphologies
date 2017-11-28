@@ -37,7 +37,7 @@ void GeneticString::add(
     }
 
     // the new item
-    inode = new GeneticString::Node;
+    inode = new GeneticString::Node();
     inode->item = genetic_string_item;
     inode->prev = previous;
     inode->next = next;
@@ -67,8 +67,8 @@ void GeneticString::create_joined_list(
         int pos_parent2_ini,
         int pos_parent1_end,
         int pos_parent2_end,
-        GeneticString *  gs_parent1,
-        GeneticString *  gs_parent2)
+        GeneticString  gs_parent1,
+        GeneticString  gs_parent2)
 {
     GeneticString::Node *current, *inode, *current_parent1, *current_parent2;
 
@@ -76,14 +76,14 @@ void GeneticString::create_joined_list(
     int pos_parent2 = 1;
 
     current = start; // genetic-string of the offspring
-    current_parent1 = gs_parent1->start; // genetic-string of the parent1
-    current_parent2 = gs_parent2->start; // genetic-string of the parent2
+    current_parent1 = gs_parent1.start; // genetic-string of the parent1
+    current_parent2 = gs_parent2.start; // genetic-string of the parent2
 
     while (pos_parent1 <= pos_parent1_end)
     {
         if (pos_parent1 >= pos_parent1_ini)
         {
-            inode = new GeneticString::Node; // new item, copied from parent 1
+            inode = new GeneticString::Node(); // new item, copied from parent 1
             inode->item = current_parent1->item;
             inode->prev = current;
             inode->next = nullptr;
@@ -108,7 +108,7 @@ void GeneticString::create_joined_list(
     {
         if (pos_parent2 >= pos_parent2_ini)
         {
-            inode = new GeneticString::Node; // new item, copied from parent 2
+            inode = new GeneticString::Node(); // new item, copied from parent 2
             inode->item = current_parent2->item;
             inode->prev = current;
             inode->next = nullptr;
@@ -203,7 +203,7 @@ void GeneticString::swap(
  * Performs replacements in the genetic-string given the production rules of the grammar.
  * @param grammar - contains the production rules for each letter of the alphabet.
  */
-void GeneticString::replaces(std::map< std::string, GeneticString *  > grammar)
+void GeneticString::replaces(std::map< std::string, GeneticString  > grammar)
 {
     if (start == nullptr)
     {
@@ -219,7 +219,8 @@ void GeneticString::replaces(std::map< std::string, GeneticString *  > grammar)
 
         if (!(grammar.find(current->item) == grammar.end()))
         {
-            current_replacement = grammar[current->item]->start; // pointer to the first item of the genetic-string of the production rule for the letter (item)
+            current_replacement = grammar[current->item].start; // pointer to
+            // the first item of the genetic-string of the production rule for the letter (item)
 
             // removes letter from the main genetic-string, once it will be replaced by other item/s
             previous = current->prev;
@@ -228,7 +229,7 @@ void GeneticString::replaces(std::map< std::string, GeneticString *  > grammar)
             while (current_replacement not_eq nullptr)
             {
                 // the new item takes the place of the removed item
-                inode = new GeneticString::Node;
+                inode = new GeneticString::Node();
                 inode->item = current_replacement->item;
                 inode->prev = previous;
                 inode->next = next;
@@ -269,7 +270,8 @@ void GeneticString::create_list(std::vector< std::string > genetic_string_items)
         for (int i = 0; i < genetic_string_items.size(); i++)
         {   // adds each item of the vector in the list (genetic-string)
 
-            inode = new Node; // creates new node for the new item
+            inode = new GeneticString::Node(); // creates new node for the new
+            // item
             inode->item = genetic_string_items[i];
 
             if (i == 0)

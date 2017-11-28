@@ -97,8 +97,8 @@ void EvolutionIndirect::crossover(
 
     this->next_id++;
 
-    std::map< std::string, GeneticString *  > grammar =
-        std::map< std::string, GeneticString *  >();
+    std::map< std::string, GeneticString  > grammar =
+        std::map< std::string, GeneticString  >();
 
     std::random_device rd;
     std::default_random_engine generator(rd());
@@ -112,20 +112,18 @@ void EvolutionIndirect::crossover(
       {
         this->aux.logs(letter.first + " from parent1");
 
-        // copies object of rule from the genome parent
-        GeneticString * gsp1 = nullptr;
-        gsp1 = new GeneticString(*this->population[parent1].getGrammar()
-                                 [letter.first]);
+        // copies object of rule from the genome parent1
+        GeneticString gsp1 = GeneticString(this->population[parent1]
+                                              .getGrammar()[letter.first]);
         grammar.emplace(letter.first, gsp1); // gets it from parent1
       }
       else
       {
         this->aux.logs(letter.first + " from parent2");
 
-        // copies object of rule from the genome parent
-        GeneticString * gsp2 = nullptr;
-        gsp2 = new GeneticString(*this->population[parent2].getGrammar()
-                                 [letter.first]);
+        // copies object of rule from the genome parent2
+        GeneticString gsp2 = GeneticString(this->population[parent2]
+                                               .getGrammar()[letter.first]);
         grammar.emplace(letter.first, gsp2); // gets it from parent1
       }
     }
@@ -135,7 +133,8 @@ void EvolutionIndirect::crossover(
     offspring.push_back(gen); // adds new individual to the offspring
   }
 
-  this->mutation(LS, offspring); // mutates new individuals
+  // mutates new individuals
+  this->mutation(LS, &offspring);
 }
 
 
@@ -147,7 +146,7 @@ void EvolutionIndirect::crossover(
 
 void EvolutionIndirect::mutation(
     LSystem LS,
-    std::vector< Genome > &offspring)
+    std::vector< Genome > * offspring)
 {
 
 
@@ -191,7 +190,7 @@ void EvolutionIndirect::mutation(
 
 
   // for each genome of the offspring
-  for (int i = 0; i < offspring.size(); i++)
+  for (int i = 0; i < offspring->size(); i++)
   {
 
     std::string mutate_letter = LS.getAlphabetIndex()[dist_letter_target(generator)];
@@ -210,12 +209,12 @@ void EvolutionIndirect::mutation(
       {
 
         //  if there is at least more than one component
-        if (offspring[i].getGrammar()[mutate_letter]->count() > 1)
+        if (offspring->at(i).getGrammar()[mutate_letter].count() > 1)
         {
 
           // distribution for position of deletion in the genetic-string
           std::uniform_int_distribution< int > pos_d(1,
-                                                     offspring[i].getGrammar()[mutate_letter]->count());
+                                                     offspring->at(i).getGrammar()[mutate_letter].count());
           int pos_deletion = pos_d(generator);
 
           // if it is the production rule of the core-component, prevents core-component from being deleted, preserving the root
@@ -226,10 +225,11 @@ void EvolutionIndirect::mutation(
           else
           {
 
-            this->aux.logs("mutation: remove in " + offspring[i].getId()
+            this->aux.logs("mutation: remove in " + offspring->at(i).getId()
                            + " for " + mutate_letter
                            + " at " + std::to_string(pos_deletion));
-            offspring[i].getGrammar()[mutate_letter]->remove(pos_deletion); // removes item from chosen position
+            offspring->at(i).getGrammar()[mutate_letter].remove(pos_deletion); //
+            // removes item from chosen position
 
           }
         }
@@ -242,7 +242,7 @@ void EvolutionIndirect::mutation(
 
         // distribution for position of insertion/swap in the genetic-string
         std::uniform_int_distribution< int > pos_s(1,
-                                                   offspring[i].getGrammar()[mutate_letter]->count());
+                                                   offspring->at(i).getGrammar()[mutate_letter].count());
 
         // position of items to be swapped in the genetic-string
         int pos_swap1 = pos_s(generator);
@@ -260,9 +260,9 @@ void EvolutionIndirect::mutation(
           pos_swap2 = 0;
         }
 
-        offspring[i].getGrammar()[mutate_letter]->swap(pos_swap1,
+        offspring->at(i).getGrammar()[mutate_letter].swap(pos_swap1,
                                                        pos_swap2); // removes item from chosen position
-        this->aux.logs("mutation: swap in " + offspring[i].getId() + " for " +
+        this->aux.logs("mutation: swap in " + offspring->at(i).getId() + " for " +
                        mutate_letter
                        + " between " + std::to_string(pos_swap1) + " and " +
                        std::to_string(pos_swap2));
@@ -273,16 +273,17 @@ void EvolutionIndirect::mutation(
       else if (type_of_mutation == 3)
       {
 
-        // type of item t oadd
+        // type of item to add
         std::uniform_int_distribution< int > type_adding(1,
                                                          5);
         int type_of_adding = type_adding(generator);
+        int aux =0;
 
         std::string genetic_string_item = "";
 
         // distribution for position of insertion in the genetic-string
         std::uniform_int_distribution< int > pos_i(0,
-                                                   offspring[i].getGrammar()[mutate_letter]->count());
+                                                   offspring->at(i).getGrammar()[mutate_letter].count());
         int pos_insertion = pos_i(generator);
 
         // if it is the production rule of the core-component, prevents new items from being inserted at the beginning, preserving the root
@@ -294,11 +295,10 @@ void EvolutionIndirect::mutation(
         // # adding mounting command
         if (type_of_adding == 1)
         {
-
-          int aux = dist_mountingcommand(generator);
+          aux = dist_mountingcommand(generator);
           this->aux.logs(
               "mutation: add mounting command " + LS.getMountingCommands()[aux]
-              + " in " + offspring[i].getId()
+              + " in " + offspring->at(i).getId()
               + " for " + mutate_letter + " at "
               + std::to_string(pos_insertion));
           genetic_string_item = LS.getMountingCommands()[aux];
@@ -307,10 +307,9 @@ void EvolutionIndirect::mutation(
           // # adding letter
         else if (type_of_adding == 2)
         {
-
-          int aux = dist_letter(generator);
+          aux = dist_letter(generator);
           this->aux.logs("mutation: add letter " + LS.getAlphabetIndex()[aux]
-                         + " in " + offspring[i].getId()
+                         + " in " + offspring->at(i).getId()
                          + " for " + mutate_letter + " at "
                          + std::to_string(pos_insertion));
           genetic_string_item = LS.getAlphabetIndex()[aux];
@@ -319,11 +318,10 @@ void EvolutionIndirect::mutation(
           // # adding moving command
         else if (type_of_adding == 3)
         {
-
-          int aux = dist_movingcommand(generator);
+          aux = dist_movingcommand(generator);
           this->aux.logs("mutation: add moving command " + LS
               .getMovingCommands()[aux]
-                         + " in " + offspring[i].getId()
+                         + " in " + offspring->at(i).getId()
                          + " for " + mutate_letter
                          + " at " + std::to_string(pos_insertion));
           genetic_string_item = LS.getMovingCommands()[aux];
@@ -332,37 +330,33 @@ void EvolutionIndirect::mutation(
           // # adding brain move command
         else if (type_of_adding == 4)
         {
-
-          auto genetic_string_item = LS.buildBrainCommand(
-              LS.getBrainMoveCommands()[dist_brainmovecommand(generator)]);
-          this->aux.logs("mutation: add brain move command " +
-                         genetic_string_item
-                         + " in " + offspring[i].getId()
+          aux = dist_brainmovecommand(generator);
+          std::string com = LS.buildBrainCommand(LS.getBrainMoveCommands()[aux]);
+          this->aux.logs("mutation: add brain move command "
+                         + com
+                         + " in " + offspring->at(i).getId()
                          + " for " + mutate_letter
                          + " at " + std::to_string(pos_insertion));
+          genetic_string_item = com;
         }
 
           // # adding brain change command
         else if (type_of_adding == 5)
         {
-
-          auto genetic_string_item = LS.buildBrainCommand(
-              LS.getBrainChangeCommands()[dist_brainchangecommand(generator)]);
-          this->aux.logs("mutation: add brain change command " +
-                         genetic_string_item
-                         + " in " + offspring[i].getId()
+          aux = dist_brainchangecommand(generator);
+          std::string com = LS.buildBrainCommand(LS.getBrainChangeCommands()[aux]);
+          this->aux.logs("mutation: add brain change command "
+                         + com
+                         + " in " + offspring->at(i).getId()
                          + " for " + mutate_letter
                          + " at " + std::to_string(pos_insertion));
+          genetic_string_item = com;
         }
 
         //  (possibly) alters genetic-string (production rule) adding items (letters or commands)
-        offspring[i].getGrammar()[mutate_letter]->add(pos_insertion,
+        offspring->at(i).getGrammar()[mutate_letter].add(pos_insertion,
                                                       genetic_string_item);
-
       }
     }
-
-
   }
-
 }

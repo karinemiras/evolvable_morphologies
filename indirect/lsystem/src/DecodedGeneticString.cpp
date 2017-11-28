@@ -25,7 +25,7 @@
  * @param LS - Lsystem structure containing the alphabet.
  * @param params - parameters of the system
  */
-void DecodedGeneticString::decode(GeneticString * gs,
+void DecodedGeneticString::decode(GeneticString gs,
                                   LSystem LS,
                                   std::map<std::string, double> params,
                                   std::string path)
@@ -42,10 +42,10 @@ void DecodedGeneticString::decode(GeneticString * gs,
     DecodedGeneticString::Vertex  *current_component = NULL;
     DecodedGeneticString::Vertex *new_component = NULL;
     GeneticString::Node *current_gs_item;
-    current_gs_item = gs->getStart();
+    current_gs_item = gs.getStart();
 
 
-    for (int i = 0; i < gs->count(); i++)
+    for (int i = 0; i < gs.count(); i++)
     { // for each item of the main genetic-string
 
         //std::cout<<" ------ current_gs_item "<<current_gs_item->item<<std::endl;

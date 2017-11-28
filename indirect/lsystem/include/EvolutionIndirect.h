@@ -34,7 +34,7 @@ public:
 
     void initPopulation(LSystem LS);
     void crossover(LSystem LS, std::vector<Genome >  &offspring);
-    void mutation(LSystem LS, std::vector<Genome> &offspring);
+    void mutation(LSystem LS, std::vector<Genome> * offspring);
 
 
 

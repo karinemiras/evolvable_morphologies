@@ -98,7 +98,7 @@ public:
                             std::string path);
 
     // builds graphs
-    void decode(GeneticString * gs,
+    void decode(GeneticString gs,
                 LSystem LS,
                 std::map<std::string, double> params,
                 std::string path);
