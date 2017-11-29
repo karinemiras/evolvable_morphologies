@@ -1,8 +1,5 @@
 project("lsystem_proto")
 
-
-
-
 # CMake useful variables
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
@@ -44,9 +41,6 @@ find_package(Qt4 COMPONENTS
         )
 
 
-
-
-#find_package(MPI)
 include_directories(SYSTEM ${MPI_INCLUDE_PATH})
 
 find_package(mlpack)
@@ -56,14 +50,13 @@ find_package(armadillo)
 # Source subdirectories
 # _____________________________________________________________________________
 
-#enable_testing()
+
 include_directories(include)
 add_subdirectory(src)
-#add_subdirectory(test)
+include_directories(../../revolve-simulator)
 
 file(GLOB_RECURSE SOURCES
         main.cpp
-        include/Types.h
         src/GeneticString.cpp
         src/Genome.cpp
         src/LSystem.cpp
@@ -86,5 +79,4 @@ target_link_libraries(lsystem_proto
         mlpack
         armadillo
         yaml-cpp
-      #  ${MPI_C_LIBRARIES}
         )

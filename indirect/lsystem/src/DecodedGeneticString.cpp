@@ -15,7 +15,6 @@
 #include "DecodedGeneticString.h"
 #include "GeneticString.h"
 #include "LSystem.h"
-#include "Types.h"
 
 
 /**
@@ -664,7 +663,7 @@ void DecodedGeneticString::decodeBrainNode(std::string direction,
     std::uniform_real_distribution<double> weight_uni(-1, 1);
 
     // the item is a sensor
-    if(item == "SI" or item == "SL")
+    if(item == "ST" or item == "SL")
     {
         // if there's no output node yet
         // adds node to the list of 'from' nodes of current-edge
@@ -693,7 +692,7 @@ void DecodedGeneticString::decodeBrainNode(std::string direction,
                     ",color=\"lightgrey\",style=filled];"
                     ""<<std::endl;
         }
-        if (item == "SI") {
+        if (item == "ST") {
             file << v->id << "[label=<"<<v->id<<"<BR/>M"<<id_comp<<">"
                     ",color=\"grey\",style=filled];"
                     ""<<std::endl;

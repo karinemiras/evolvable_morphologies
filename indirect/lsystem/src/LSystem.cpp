@@ -11,7 +11,7 @@
 void LSystem::build_brain_functions(){
     brainfunctions.push_back("Simple");
     brainfunctions.push_back("Sigmoid");
-    brainfunctions.push_back("Oscillator");
+    //brainfunctions.push_back("Oscillator");
 }
 
 /**
@@ -97,13 +97,13 @@ void LSystem::build_alphabet(){
     alphabet_index.push_back("B");
     alphabet_type["B"] = "body";
 
-    alphabet["SI"] = "SI";   // infra-red (touch) sensor
-    alphabet_index.push_back("SI");
-    alphabet_type["SI"] = "sensor";
+    alphabet["ST"] = "ST";   // touch  sensor
+    alphabet_index.push_back("ST");
+    alphabet_type["ST"] = "sensor";
 
-    alphabet["SL"] = "SL";   // light sensor
-    alphabet_index.push_back("SL");
-    alphabet_type["SL"] = "sensor";
+    //alphabet["SL"] = "SL";   // light sensor
+    //alphabet_index.push_back("SL");
+    //alphabet_type["SL"] = "sensor";
 
 }
 

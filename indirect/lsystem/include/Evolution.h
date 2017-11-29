@@ -14,15 +14,16 @@
 #include "Measures.h"
 #include "Tests.h"
 
-/**
- * Evolutionary algorithm.
- */
+//from tol.spec import get_body_spec, get_brain_spec
 
+/**
+ * Evolutionary algorithms.
+ */
 class  Evolution{
 
 
 public:
-    // name of the experiment / if the experiment should be started from scratch (1) or not (0)
+
     explicit Evolution(std::string experiment_name,
                        int new_experiment,
                        std::string type_experiment){

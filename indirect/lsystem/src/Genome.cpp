@@ -966,7 +966,7 @@ void Genome::convertYamlBody(
   letters_convertion["C"] = "Core";
   letters_convertion["B"] = "FixedBrick";
   letters_convertion["AJ"] = "ActiveHinge";
-  letters_convertion["SI"] = "TouchSensor";
+  letters_convertion["ST"] = "TouchSensor";
   letters_convertion["SL"] = "LightSensor";
 
   // slots 0-back 1-front 2-right 3-left

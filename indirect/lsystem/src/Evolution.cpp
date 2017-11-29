@@ -674,6 +674,7 @@ void Evolution::evaluateNS(
  * @param generation - number of the generation for the evolution
  * @param individuals - population
  * */
+
 void Evolution::evaluateLocomotion(
     int generation,
     std::vector< Genome > &individuals)
@@ -686,6 +687,11 @@ void Evolution::evaluateLocomotion(
     // check validity of the morphology
     if (individuals[i].getValid() == 1)
     {
+
+//      body_spec = get_body_spec(self.conf);
+//      brain_spec = get_brain_spec(self.conf);
+//      missing_body = yaml_to_robot(body_spec, brain_spec, basic_yaml_object);
+
       individuals[i].updateFitness(1);
     }
     else
