@@ -409,3 +409,7 @@ direct/experiments
 experiments
 direct/cmake-build-debug
 indirect/cmake-build-debug
+revolve-simulator/cmake-build-debug
+direct/build
+indirect/build
+revolve-simulator/build
