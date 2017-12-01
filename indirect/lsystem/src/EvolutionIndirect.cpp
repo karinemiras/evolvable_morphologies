@@ -308,11 +308,12 @@ void EvolutionIndirect::mutation(
         else if (type_of_adding == 2)
         {
           aux = dist_letter(generator);
-          this->aux.logs("mutation: add letter " + LS.getAlphabetIndex()[aux]
+          auto letter = LS.buildBrainCommand(LS.getAlphabetIndex()[aux]);
+          this->aux.logs("mutation: add letter " + letter
                          + " in " + offspring->at(i).getId()
                          + " for " + mutate_letter + " at "
                          + std::to_string(pos_insertion));
-          genetic_string_item = LS.getAlphabetIndex()[aux];
+          genetic_string_item = letter;
         }
 
           // # adding moving command

@@ -167,6 +167,11 @@ void Genome::build_grammar(
       // prevents core component of being (re)included in the rule
       if (item != "C")
       {
+        // if its a joint, adds neuron info
+        if(item.substr(0,1) == "A" or item.substr(0,1) == "S"){
+          item = LS.buildBrainCommand(item);
+        }
+
         // raffles a brain move command to be included
         auto braincommand = LS.buildBrainCommand(LS.getBrainMoveCommands()[dist_5(generator)]);
         letter_items.push_back(braincommand);
@@ -289,7 +294,6 @@ void Genome::generate_final_string(
   // performs replacements for a number of iterations
   for (int i = 1; i <= replacement_iterations; i++)
   {
-
     // replacement is made given the grammar
     this->gs.replaces(this->grammar);
   }
@@ -895,13 +899,14 @@ void Genome::convertYamlBrain(std::string _directoryPath)
     auto id = node.first;
     auto type = node.second.first.first;
     auto function = node.second.first.second;
-    auto id_comp = node.second.second.first;
-    auto direction = node.second.second.second;
+    auto id_comp = node.second.second.second.first;
+    auto direction = node.second.second.second.second;
 
     robot_file << "    node" << id << ":" << std::endl;
     robot_file << "      id: node" << id << std::endl;
     robot_file << "      layer: " << type << std::endl;
     robot_file << "      part_id: module" << id_comp;
+    // if its a sensor in a direction
     if (direction != "")
     {
       robot_file << "sensor-" << direction;
@@ -918,30 +923,24 @@ void Genome::convertYamlBrain(std::string _directoryPath)
     auto destination = edge.first.second;
     auto weight = edge.second;
 
-    if (origin != 0) // desconsider bias
-    {
-      robot_file << "  - dst: node" << destination << std::endl;
-      robot_file << "    src: node" << origin << std::endl;
-      robot_file << "    weight: " << weight << std::endl;
-    }
+    robot_file << "  - dst: node" << destination << std::endl;
+    robot_file << "    src: node" << origin << std::endl;
+    robot_file << "    weight: " << weight << std::endl;
   }
 
   // adds bias connections
   robot_file << "  params:" << std::endl;
 
-  for (const auto &edge : this->dgs.getBrain_edges())
+  for (const auto &node : this->dgs.getBrain_nodes())
   {
-    auto origin = edge.first.first;
-    auto destination = edge.first.second;
-    auto weight = edge.second;
-
-    if (origin == 0) // desconsider bias
+    auto id = node.first;
+    auto bias = node.second.second.first;
+    if (bias != 0)
     {
-      robot_file << "    node" << destination << ":" << std::endl;
-      robot_file << "      bias: " << weight << std::endl;
+      robot_file << "    node" << id << ":" << std::endl;
+      robot_file << "      bias: " << bias << std::endl;
     }
   }
-
   robot_file.close();
 }
 

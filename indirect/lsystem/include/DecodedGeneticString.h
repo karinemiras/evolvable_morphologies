@@ -31,13 +31,7 @@ public:
 
   DecodedGeneticString(){
       root = NULL;
-      toNode = NULL;
       ids=0;
-
-      // add defualt bias as node
-      fromNode.push_back(new Vertex2());
-      fromNode[0]->id = 0;
-      fromNode[0]->type = "bias";
   }
 
   ~DecodedGeneticString(){}
@@ -69,17 +63,19 @@ public:
     // brain structure
     struct Vertex2
     {
-        std::string type; // EXCLUDE !
+        std::string type;
         int id;
         // identifies component (joint or sensor) to which the node is relative
-        int id_comp; // EXCLUDE !
+        int id_comp;
+        double bias;
+        double weight;
         //std::map< int, std::pair<Vertex2 *, double> > from_nodes;
         std::vector<Vertex2 *> from_nodes;
         std::vector<Vertex2 *> to_nodes;
 
         Vertex2()
         {
-            type=""; id_comp=id=-1;
+            type=""; id_comp=id=-1; weight=bias=0;
             from_nodes = std::vector<Vertex2 *>();
             to_nodes = std::vector<Vertex2 *>();
         }
@@ -106,7 +102,8 @@ public:
     std::map< std::pair<int, int>, double >
                         getBrain_edges();
 
-    std::map< int, std::pair<std::pair<std::string, std::string>, std::pair<int, std::string> > >
+    std::map< int, std::pair<std::pair<std::string, std::string>,
+       std::pair<double, std::pair<int, std::string> > > >
                         getBrain_nodes();
 
 
@@ -119,18 +116,22 @@ private:
             brain_edges = std::map< std::pair<int, int>, double >();
 
     // nodes of brain graph
-    std::map< int, std::pair<
-            std::pair<std::string, std::string>,
-            std::pair<int, std::string> > >
-    // <id, < <type,function>, <id_comp,direction> > >
-            brain_nodes =      std::map< int, std::pair<std::pair<std::string, std::string>, std::pair<int, std::string> > > ();
+    std::map< int, std::pair<std::pair<std::string,
+        std::string>, std::pair<double, std::pair<int, std::string> > > >
+            // <id, < <type,function>, <bias, <id_comp,direction> > > >
+            brain_nodes = std::map< int, std::pair<std::pair<std::string,
+               std::string>, std::pair<double, std::pair<int, std::string> > > >();
 
     // pointers to current-edge of brain graph:
 
     //  'from' node(s) in current-edge
-    std::vector<Vertex2 *> fromNode;
-    //  'to' node in current-edge
-    Vertex2 * toNode;
+    std::vector<Vertex2 *> fromNode =
+        std::vector<Vertex2 *>();
+
+    //  'to' node(s) in current-edge
+    std::vector<Vertex2 *> toNode =
+        std::vector<Vertex2 *>();
+
     int ids; // count of ids so far
 };
 

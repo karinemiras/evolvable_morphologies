@@ -4,6 +4,9 @@
 
 #include <iostream>
 
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/algorithm/string/split.hpp>
+
 #include "GeneticString.h"
 
 /**
@@ -216,10 +219,16 @@ void GeneticString::replaces(std::map< std::string, GeneticString  > grammar)
 
     while (current not_eq nullptr)
     { // for each letter on the main genetic-string of the genome, performs the due replacements (remotion/insertions) with other letters/commands
+        // if there are brain parameters for the letter (joint)
+        std::vector<std::string> tokens;
+        boost::split(tokens, current->item, boost::is_any_of("_"));
+        std::string aux_item;
+        if(tokens.size()>1) aux_item = tokens[0];
+        else aux_item = current->item;
 
-        if (!(grammar.find(current->item) == grammar.end()))
+        if (!(grammar.find(aux_item) == grammar.end()))
         {
-            current_replacement = grammar[current->item].start; // pointer to
+            current_replacement = grammar[aux_item].start; // pointer to
             // the first item of the genetic-string of the production rule for the letter (item)
 
             // removes letter from the main genetic-string, once it will be replaced by other item/s

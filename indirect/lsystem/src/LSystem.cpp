@@ -111,20 +111,42 @@ void LSystem::build_alphabet(){
 /**
  * Enhances brain commands with a parameter.
  **/
-std::string LSystem::buildBrainCommand(std::string braincommand){
-
+std::string LSystem::buildBrainCommand(std::string braincommand)
+{
     std::random_device rd;
     std::default_random_engine generator(rd());
     std::uniform_real_distribution<double> weight_uni(-1, 1);
     std::normal_distribution<double> weight_nor(0, 1);
     std::uniform_int_distribution<int> func(0, this->brainfunctions.size()-1);
 
+    if(braincommand.substr(0,1) == "A")
+    {
+        // new connection weight
+        braincommand += "_"+std::to_string(weight_uni(generator));
+        // bias weight
+        braincommand += "|"+std::to_string(weight_uni(generator));
+        // transfer/activation function
+        braincommand += "|" + this->brainfunctions[func(generator)];
+    }
+
+    if(braincommand.substr(0,1) == "S")
+    {
+      // new connection weight
+      braincommand += "_"+std::to_string(weight_uni(generator));
+    }
+
     if(   braincommand == "brainedge"
           or braincommand == "brainloop")
+        // new connection weight
         braincommand += "_"+std::to_string(weight_uni(generator));
 
-    if(  braincommand == "brainnode") {
+    if(  braincommand == "brainnode")
+    {
+        // new connection weight
         braincommand += "_" + std::to_string(weight_uni(generator));
+        // bias weight
+        braincommand += "|" + std::to_string(weight_uni(generator));
+        // transfer/activation function
         braincommand += "|" + this->brainfunctions[func(generator)];
     }
 
@@ -146,8 +168,10 @@ std::string LSystem::buildBrainCommand(std::string braincommand){
     if(   braincommand == "brainmoveTTS"
           or  braincommand == "brainmoveFTS")
     {
+        // intermediate node to roam
         double intermediate = weight_nor(generator);
         intermediate = ceil(sqrt(intermediate*intermediate));
+        // sibbling node to roam
         double sibling = weight_nor(generator);
         sibling = ceil(sqrt(sibling*sibling));
 

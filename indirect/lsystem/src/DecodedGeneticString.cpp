@@ -43,22 +43,27 @@ void DecodedGeneticString::decode(GeneticString gs,
     GeneticString::Node *current_gs_item;
     current_gs_item = gs.getStart();
 
-
+    // for each item of the main genetic-string
     for (int i = 0; i < gs.count(); i++)
-    { // for each item of the main genetic-string
+    {
 
-        //std::cout<<" ------ current_gs_item "<<current_gs_item->item<<std::endl;
+        // if there are brain parameters for the letter (joint)
+        std::vector<std::string> tokens;
+        boost::split(tokens, current_gs_item->item, boost::is_any_of("_"));
+        std::string aux_item;
+        if(tokens.size()>1) aux_item = tokens[0];
+        else aux_item = current_gs_item->item;
 
 
         // if the item is a letter (component) in the alphabet
-        if (LS.getAlphabet().count(current_gs_item->item) > 0){
+        if (LS.getAlphabet().count(aux_item) > 0){
 
             // if limit number of components has not been reached
             if(num_components < params["max_comps"])
             {
 
                 // if item is a sensor
-                if (LS.getAlphabetType()[current_gs_item->item] == "sensor") {
+                if (LS.getAlphabetType()[aux_item] == "sensor") {
                     if (root != NULL // if previous component is core or brick
                         and (current_component->item == "C" or
                              current_component->item == "B")) {
@@ -76,7 +81,7 @@ void DecodedGeneticString::decode(GeneticString gs,
                                     ) {
                                 if (current_component->back == NULL and
                                     current_component->sensor_back == "Sn") {
-                                    current_component->sensor_back = current_gs_item->item;
+                                    current_component->sensor_back = aux_item;
                                     this->decodeBrainNode
                                             ("b",
                                              current_gs_item->item,
@@ -88,7 +93,7 @@ void DecodedGeneticString::decode(GeneticString gs,
                                     if (current_component->left == NULL and
                                         current_component->sensor_left ==
                                         "Sn") {
-                                        current_component->sensor_left = current_gs_item->item;
+                                        current_component->sensor_left = aux_item;
                                         this->decodeBrainNode
                                                 (mountingcommand,
                                                  current_gs_item->item,
@@ -99,7 +104,7 @@ void DecodedGeneticString::decode(GeneticString gs,
                                     if (current_component->front == NULL and
                                         current_component->sensor_front ==
                                         "Sn") {
-                                        current_component->sensor_front = current_gs_item->item;
+                                        current_component->sensor_front = aux_item;
                                         this->decodeBrainNode
                                                 (mountingcommand,
                                                  current_gs_item->item,
@@ -110,7 +115,7 @@ void DecodedGeneticString::decode(GeneticString gs,
                                     if (current_component->right == NULL and
                                         current_component->sensor_right ==
                                         "Sn") {
-                                        current_component->sensor_right = current_gs_item->item;
+                                        current_component->sensor_right = aux_item;
                                         this->decodeBrainNode
                                                 (mountingcommand,
                                                  current_gs_item->item,
@@ -124,9 +129,9 @@ void DecodedGeneticString::decode(GeneticString gs,
                 }
 
                 // if item is a body component
-                if (LS.getAlphabetType()[current_gs_item->item] == "body") {
+                if (LS.getAlphabetType()[aux_item] == "body") {
 
-                    std::string letter = current_gs_item->item;
+                    std::string letter = aux_item;
 
                     // creates new node in the graph with the current letter (component)
                     new_component = new DecodedGeneticString::Vertex;
@@ -209,7 +214,8 @@ void DecodedGeneticString::decode(GeneticString gs,
                                     }
 
                                     if (mountingcommand ==
-                                        "r") {  // mounts component on the right
+                                        "r") {  // mounts componentf on the
+                                      // right
                                         if (current_component->right != NULL
                                             or
                                             current_component->sensor_right !=
@@ -249,7 +255,7 @@ void DecodedGeneticString::decode(GeneticString gs,
                             mountingcommand = "";
 
                             if (new_component->item.substr(0, 1) == "A") {
-                                this->decodeBrainNode("",current_gs_item->item,
+                                this->decodeBrainNode("", current_gs_item->item,
                                                       new_component->id, path);
                             }
 
@@ -262,7 +268,7 @@ void DecodedGeneticString::decode(GeneticString gs,
                 }
             }
 
-            // the item is a command
+        // the item is a command
         } else {
 
             std::string typecommand = current_gs_item->item.substr(0, 3);
@@ -366,8 +372,8 @@ void DecodedGeneticString::decodeBrainCommand(std::string item,
                                               std::string path)
 {
     // if there is a current-edge
-    if(this->toNode != NULL) {
-
+    if(this->toNode.size() != 0 and this->fromNode.size() != 0 )
+    {
         std::ofstream file;
         file.open("../../experiments/"+ path +"/tempbrain.dot", std::ofstream::app);
 
@@ -379,7 +385,7 @@ void DecodedGeneticString::decodeBrainCommand(std::string item,
 
         auto edge = std::make_pair(
                 this->fromNode[0]->id,
-                this->toNode->id);
+                this->toNode[0]->id);
 
         // pertubs weight of current-edge
         if(command == "brainperturb")
@@ -397,12 +403,12 @@ void DecodedGeneticString::decodeBrainCommand(std::string item,
         if(command == "brainloop")
         {
             auto self_edge = std::make_pair(
-                    this->toNode->id,
-                    this->toNode->id);
+                    this->toNode[0]->id,
+                    this->toNode[0]->id);
             // if self-connection does not exist already
             // and node is output
             if(this->brain_edges.count(self_edge) == 0
-               and this->toNode->type != "hidden")
+               and this->toNode[0]->type != "hidden")
             {
                 this->brain_edges[self_edge] = std::stod(param);
             }
@@ -414,61 +420,66 @@ void DecodedGeneticString::decodeBrainCommand(std::string item,
             // if a connection exists, creates new node in between nodes
             if(this->brain_edges.count(edge) > 0)
             {
-                DecodedGeneticString::Vertex2 * v = new Vertex2();
-                this->ids++;
-                v->id = this->ids;
-                v->id_comp = 0;
-                v->type = "hidden";
+              tokens = boost::split(tokens, param, boost::is_any_of("|"));
+              auto weight = std::stod(tokens[0]);
+              auto bias = std::stod(tokens[1]);
+              auto function = tokens[2];
 
-                tokens = boost::split(tokens, param, boost::is_any_of("|"));
-                auto weight = std::stod(tokens[0]);
-                auto function = tokens[1];
+              DecodedGeneticString::Vertex2 * v = new Vertex2();
+              this->ids++;
+              v->id = this->ids;
+              v->id_comp = 0;
+              v->type = "hidden";
+              v->bias = bias;
+              v->weight = weight;
 
-                // sets node in the visualization
-                file << v->id << " [label=<"<<v->id<<"<BR/>"<<function<<">,"
-                        "shape=box];"
-                        ""<<std::endl;
+              // sets node in the visualization
+              file << v->id << " [label=<"<<v->id<<"<BR/>"
+                   <<function
+                  <<"<BR /> bias "
+                  << v->bias <<">,"
+                      "shape=box];"<<std::endl;
 
-                // updates list of nodes
-                this->brain_nodes[v->id] =
-                        { {v->type, function},
-                          {v->id_comp, ""}
-                        };
+              // updates list of nodes
+              this->brain_nodes[v->id] =
+                      { {v->type, function},
+                        {v->bias, {v->id_comp, ""}}
+                      };
 
-                // removes old link
-                double old_w = this->brain_edges[edge];
-                this->brain_edges.erase(edge);
+              // removes old link
+              double old_w = this->brain_edges[edge];
+              this->brain_edges.erase(edge);
 
-                // adds link from 'from' to new
-                edge = std::make_pair(
-                        this->fromNode[0]->id,
-                        v->id);
-                this->brain_edges[edge] = old_w;
+              // adds link from 'from' to new
+              edge = std::make_pair(
+                      this->fromNode[0]->id,
+                      v->id);
+              this->brain_edges[edge] = old_w;
 
-                // adds link new in to 'to'
-                edge = std::make_pair(
-                        v->id,
-                        this->toNode->id);
-                this->brain_edges[edge] = weight;
+              // adds link new in to 'to'
+              edge = std::make_pair(
+                      v->id,
+                      this->toNode[0]->id);
+              this->brain_edges[edge] = weight;
 
-                // updates pointers of current-edge brain graph
+              // updates pointers of current-edge brain graph
 
-                for (int i=0; i<this->fromNode[0]->to_nodes.size(); i++)
-                {
-                    if (this->fromNode[0]->to_nodes[i] == this->toNode)
-                    {
-                        this->fromNode[0]->to_nodes[i] = v;
-                        v->from_nodes.push_back(this->fromNode[0]);
-                    }
-                }
-                for (int i=0; i<this->toNode->from_nodes.size(); i++)
-                {
-                    if (this->toNode->from_nodes[i] == this->fromNode[0])
-                    {
-                        this->toNode->from_nodes[i] = v;
-                        v->to_nodes.push_back(this->toNode);
-                    }
-                }
+              for (int i=0; i<this->fromNode[0]->to_nodes.size(); i++)
+              {
+                  if (this->fromNode[0]->to_nodes[i] == this->toNode[0])
+                  {
+                      this->fromNode[0]->to_nodes[i] = v;
+                      v->from_nodes.push_back(this->fromNode[0]);
+                  }
+              }
+              for (int i=0; i<this->toNode[0]->from_nodes.size(); i++)
+              {
+                  if (this->toNode[0]->from_nodes[i] == this->fromNode[0])
+                  {
+                      this->toNode[0]->from_nodes[i] = v;
+                      v->to_nodes.push_back(this->toNode[0]);
+                  }
+              }
 
             }
         }
@@ -479,12 +490,12 @@ void DecodedGeneticString::decodeBrainCommand(std::string item,
             // if there is no connection, creates edge
             if (this->brain_edges.count(edge) == 0)
             {
-                this->fromNode[0]->to_nodes.push_back(this->toNode);
-                this->toNode->from_nodes.push_back(this->fromNode[0]);
+                this->fromNode[0]->to_nodes.push_back(this->toNode[0]);
+                this->toNode[0]->from_nodes.push_back(this->fromNode[0]);
 
                 edge = std::make_pair(
                         this->fromNode[0]->id,
-                        this->toNode->id);
+                        this->toNode[0]->id);
                 this->brain_edges[edge] = std::stod(param);
 
 
@@ -516,7 +527,7 @@ void DecodedGeneticString::decodeBrainCommand(std::string item,
             // if child is hidden node (not output)
             // and is not the current 'to'
             if(this->fromNode[0]->to_nodes[node]->type == "hidden"
-               and this->fromNode[0]->to_nodes[node] != this->toNode)
+               and this->fromNode[0]->to_nodes[node] != this->toNode[0])
             {
                 this->fromNode[0] = this->fromNode[0]->to_nodes[node];
             }
@@ -548,14 +559,14 @@ void DecodedGeneticString::decodeBrainCommand(std::string item,
         {
             auto node = std::stod(param);
             // arranges to which parent to go
-            if(this->toNode->from_nodes.size() < node){
-                node = this->toNode->from_nodes.size()-1;
+            if(this->toNode[0]->from_nodes.size() < node){
+                node = this->toNode[0]->from_nodes.size()-1;
             } else node = node-1;
             // if parent is hidden node (not input)
             // or is the current 'to'
-            if(this->toNode->from_nodes[node]->type == "hidden"
-               and this->toNode->from_nodes[node] != this->fromNode[0]){
-                this->toNode = this->toNode->from_nodes[node];
+            if(this->toNode[0]->from_nodes[node]->type == "hidden"
+               and this->toNode[0]->from_nodes[node] != this->fromNode[0]){
+                this->toNode[0] = this->toNode[0]->from_nodes[node];
             }
         }
 
@@ -564,12 +575,12 @@ void DecodedGeneticString::decodeBrainCommand(std::string item,
         {
             auto node = std::stod(param);
             // if it is not output layer
-            if (this->toNode->to_nodes.size() != 0) {
+            if (this->toNode[0]->to_nodes.size() != 0) {
                 // arranges to which child to go
-                if (this->toNode->to_nodes.size() < node) {
-                    node = this->toNode->to_nodes.size() - 1;
+                if (this->toNode[0]->to_nodes.size() < node) {
+                    node = this->toNode[0]->to_nodes.size() - 1;
                 } else node = node - 1;
-                this->toNode = this->toNode->to_nodes[node];
+                this->toNode[0] = this->toNode[0]->to_nodes[node];
             }
         }
 
@@ -581,60 +592,19 @@ void DecodedGeneticString::decodeBrainCommand(std::string item,
             auto sibling = std::stod(tokens[1]);
 
             // arranges to which intermediate to go
-            if (this->toNode->from_nodes.size() < intermediate){
-                intermediate = this->toNode->from_nodes.size() - 1;
+            if (this->toNode[0]->from_nodes.size() < intermediate){
+                intermediate = this->toNode[0]->from_nodes.size() - 1;
             } else intermediate = intermediate - 1;
 
             // arranges to which sibling to go
-            if (this->toNode->from_nodes[intermediate]->to_nodes.size() < sibling){
-                sibling = this->toNode->from_nodes[intermediate]->to_nodes.size() - 1;
+            if (this->toNode[0]->from_nodes[intermediate]->to_nodes.size() < sibling){
+                sibling = this->toNode[0]->from_nodes[intermediate]->to_nodes.size() - 1;
             } else sibling = sibling - 1;
 
-            this->toNode =
-                    this->toNode->from_nodes[intermediate]->to_nodes[sibling];
+            this->toNode[0] =
+                    this->toNode[0]->from_nodes[intermediate]->to_nodes[sibling];
         }
-
-//
-//        for (const auto &nothing : this->brain_nodes){
-//            std::cout<<nothing.first.first<<" "<<nothing.first.second<<" "
-//                     <<nothing.second.first<<" " <<nothing.second.second<<std::endl;
-//        }
-//        for (const auto &nothing : this->brain_edges){
-//            std::cout<<nothing.first.first<<" "<<nothing.first.second<<" "<<nothing.second<<std::endl;
-//        }
-//
-//        std::cout<<"> from list: "<<std::endl;
-//        for(int i=0;i<this->fromNode.size();i++){
-//            std::cout<<std::endl<<" id "<<this->fromNode[i]->id;
-//            std::cout<<" type "<<this->fromNode[i]->type;
-//            std::cout<<" idcomp "<<this->fromNode[i]->id_comp<<std::endl;
-//            if(this->fromNode[i]->to_nodes.size()>0){
-//                for(int j=0;j<this->fromNode[i]->to_nodes.size();j++){
-//                    std::cout<<"   id "<<this->fromNode[i]->to_nodes[j]->id;
-//                    std::cout<<" type "<<this->fromNode[i]->to_nodes[j]->type;
-//                    std::cout<<" idcomp "<<this->fromNode[i]->to_nodes[j]->id_comp<<std::endl;
-//                }
-//            }
-//        }
-//
-//        std::cout<<"> to  : "<<std::endl;
-//        if (this->toNode != NULL) {
-//            std::cout << std::endl << " id " << this->toNode->id;
-//            std::cout << " type " << this->toNode->type;
-//            std::cout << " idcomp " << this->toNode->id_comp << std::endl;
-//            if (this->toNode->from_nodes.size() > 0) {
-//                for (int j = 0; j < this->toNode->from_nodes.size(); j++) {
-//                    std::cout  << "   id "
-//                               << this->toNode->from_nodes[j]->id;
-//                    std::cout << " type " << this->toNode->from_nodes[j]->type;
-//                    std::cout << " idcomp "
-//                              << this->toNode->from_nodes[j]->id_comp << std::endl;
-//                }
-//            }
-//        }
-
         file.close();
-
     }
 }
 
@@ -647,10 +617,15 @@ void DecodedGeneticString::decodeBrainCommand(std::string item,
 void DecodedGeneticString::decodeBrainNode(std::string direction,
                                            std::string item,
                                            int id_comp,
-                                           std::string path){
-
+                                           std::string path)
+{
     std::ofstream file;
     file.open("../../experiments/"+ path +"/tempbrain.dot", std::ofstream::app);
+
+    std::vector<std::string> tokens;
+    boost::split(tokens, item,  boost::is_any_of("_"));
+    item = tokens[0];
+    auto param = tokens[1];
 
     DecodedGeneticString::Vertex2 * v = new Vertex2();
     this->ids++;
@@ -658,32 +633,46 @@ void DecodedGeneticString::decodeBrainNode(std::string direction,
     v->id_comp = id_comp;
     v->type = item;
 
-    std::random_device rd;
-    std::default_random_engine generator(rd());
-    std::uniform_real_distribution<double> weight_uni(-1, 1);
-
     // the item is a sensor
     if(item == "ST" or item == "SL")
     {
         // if there's no output node yet
         // adds node to the list of 'from' nodes of current-edge
-        // remember: list starts with bias
-        if (this->toNode == NULL)
+        if (this->toNode.size() == 0)
         {
+            v->weight = std::stod(param);
             this->fromNode.push_back(v);
         }else
         {
             // update 'from' of current-edge
-            this->fromNode[0] = v;
+          if(this->fromNode.size()>0)
+              this->fromNode[0] = v;
+          else
+            this->fromNode.push_back(v);
 
-            // connects new node to 'to-node' of current edge
-            this->toNode->from_nodes.push_back(this->fromNode[0]);
-            this->fromNode[0]->to_nodes.push_back(this->toNode);
+            // if there's a list, connects new node to them all and updates the list
+            // with the latest node only
+            for(int i=0; i< this->toNode.size(); i++)
+            {
+                // connects new node to 'to-node' of current edge
+                this->toNode[i]->from_nodes.push_back(this->fromNode[0]);
+                this->fromNode[0]->to_nodes.push_back(this->toNode[i]);
 
-            std::pair<int, int> edge = std::make_pair(this->fromNode[0]->id,
-                                                      this->toNode->id);
-            this->brain_edges[edge] = weight_uni(generator);
+                std::pair< int, int > edge = std::make_pair(
+                    this->fromNode[0]->id,
+                    this->toNode[i]->id);
 
+              if(i == this->toNode.size()-1)
+                // weight of new node
+                this->brain_edges[edge] = std::stod(param);
+              else
+                // weight of node on the stack
+                this->brain_edges[edge] = this->toNode[i]->weight;
+            }
+            // remove from 'to' list after connection, except for the last
+            this->toNode.erase(
+                this->toNode.begin(),
+                this->toNode.begin() + this->toNode.size() - 1);
         }
 
         // sets node in the visualization
@@ -702,100 +691,75 @@ void DecodedGeneticString::decodeBrainNode(std::string direction,
         // <id, < <type,function>, <id_comp,direction> > >
         this->brain_nodes[this->ids] =
             { {"input", "Input"},
-              {id_comp, direction}
+              {0,{id_comp, direction}}
             };
     }
 
     // the item is an active joint
     if(item == "AJ1" or item == "AJ2")
     {
-        // update 'to' of current-edge
-        this->toNode = v;
+        boost::split(tokens, param,  boost::is_any_of("|"));
+        auto weight = std::stod(tokens[0]);
+        auto bias = std::stod(tokens[1]);
+        auto function = tokens[2];
 
-        // if theres a list, connects new node to them all and updates the list
-        // with the latest node only
-        for(int i=0; i< this->fromNode.size(); i++){
+        // if there's no input node yet
+        // adds node to the list of 'to' nodes of current-edge
+        if (this->fromNode.size() == 0)
+        {
+            v->weight = weight;
+            this->toNode.push_back(v);
+        }else
+        {
+            // update 'to' of current-edge
+          if(this->toNode.size() >0)
+            this->toNode[0] = v;
+          else
+            this->toNode.push_back(v);
 
-            // connects new node to 'from-node(s)' of current edge
-            this->toNode->from_nodes.push_back(this->fromNode[i]);
-            this->fromNode[i]->to_nodes.push_back(this->toNode);
+            // if theres a list, connects new node to them all and updates the list
+            // with the latest node only
+            for (int i = 0; i < this->fromNode.size(); i++)
+            {
+                // connects new node to 'from-node(s)' of current edge
+                this->toNode[0]->from_nodes.push_back(this->fromNode[i]);
+                this->fromNode[i]->to_nodes.push_back(this->toNode[0]);
 
+                std::pair< int, int > edge = std::make_pair(
+                    this->fromNode[i]->id,
+                    this->toNode[0]->id);
 
-            std::pair<int, int> edge = std::make_pair(this->fromNode[i]->id,
-                                                      this->toNode->id);
-            this->brain_edges[edge] = weight_uni(generator);
+              if(i == this->fromNode.size()-1)
+                // weight of new node
+                this->brain_edges[edge] = weight;
+              else
+                // weight of node on the stack
+                this->brain_edges[edge] = this->fromNode[i]->weight;
+            }
+
+            // remove from 'from' list after connection, except for the last
+            this->fromNode.erase(
+                this->fromNode.begin(),
+                this->fromNode.begin() + this->fromNode.size() - 1);
         }
-
-        // remove from list after connection, except for the last
-        this->fromNode.erase(this->fromNode.begin(),
-                             this->fromNode.begin()+this->fromNode.size()-1);
-
-
-        // sets tranfer function for node
-        std::random_device rd;
-        std::default_random_engine generator(rd());
-        LSystem LS;
-        std::uniform_int_distribution<int> func(0, LS.getBrainFunctions().size()-1);
-        auto function = LS.getBrainFunctions()[func(generator)];
-
-        // updates list of nodes
-        // <id, < <type,function>, <id_comp,direction> > >
-        this->brain_nodes[this->ids] =
-                { {"output", function},
-                  {id_comp, ""}
-                };
 
         // sets node in the visualization
         file << v->id <<
              " [label=<"<< v->id <<"<BR />"
              <<function<<" "
-                     "M"<<id_comp<<">, shape=box,color=red,"
+                     "M"<<id_comp<<"<BR /> bias "
+                     << bias
+                     <<">, shape=box,color=red,"
                      "style=filled];"<<std::endl;
+
+        // updates list of nodes
+        // <id, < <type,function>, <bias ,<id_comp,direction> > > >
+        this->brain_nodes[this->ids] =
+            { {"output", function},
+              { bias , {id_comp, ""}}
+            };
+
     }
-
-
-//
-//    std::cout<<" -------------------- "<<item<<" "<<id_comp<<std::endl;
-//
-//    for (const auto &nothing : this->brain_nodes){
-//        std::cout<<nothing.first.first<<" "<<nothing.first.second<<" "
-//                 <<nothing.second.first<<" " <<nothing.second.second<<std::endl;
-//    }
-//    for (const auto &nothing : this->brain_edges){
-//        std::cout<<nothing.first.first<<" "<<nothing.first.second<<" "<<nothing.second<<std::endl;
-//    }
-//
-//    std::cout<<"> from list: "<<std::endl;
-//    for(int i=0;i<this->fromNode.size();i++){
-//        std::cout<<std::endl<<" id "<<this->fromNode[i]->id;
-//        std::cout<<" type "<<this->fromNode[i]->type;
-//        std::cout<<" idcomp "<<this->fromNode[i]->id_comp<<std::endl;
-//        if(this->fromNode[i]->to_nodes.size()>0){
-//            for(int j=0;j<this->fromNode[i]->to_nodes.size();j++){
-//                std::cout<<"   id "<<this->fromNode[i]->to_nodes[j]->id;
-//                std::cout<<" type "<<this->fromNode[i]->to_nodes[j]->type;
-//                std::cout<<" idcomp "<<this->fromNode[i]->to_nodes[j]->id_comp<<std::endl;
-//            }
-//        }
-//    }
-//
-//    std::cout<<"> to  : "<<std::endl;
-//    if (this->toNode != NULL) {
-//        std::cout << std::endl << " id " << this->toNode->id;
-//        std::cout << " type " << this->toNode->type;
-//        std::cout << " idcomp " << this->toNode->id_comp << std::endl;
-//        if (this->toNode->from_nodes.size() > 0) {
-//            for (int j = 0; j < this->toNode->from_nodes.size(); j++) {
-//                std::cout  << "   id "
-//                           << this->toNode->from_nodes[j]->id;
-//                std::cout << " type " << this->toNode->from_nodes[j]->type;
-//                std::cout << " idcomp "
-//                          << this->toNode->from_nodes[j]->id_comp << std::endl;
-//            }
-//        }
-//
-//    }
-
     file.close();
 }
 
@@ -811,7 +775,7 @@ std::map< std::pair<int, int>, double > DecodedGeneticString::getBrain_edges(){
     return this->brain_edges;
 }
 
-std::map< int, std::pair<std::pair<std::string, std::string>, std::pair<int, std::string> > >
+std::map< int, std::pair<std::pair<std::string, std::string>, std::pair<double, std::pair<int, std::string> > > >
     DecodedGeneticString::getBrain_nodes(){
         return this->brain_nodes;
 }
