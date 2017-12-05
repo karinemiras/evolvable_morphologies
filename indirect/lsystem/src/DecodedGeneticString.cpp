@@ -357,7 +357,7 @@ void DecodedGeneticString::decode(GeneticString gs,
         auto destination = c.first.second;
         auto weight = c.second;
         file<<origin<<" -> "<< destination
-            <<"[label=\""<<weight<<" \",fontsize=\"10\"];"<<std::endl;
+            <<"[label=\""<<weight<<" \",fontsize=\"8\"];"<<std::endl;
     }
     file<<" }"<<std::endl;
     file.close();
@@ -408,7 +408,7 @@ void DecodedGeneticString::decodeBrainCommand(std::string item,
             // if self-connection does not exist already
             // and node is output
             if(this->brain_edges.count(self_edge) == 0
-               and this->toNode[0]->type != "hidden")
+               and this->toNode[0]->layer != "hidden")
             {
                 this->brain_edges[self_edge] = std::stod(param);
             }
@@ -420,31 +420,46 @@ void DecodedGeneticString::decodeBrainCommand(std::string item,
             // if a connection exists, creates new node in between nodes
             if(this->brain_edges.count(edge) > 0)
             {
-              tokens = boost::split(tokens, param, boost::is_any_of("|"));
-              auto weight = std::stod(tokens[0]);
-              auto bias = std::stod(tokens[1]);
-              auto function = tokens[2];
-
               DecodedGeneticString::Vertex2 * v = new Vertex2();
               this->ids++;
               v->id = this->ids;
               v->id_comp = 0;
-              v->type = "hidden";
-              v->bias = bias;
-              v->weight = weight;
+              v->layer = "hidden";
+              v->direction = "";
+
+              tokens = boost::split(tokens, param, boost::is_any_of("|"));
+              v->weight = std::stod(tokens[0]);
+              v->function = tokens[1];
+
+              if(v->function == "Oscillator")
+              {
+                v->amplitude = std::stod(tokens[2]);
+                v->period = std::stod(tokens[3]);
+                v->phase_offset = std::stod(tokens[4]);
+              }
+              else
+                v->bias = std::stod(tokens[2]);
+
 
               // sets node in the visualization
-              file << v->id << " [label=<"<<v->id<<"<BR/>"
-                   <<function
-                  <<"<BR /> bias "
-                  << v->bias <<">,"
-                      "shape=box];"<<std::endl;
+              auto output_text = std::to_string(v->id)
+                                +"[label=<"+std::to_string(v->id)+"<BR/>"
+                                +v->function+"<BR/>";
+              if(v->function == "Oscillator")
+              {
+                output_text += " amplitude: " + std::to_string(v->amplitude)+"<BR />";
+                output_text += " period: " + std::to_string(v->period)+"<BR />";
+                output_text += " phase_offset: " + std::to_string(v->phase_offset);
+              }
+              else
+                output_text += " bias: " + std::to_string(v->bias);
+
+              output_text +=">,shape=box,fontsize=8];";
+              file << output_text<<std::endl;
 
               // updates list of nodes
-              this->brain_nodes[v->id] =
-                      { {v->type, function},
-                        {v->bias, {v->id_comp, ""}}
-                      };
+              this->brain_nodes[v->id] = v;
+
 
               // removes old link
               double old_w = this->brain_edges[edge];
@@ -460,7 +475,7 @@ void DecodedGeneticString::decodeBrainCommand(std::string item,
               edge = std::make_pair(
                       v->id,
                       this->toNode[0]->id);
-              this->brain_edges[edge] = weight;
+              this->brain_edges[edge] = v->weight;
 
               // updates pointers of current-edge brain graph
 
@@ -526,7 +541,7 @@ void DecodedGeneticString::decodeBrainCommand(std::string item,
             } else node = node-1;
             // if child is hidden node (not output)
             // and is not the current 'to'
-            if(this->fromNode[0]->to_nodes[node]->type == "hidden"
+            if(this->fromNode[0]->to_nodes[node]->layer == "hidden"
                and this->fromNode[0]->to_nodes[node] != this->toNode[0])
             {
                 this->fromNode[0] = this->fromNode[0]->to_nodes[node];
@@ -564,7 +579,7 @@ void DecodedGeneticString::decodeBrainCommand(std::string item,
             } else node = node-1;
             // if parent is hidden node (not input)
             // or is the current 'to'
-            if(this->toNode[0]->from_nodes[node]->type == "hidden"
+            if(this->toNode[0]->from_nodes[node]->layer == "hidden"
                and this->toNode[0]->from_nodes[node] != this->fromNode[0]){
                 this->toNode[0] = this->toNode[0]->from_nodes[node];
             }
@@ -631,11 +646,15 @@ void DecodedGeneticString::decodeBrainNode(std::string direction,
     this->ids++;
     v->id = this->ids;
     v->id_comp = id_comp;
-    v->type = item;
 
     // the item is a sensor
     if(item == "ST" or item == "SL")
     {
+        v->layer = "input";
+        v->bias = 0;
+        v->function = "Simple";
+        // direction is to identify the sensor, ex.: sensor of the left
+        v->direction = direction;
         // if there's no output node yet
         // adds node to the list of 'from' nodes of current-edge
         if (this->toNode.size() == 0)
@@ -677,37 +696,42 @@ void DecodedGeneticString::decodeBrainNode(std::string direction,
 
         // sets node in the visualization
         if (item == "SL") {
-            file << v->id << "[label=<"<<v->id<<"<BR/>M"<<id_comp<<">"
-                    ",color=\"lightgrey\",style=filled];"
+            file << v->id << "[label=<"<<v->id<<"<BR/>M"<<v->id_comp<<">"
+                    ",color=\"lightgrey\",style=filled,fontsize=8];"
                     ""<<std::endl;
         }
         if (item == "ST") {
-            file << v->id << "[label=<"<<v->id<<"<BR/>M"<<id_comp<<">"
-                    ",color=\"grey\",style=filled];"
+            file << v->id << "[label=<"<<v->id<<"<BR/>M"<<v->id_comp<<">"
+                    ",color=\"grey\",style=filled,fontsize=8];"
                     ""<<std::endl;
         }
 
         // updates list of nodes
-        // <id, < <type,function>, <id_comp,direction> > >
-        this->brain_nodes[this->ids] =
-            { {"input", "Input"},
-              {0,{id_comp, direction}}
-            };
+        this->brain_nodes[this->ids] = v;
     }
 
     // the item is an active joint
     if(item == "AJ1" or item == "AJ2")
     {
+        v->layer = "output";
+        v->direction = "";
+
         boost::split(tokens, param,  boost::is_any_of("|"));
-        auto weight = std::stod(tokens[0]);
-        auto bias = std::stod(tokens[1]);
-        auto function = tokens[2];
+        v->weight = std::stod(tokens[0]);
+        v->function = tokens[1];
+        if(v->function == "Oscillator")
+        {
+          v->amplitude = std::stod(tokens[2]);
+          v->period = std::stod(tokens[3]);
+          v->phase_offset = std::stod(tokens[4]);
+        }
+        else
+          v->bias = std::stod(tokens[2]);
 
         // if there's no input node yet
         // adds node to the list of 'to' nodes of current-edge
         if (this->fromNode.size() == 0)
         {
-            v->weight = weight;
             this->toNode.push_back(v);
         }else
         {
@@ -731,7 +755,7 @@ void DecodedGeneticString::decodeBrainNode(std::string direction,
 
               if(i == this->fromNode.size()-1)
                 // weight of new node
-                this->brain_edges[edge] = weight;
+                this->brain_edges[edge] = v->weight;
               else
                 // weight of node on the stack
                 this->brain_edges[edge] = this->fromNode[i]->weight;
@@ -744,21 +768,24 @@ void DecodedGeneticString::decodeBrainNode(std::string direction,
         }
 
         // sets node in the visualization
-        file << v->id <<
-             " [label=<"<< v->id <<"<BR />"
-             <<function<<" "
-                     "M"<<id_comp<<"<BR /> bias "
-                     << bias
-                     <<">, shape=box,color=red,"
-                     "style=filled];"<<std::endl;
+        auto output_text = std::to_string(v->id) + " [label=<"
+                           +std::to_string(v->id) +"<BR />" +v->function
+                           +" M"+std::to_string(v->id_comp)+"<BR />";
+        if(v->function == "Oscillator")
+        {
+          output_text += " amplitude: " + std::to_string(v->amplitude)+"<BR />";
+          output_text += " period: " + std::to_string(v->period)+"<BR />";
+          output_text += " phase_offset: " + std::to_string(v->phase_offset);
+        }
+        else
+          output_text += " bias: " + std::to_string(v->bias);
+
+        output_text +=">, shape=box,color=red,style=filled,fontsize=8];";
+
+        file << output_text<<std::endl;
 
         // updates list of nodes
-        // <id, < <type,function>, <bias ,<id_comp,direction> > > >
-        this->brain_nodes[this->ids] =
-            { {"output", function},
-              { bias , {id_comp, ""}}
-            };
-
+        this->brain_nodes[this->ids] = v;
     }
     file.close();
 }
@@ -775,8 +802,8 @@ std::map< std::pair<int, int>, double > DecodedGeneticString::getBrain_edges(){
     return this->brain_edges;
 }
 
-std::map< int, std::pair<std::pair<std::string, std::string>, std::pair<double, std::pair<int, std::string> > > >
-    DecodedGeneticString::getBrain_nodes(){
+std::map< int, DecodedGeneticString::Vertex2 *>
+DecodedGeneticString::getBrain_nodes(){
         return this->brain_nodes;
 }
 

@@ -896,23 +896,17 @@ void Genome::convertYamlBrain(std::string _directoryPath)
 
   for (const auto &node : this->dgs.getBrain_nodes())
   {
-    auto id = node.first;
-    auto type = node.second.first.first;
-    auto function = node.second.first.second;
-    auto id_comp = node.second.second.second.first;
-    auto direction = node.second.second.second.second;
-
-    robot_file << "    node" << id << ":" << std::endl;
-    robot_file << "      id: node" << id << std::endl;
-    robot_file << "      layer: " << type << std::endl;
-    robot_file << "      part_id: module" << id_comp;
+    robot_file << "    node" << node.first << ":" << std::endl;
+    robot_file << "      id: node" << node.first << std::endl;
+    robot_file << "      layer: " << node.second->layer << std::endl;
+    robot_file << "      part_id: module" << node.second->id_comp;
     // if its a sensor in a direction
-    if (direction != "")
+    if (node.second->direction != "")
     {
-      robot_file << "sensor-" << direction;
+      robot_file << "sensor-" << node.second->direction;
     }
     robot_file << std::endl;
-    robot_file << "      type: " << function << std::endl;
+    robot_file << "      type: " << node.second->function << std::endl;
   }
 
   robot_file << "  connections:" << std::endl;
@@ -928,17 +922,24 @@ void Genome::convertYamlBrain(std::string _directoryPath)
     robot_file << "    weight: " << weight << std::endl;
   }
 
-  // adds bias connections
+  // adds parameters
   robot_file << "  params:" << std::endl;
 
   for (const auto &node : this->dgs.getBrain_nodes())
   {
-    auto id = node.first;
-    auto bias = node.second.second.first;
-    if (bias != 0)
+    if (node.second->function == "Oscillator" )
     {
-      robot_file << "    node" << id << ":" << std::endl;
-      robot_file << "      bias: " << bias << std::endl;
+      robot_file << "    node" << node.first << ":" << std::endl;
+      robot_file << "      amplitude: " << node.second->amplitude << std::endl;
+      robot_file << "      period: " << node.second->period << std::endl;
+      robot_file << "      phase_offset: " << node.second->phase_offset << std::endl;
+    }else
+    {
+      if(node.second->layer != "input")
+      {
+        robot_file << "    node" << node.first << ":" << std::endl;
+        robot_file << "      bias: " << node.second->bias << std::endl;
+      }
     }
   }
   robot_file.close();

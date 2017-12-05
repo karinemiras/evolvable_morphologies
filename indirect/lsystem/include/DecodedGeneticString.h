@@ -63,19 +63,24 @@ public:
     // brain structure
     struct Vertex2
     {
-        std::string type;
         int id;
         // identifies component (joint or sensor) to which the node is relative
         int id_comp;
         double bias;
+        double amplitude;
+        double period;
+        double phase_offset;
         double weight;
-        //std::map< int, std::pair<Vertex2 *, double> > from_nodes;
+        std::string layer;
+        std::string function;
+        std::string direction;
         std::vector<Vertex2 *> from_nodes;
         std::vector<Vertex2 *> to_nodes;
 
         Vertex2()
         {
-            type=""; id_comp=id=-1; weight=bias=0;
+            layer=function=direction=""; id_comp=id=-1;
+            weight=bias=amplitude=period=phase_offset=0;
             from_nodes = std::vector<Vertex2 *>();
             to_nodes = std::vector<Vertex2 *>();
         }
@@ -102,9 +107,7 @@ public:
     std::map< std::pair<int, int>, double >
                         getBrain_edges();
 
-    std::map< int, std::pair<std::pair<std::string, std::string>,
-       std::pair<double, std::pair<int, std::string> > > >
-                        getBrain_nodes();
+    std::map< int, Vertex2 * > getBrain_nodes();
 
 
 private:
@@ -116,11 +119,8 @@ private:
             brain_edges = std::map< std::pair<int, int>, double >();
 
     // nodes of brain graph
-    std::map< int, std::pair<std::pair<std::string,
-        std::string>, std::pair<double, std::pair<int, std::string> > > >
-            // <id, < <type,function>, <bias, <id_comp,direction> > > >
-            brain_nodes = std::map< int, std::pair<std::pair<std::string,
-               std::string>, std::pair<double, std::pair<int, std::string> > > >();
+    std::map< int, Vertex2 * >
+            brain_nodes = std::map< int, Vertex2 *>();
 
     // pointers to current-edge of brain graph:
 

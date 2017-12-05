@@ -11,7 +11,7 @@
 void LSystem::build_brain_functions(){
     brainfunctions.push_back("Simple");
     brainfunctions.push_back("Sigmoid");
-    //brainfunctions.push_back("Oscillator");
+    brainfunctions.push_back("Oscillator");
 }
 
 /**
@@ -116,6 +116,7 @@ std::string LSystem::buildBrainCommand(std::string braincommand)
     std::random_device rd;
     std::default_random_engine generator(rd());
     std::uniform_real_distribution<double> weight_uni(-1, 1);
+    std::uniform_real_distribution<double> weight_uni2(1, 10);
     std::normal_distribution<double> weight_nor(0, 1);
     std::uniform_int_distribution<int> func(0, this->brainfunctions.size()-1);
 
@@ -123,10 +124,21 @@ std::string LSystem::buildBrainCommand(std::string braincommand)
     {
         // new connection weight
         braincommand += "_"+std::to_string(weight_uni(generator));
-        // bias weight
-        braincommand += "|"+std::to_string(weight_uni(generator));
         // transfer/activation function
-        braincommand += "|" + this->brainfunctions[func(generator)];
+        auto function = this->brainfunctions[func(generator)];
+        braincommand += "|" + function;
+
+        if(function == "Oscillator")
+        {
+          // amplitude
+          braincommand += "|" + std::to_string(weight_uni2(generator));
+          // period
+          braincommand += "|" + std::to_string(weight_uni2(generator));
+          // phase_offset
+          braincommand += "|" + std::to_string(weight_uni2(generator));
+        }else
+          // bias weight
+          braincommand += "|"+std::to_string(weight_uni(generator));
     }
 
     if(braincommand.substr(0,1) == "S")
@@ -144,10 +156,21 @@ std::string LSystem::buildBrainCommand(std::string braincommand)
     {
         // new connection weight
         braincommand += "_" + std::to_string(weight_uni(generator));
-        // bias weight
-        braincommand += "|" + std::to_string(weight_uni(generator));
         // transfer/activation function
-        braincommand += "|" + this->brainfunctions[func(generator)];
+        auto function = this->brainfunctions[func(generator)];
+        braincommand += "|" + function;
+
+        if(function == "Oscillator")
+        {
+          // amplitude
+          braincommand += "|" + std::to_string(weight_uni2(generator));
+          // period
+          braincommand += "|" + std::to_string(weight_uni2(generator));
+          // phase_offset
+          braincommand += "|" + std::to_string(weight_uni2(generator));
+        }else
+          // bias weight
+          braincommand += "|" + std::to_string(weight_uni(generator));
     }
 
     if(braincommand == "brainperturb")
