@@ -652,7 +652,7 @@ void DecodedGeneticString::decodeBrainNode(std::string direction,
     {
         v->layer = "input";
         v->bias = 0;
-        v->function = "Simple";
+        v->function = "Input";
         // direction is to identify the sensor, ex.: sensor of the left
         v->direction = direction;
         // if there's no output node yet

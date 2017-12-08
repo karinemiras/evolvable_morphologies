@@ -939,6 +939,7 @@ void Genome::convertYamlBrain(std::string _directoryPath)
       {
         robot_file << "    node" << node.first << ":" << std::endl;
         robot_file << "      bias: " << node.second->bias << std::endl;
+        robot_file << "      gain: 1"<< std::endl;
       }
     }
   }
