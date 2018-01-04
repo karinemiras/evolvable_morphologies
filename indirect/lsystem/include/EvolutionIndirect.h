@@ -24,17 +24,12 @@ class EvolutionIndirect: public Evolution{
 public:
 
 
-    EvolutionIndirect(std::string experiment_name,
-                      int new_experiment,
-                      std::string type_experiment) :
-            Evolution(experiment_name,
-                      new_experiment,
-                      type_experiment){ }
+    EvolutionIndirect(std::string experiment_name, int new_experiment) : Evolution(experiment_name, new_experiment){ }
 
 
     void initPopulation(LSystem LS);
-    void crossover(LSystem LS, std::vector<Genome >  &offspring);
-    void mutation(LSystem LS, std::vector<Genome> * offspring);
+    void crossover(LSystem LS, std::vector<Genome  *> * offspring);
+    void mutation(LSystem LS, std::vector<Genome *> * offspring);
 
 
 

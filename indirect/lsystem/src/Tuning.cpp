@@ -59,12 +59,11 @@ void Tuning::optimize(int argc, char* argv[]){
         genome.push_back(dist_mut(generator)/(float)10); // 4 - mutation_move_prob
 
         // sets up evolution according to the genome (configuration of parameters)
-        EvolutionIndirect * e = new EvolutionIndirect
-                ("g0-config"+std::to_string(i), 1,"novelty");
+        EvolutionIndirect * e = new EvolutionIndirect("g0-config"+std::to_string(i), 1);
         this->setupEvolution(e, genome);
 
         // tests fitness of the genome running evolution given the parameters
-        double fitness = e->runExperiment(argc, argv);
+        int fitness = e->noveltySearch(argc, argv,1);
         delete e;
 
         genome.push_back((double)fitness); // 5 - fitness
@@ -139,12 +138,11 @@ void Tuning::optimize(int argc, char* argv[]){
             }
 
 
-            EvolutionIndirect * e = new EvolutionIndirect("g"+std::to_string
-                    (g)+"-config"+std::to_string(i), 1, "novelty");
+            EvolutionIndirect * e = new EvolutionIndirect("g"+std::to_string(g)+"-config"+std::to_string(i), 1);
             this->setupEvolution(e, genome);
 
             // tests fitness of the genome running evolution given the parameters
-            double fitness = e->runExperiment(argc, argv);
+            int fitness = e->noveltySearch(argc, argv,1);
             delete e;
 
 
